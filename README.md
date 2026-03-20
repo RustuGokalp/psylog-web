@@ -58,5 +58,3 @@ src/
 Backend base path: `/api`
 Auth: JWT → `Set-Cookie: token; HttpOnly`
 Tüm fetch çağrıları `credentials: 'include'` kullanır.
-
-Detaylı endpoint listesi için: [`.claude/api-contract.md`](.claude/api-contract.md)
