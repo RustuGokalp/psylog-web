@@ -66,7 +66,7 @@ export function ActionAlert({
         </DialogHeader>
         <DialogFooter className="justify-center">
           <Button variant={buttonVariant} onClick={onClose}>
-            OK
+            Kapat
           </Button>
         </DialogFooter>
       </DialogContent>

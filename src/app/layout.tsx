@@ -17,7 +17,7 @@ const lora = Lora({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://psylog.com.tr"
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://psylog.com.tr",
   ),
   title: {
     default: "Psylog | Klinik Psikolog",
