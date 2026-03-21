@@ -1,4 +1,4 @@
-export const SITE_NAME = "Psylog";
+export const SITE_NAME = "Tuğçe Tekin";
 export const SITE_TAGLINE = "Klinik Psikolog";
 
 export const NAV_LINKS = [

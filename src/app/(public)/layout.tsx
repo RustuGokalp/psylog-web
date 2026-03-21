@@ -1,10 +1,16 @@
-// TODO: Add public navigation header and footer here.
-// This layout wraps all public-facing pages: Home, About, Posts, Post Detail, Contact.
+import NavBar from "@/components/nav-bar";
+import Footer from "@/components/footer";
 
 export default function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <div className="flex min-h-screen flex-col">
+      <NavBar />
+      <main className="flex-1">{children}</main>
+      <Footer />
+    </div>
+  );
 }

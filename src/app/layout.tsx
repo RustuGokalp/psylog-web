@@ -17,14 +17,14 @@ const lora = Lora({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://psylog.com.tr",
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://tugcetekin.com",
   ),
   title: {
-    default: "Psylog | Klinik Psikolog",
-    template: "%s | Psylog",
+    default: "Tuğçe Tekin | Klinik Psikolog",
+    template: "%s | Tuğçe Tekin",
   },
   description:
-    "Klinik psikolog portföyü ve makale platformu. Psikoloji, terapi ve zihinsel sağlık üzerine profesyonel içerikler.",
+    "Klinik Psikolog Tuğçe Tekin'in resmi web sitesi. Psikoloji, terapi ve zihinsel sağlık üzerine profesyonel makaleler ve danışmanlık bilgisi.",
   robots: {
     index: true,
     follow: true,
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "tr_TR",
-    siteName: "Psylog",
+    siteName: "Tuğçe Tekin",
   },
 };
 
