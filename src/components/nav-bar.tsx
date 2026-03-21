@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { NAV_LINKS, SITE_NAME, SITE_TAGLINE } from "@/lib/constants";
+import { NAV_LINKS, SITE_NAME } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -16,11 +17,15 @@ export default function NavBar() {
     <header className="border-b bg-background">
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         {/* Logo */}
-        <Link href="/" className="flex flex-col leading-tight">
-          <span className="text-lg font-semibold tracking-tight">
-            {SITE_NAME}
-          </span>
-          <span className="text-xs text-muted-foreground">{SITE_TAGLINE}</span>
+        <Link href="/" className="flex items-center gap-3">
+          <Image
+            src="/tugce-tekin-temporary-logo.png"
+            alt={`${SITE_NAME} logo`}
+            width={100}
+            height={45}
+            className="object-contain"
+            priority
+          />
         </Link>
 
         {/* Desktop links */}
