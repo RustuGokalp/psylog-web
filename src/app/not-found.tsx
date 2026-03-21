@@ -4,12 +4,14 @@ import NavBar from "@/components/nav-bar";
 import Footer from "@/components/footer";
 import { createMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = createMetadata({
-  title: "Sayfa Bulunamadı",
-  description:
-    "Aradığınız sayfa mevcut değil. Ana sayfaya dönerek devam edebilirsiniz.",
-  path: "/404",
-});
+export const metadata: Metadata = {
+  ...createMetadata({
+    title: "Sayfa Bulunamadı",
+    description:
+      "Aradığınız sayfa mevcut değil. Ana sayfaya dönerek devam edebilirsiniz.",
+  }),
+  robots: { index: false, follow: false },
+};
 
 export default function NotFound() {
   return (
