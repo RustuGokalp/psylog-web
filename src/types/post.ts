@@ -11,7 +11,7 @@ export interface CommentAdminResponse {
   postTitle: string;
   postSlug: string;
   author: string;
-  email: string;
+  email: string | null;
   content: string;
   status: "PENDING" | "APPROVED" | "REJECTED";
   createdAt: string;

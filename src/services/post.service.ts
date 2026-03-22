@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api";
+import { serverFetch } from "@/lib/server-fetch";
 import { ApiSuccess } from "@/types/common";
 import {
   Comment,
@@ -10,20 +11,32 @@ import {
   UpdatePostRequest,
 } from "@/types/post";
 
-// ── Public ────────────────────────────────────────────────────────────────────
+// ── Public (server-side, ISR) ──────────────────────────────────────────────
 
 export async function getPosts(params?: {
   keyword?: string;
   tag?: string;
 }): Promise<Post[]> {
-  const response = await apiClient.get<Post[]>("/api/posts", { params });
-  return response.data;
+  const searchParams = new URLSearchParams();
+  if (params?.keyword) searchParams.set("keyword", params.keyword);
+  if (params?.tag) searchParams.set("tag", params.tag);
+
+  const query = searchParams.toString();
+  const path = query ? `/api/posts?${query}` : "/api/posts";
+
+  const data = await serverFetch<Post[]>(path, {
+    next: { revalidate: 60 },
+  });
+  return data ?? [];
 }
 
-export async function getPost(slug: string): Promise<PostDetail> {
-  const response = await apiClient.get<PostDetail>(`/api/posts/${slug}`);
-  return response.data;
+export async function getPost(slug: string): Promise<PostDetail | null> {
+  return serverFetch<PostDetail>(`/api/posts/${encodeURIComponent(slug)}`, {
+    next: { revalidate: 60 },
+  });
 }
+
+// ── Public mutations (client-side, Axios) ─────────────────────────────────
 
 export async function submitComment(
   postId: number,
@@ -36,7 +49,7 @@ export async function submitComment(
   return response.data;
 }
 
-// ── Admin ─────────────────────────────────────────────────────────────────────
+// ── Admin (client-side, Axios) ────────────────────────────────────────────────
 
 export async function getAdminPosts(): Promise<Post[]> {
   const response = await apiClient.get<Post[]>("/api/admin/posts");

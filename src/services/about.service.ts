@@ -1,11 +1,17 @@
 import { apiClient } from "@/lib/api";
+import { serverFetch } from "@/lib/server-fetch";
 import { About, CreateAboutRequest, UpdateAboutRequest } from "@/types/about";
 import { ApiSuccess } from "@/types/common";
 
-export async function getAbout(): Promise<About> {
-  const response = await apiClient.get<About>("/api/about");
-  return response.data;
+// ── Public (server-side, ISR) ──────────────────────────────────────────────
+
+export async function getAbout(): Promise<About | null> {
+  return serverFetch<About>("/api/about", {
+    next: { revalidate: 3600 },
+  });
 }
+
+// ── Admin (client-side, Axios) ─────────────────────────────────────────────
 
 export async function createAbout(body: CreateAboutRequest): Promise<About> {
   const response = await apiClient.post<About>("/api/admin/about", body);

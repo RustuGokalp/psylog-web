@@ -1,30 +1,31 @@
 import type { Metadata } from "next";
-import { Inter, Lora } from "next/font/google";
+import { Plus_Jakarta_Sans, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { siteConfig } from "@/lib/metadata";
 
-const inter = Inter({
-  variable: "--font-inter",
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-sans",
   subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const lora = Lora({
-  variable: "--font-lora",
+const dmSerifDisplay = DM_Serif_Display({
+  variable: "--font-display",
   subsets: ["latin", "latin-ext"],
+  weight: "400",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://tugcetekin.com",
-  ),
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: "Tuğçe Tekin | Klinik Psikolog",
     template: "%s | Tuğçe Tekin",
   },
   description:
-    "Klinik Psikolog Tuğçe Tekin'in resmi web sitesi. Psikoloji, terapi ve zihinsel sağlık üzerine profesyonel makaleler ve danışmanlık bilgisi.",
+    "Klinik Psikolog Tuğçe Tekin'in resmi web sitesi. Psikoloji, terapi ve zihinsel sağlık üzerine profesyonel yazılar ve danışmanlık bilgisi.",
   robots: {
     index: true,
     follow: true,
@@ -43,7 +44,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr">
-      <body className={`${inter.variable} ${lora.variable} antialiased`}>
+      <body
+        className={`${plusJakartaSans.variable} ${dmSerifDisplay.variable} antialiased`}
+      >
         {children}
         <Toaster />
       </body>

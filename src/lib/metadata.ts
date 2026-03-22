@@ -5,10 +5,11 @@ export const siteConfig = {
   tagline: "Klinik Psikolog",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://tugcetekin.com",
   description:
-    "Klinik Psikolog Tuğçe Tekin'in resmi web sitesi. Psikoloji, terapi ve zihinsel sağlık üzerine profesyonel makaleler ve danışmanlık bilgisi.",
+    "Klinik Psikolog Tuğçe Tekin'in resmi web sitesi. Psikoloji, terapi ve zihinsel sağlık üzerine profesyonel yazılar ve danışmanlık bilgisi.",
   author: "Tuğçe Tekin",
   locale: "tr_TR",
 } as const;
+
 
 interface CreateMetadataOptions {
   title: string;
@@ -37,6 +38,11 @@ export function createMetadata({
       locale: siteConfig.locale,
       siteName: siteConfig.name,
       ...openGraph,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: resolvedDescription,
     },
   };
 }

@@ -1,22 +1,18 @@
 import { apiClient } from "@/lib/api";
-import { Specialization } from "@/types/specialization";
+import { serverFetch } from "@/lib/server-fetch";
+import { Specialization, SpecializationRequest } from "@/types/specialization";
+import { ApiSuccess } from "@/types/common";
 
-export interface SpecializationRequest {
-  title: string;
-  description: string;
-  image?: string | null;
-  displayOrder?: number | null;
-}
-
-export interface DeleteSpecializationResponse {
-  success: boolean;
-  message: string;
-}
+// ── Public (server-side, ISR) ──────────────────────────────────────────────
 
 export async function getSpecializations(): Promise<Specialization[]> {
-  const response = await apiClient.get<Specialization[]>("/api/specializations");
-  return response.data;
+  const data = await serverFetch<Specialization[]>("/api/specializations", {
+    next: { revalidate: 3600 },
+  });
+  return data ?? [];
 }
+
+// ── Admin (client-side, Axios) ─────────────────────────────────────────────
 
 export async function getAdminSpecializations(): Promise<Specialization[]> {
   const response = await apiClient.get<Specialization[]>("/api/admin/specializations");
@@ -40,8 +36,8 @@ export async function updateSpecialization(
 
 export async function deleteSpecialization(
   id: number,
-): Promise<DeleteSpecializationResponse> {
-  const response = await apiClient.delete<DeleteSpecializationResponse>(
+): Promise<ApiSuccess> {
+  const response = await apiClient.delete<ApiSuccess>(
     `/api/admin/specializations/${id}`,
   );
   return response.data;
