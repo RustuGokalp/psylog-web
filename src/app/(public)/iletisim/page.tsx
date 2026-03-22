@@ -17,26 +17,41 @@ export const metadata: Metadata = createMetadata({
 export default function ContactPage() {
   return (
     <main>
-      <section className="relative overflow-hidden bg-linear-to-br from-orange-400 via-orange-300 to-amber-300">
-        <Daisy className="pointer-events-none absolute top-6 left-8 h-16 w-16 text-white/20" aria-hidden="true" />
-        <Daisy className="pointer-events-none absolute bottom-4 right-10 h-10 w-10 rotate-45 text-white/15" aria-hidden="true" />
-        <Rose  className="pointer-events-none absolute top-4 right-1/4 h-12 w-12 text-white/15" aria-hidden="true" />
-        <Butterfly className="pointer-events-none absolute bottom-3 left-1/4 h-12 w-12 text-white/15" aria-hidden="true" />
-        <Balloon   className="pointer-events-none absolute top-8 right-8 h-10 w-10 text-white/20" aria-hidden="true" />
+      <section className="relative overflow-hidden bg-linear-to-br from-orange-400 via-amber-200 to-yellow-200">
+        <Daisy
+          className="pointer-events-none absolute top-6 left-8 h-16 w-16 text-white/30"
+          aria-hidden="true"
+        />
+        <Daisy
+          className="pointer-events-none absolute bottom-4 right-10 h-10 w-10 rotate-45 text-orange-400/35"
+          aria-hidden="true"
+        />
+        <Rose
+          className="pointer-events-none absolute top-4 right-1/4 h-12 w-12 text-orange-500/25"
+          aria-hidden="true"
+        />
+        <Butterfly
+          className="pointer-events-none absolute bottom-3 left-1/4 h-12 w-12 text-orange-400/30"
+          aria-hidden="true"
+        />
+        <Balloon
+          className="pointer-events-none absolute top-8 right-8 h-10 w-10 text-orange-400/30"
+          aria-hidden="true"
+        />
         <div className="relative">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 text-center">
-          <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-orange-800/70">
-            Randevu ve Bilgi
-          </p>
-          <h1 className="text-4xl font-bold text-white sm:text-5xl">
-            İletişime Geçin
-          </h1>
-          <p className="mx-auto mt-4 max-w-xl text-base text-orange-900/80">
-            Çocuğunuz veya ergeniniz için profesyonel destek almak istiyorsanız,
-            aşağıdaki formu doldurabilir veya doğrudan iletişim bilgilerimi
-            kullanabilirsiniz.
-          </p>
-        </div>
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 text-center">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-orange-800/70">
+              Randevu ve Bilgi
+            </p>
+            <h1 className="text-4xl font-bold text-white sm:text-5xl">
+              İletişime Geçin
+            </h1>
+            <p className="mx-auto mt-4 max-w-xl text-base text-orange-900/80">
+              Çocuğunuz veya ergeniniz için profesyonel destek almak
+              istiyorsanız, aşağıdaki formu doldurabilir veya doğrudan iletişim
+              bilgilerimi kullanabilirsiniz.
+            </p>
+          </div>
         </div>
       </section>
 
