@@ -3,6 +3,10 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Post } from "@/types/post";
+import Blob from "@/components/icons/blob";
+import Daisy from "@/components/icons/daisy";
+import Butterfly from "@/components/icons/butterfly";
+import Star from "@/components/icons/star";
 
 interface PostsPreviewSectionProps {
   posts: Post[];
@@ -29,7 +33,12 @@ export default function PostsPreviewSection({
   if (posts.length === 0) return null;
 
   return (
-    <section className="bg-blue-50">
+    <section className="relative overflow-hidden bg-blue-50">
+      <Blob      className="pointer-events-none absolute -top-12 -left-12 h-48 w-48 text-blue-200/20" aria-hidden="true" />
+      <Daisy     className="pointer-events-none absolute top-6 right-10 h-14 w-14 text-blue-300/25" aria-hidden="true" />
+      <Butterfly className="pointer-events-none absolute bottom-6 right-1/4 h-12 w-12 text-blue-400/20" aria-hidden="true" />
+      <Star      className="pointer-events-none absolute bottom-8 left-8 h-8 w-8 text-blue-300/20" aria-hidden="true" />
+      <div className="relative">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
         <div className="mb-10 text-center">
           <h2 className="text-3xl text-blue-800 sm:text-4xl">Son Yazılarım</h2>
@@ -116,6 +125,7 @@ export default function PostsPreviewSection({
             Tüm Yazılarım →
           </Link>
         </div>
+      </div>
       </div>
     </section>
   );

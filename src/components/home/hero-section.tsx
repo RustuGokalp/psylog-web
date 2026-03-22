@@ -4,6 +4,8 @@ import { UserRound } from "lucide-react";
 import Blob from "@/components/icons/blob";
 import Daisy from "@/components/icons/daisy";
 import Rose from "@/components/icons/rose";
+import Butterfly from "@/components/icons/butterfly";
+import Star from "@/components/icons/star";
 import { SITE_NAME } from "@/lib/constants";
 import { About } from "@/types/about";
 
@@ -22,6 +24,8 @@ export default function HeroSection({ about }: HeroSectionProps) {
       <Daisy className="pointer-events-none absolute top-6 left-1/4 h-16 w-16 text-white/25" />
       <Rose className="pointer-events-none absolute bottom-9 right-1/6 h-12 w-12 text-pink-200/30" />
       <Rose className="pointer-events-none absolute top-4 right-6 h-10 w-10 text-white/20" />
+      <Butterfly className="pointer-events-none absolute bottom-8 left-8 h-16 w-16 text-pink-100/25" aria-hidden="true" />
+      <Star      className="pointer-events-none absolute top-12 left-1/3 h-8 w-8 text-white/20" aria-hidden="true" />
 
       <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
         <div className="flex flex-col items-center gap-12 md:flex-row md:items-center md:gap-16">
