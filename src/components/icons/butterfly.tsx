@@ -4,7 +4,7 @@ interface ButterflyProps {
 
 export default function Butterfly({ className }: ButterflyProps) {
   return (
-    <svg viewBox="0 0 100 100" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className={className}>
       {/* Upper left wing */}
       <path d="M50 50 C42 38 24 22 16 32 C10 40 20 54 50 50Z" fillOpacity="0.65" />
       {/* Lower left wing */}
