@@ -54,8 +54,9 @@ export default function NavBar() {
           className="md:hidden"
           onClick={() => setOpen((prev) => !prev)}
           aria-label={open ? "Menüyü kapat" : "Menüyü aç"}
+          aria-expanded={open}
         >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {open ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
         </Button>
       </nav>
 

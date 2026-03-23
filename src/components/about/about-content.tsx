@@ -7,6 +7,8 @@ import Daisy from "@/components/icons/daisy";
 import Rose from "@/components/icons/rose";
 import Butterfly from "@/components/icons/butterfly";
 import Star from "@/components/icons/star";
+import HtmlContent from "@/components/html-content";
+import FlowerStem from "@/components/icons/flower-stem";
 
 interface AboutContentProps {
   about: About | null;
@@ -52,17 +54,23 @@ export default function AboutContent({ about }: AboutContentProps) {
       <section className="bg-violet-50">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-12">
-            <div className="relative h-72 w-full overflow-hidden rounded-2xl md:h-auto">
+            <div>
               {about?.profileImage ? (
                 <Image
                   src={about.profileImage}
                   alt={`${SITE_NAME} profil fotoğrafı`}
-                  fill
-                  className="object-cover"
+                  width={600}
+                  height={700}
+                  priority
+                  className="h-auto w-full rounded-2xl object-cover"
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-violet-100">
+                <div
+                  role="img"
+                  aria-label="Profil fotoğrafı mevcut değil"
+                  className="flex h-72 w-full items-center justify-center rounded-2xl bg-violet-100"
+                >
                   <UserRound
                     className="h-24 w-24 text-violet-300"
                     aria-hidden="true"
@@ -79,9 +87,10 @@ export default function AboutContent({ about }: AboutContentProps) {
                 Çocuk ve Ergen Klinik Psikoloğu
               </p>
               {about?.message ? (
-                <p className="text-base leading-relaxed text-gray-600">
-                  {about.message}
-                </p>
+                <HtmlContent
+                  html={about.message}
+                  className="text-base leading-relaxed text-gray-600"
+                />
               ) : (
                 <p className="text-base leading-relaxed text-gray-500">
                   Bu sayfa yakında güncellenecektir. Benimle iletişime geçmek
@@ -94,6 +103,60 @@ export default function AboutContent({ about }: AboutContentProps) {
                   </Link>{" "}
                   ziyaret edebilirsiniz.
                 </p>
+              )}
+
+              {about && about.education.length > 0 && (
+                <div className="mt-6">
+                  <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-purple-400">
+                    Eğitim
+                  </p>
+                  <ul className="space-y-2">
+                    {about.education.map((item, index) => (
+                      <li
+                        key={index}
+                        className="flex items-center gap-2 text-sm text-gray-600"
+                      >
+                        <span
+                          className="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400"
+                          aria-hidden="true"
+                        />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {about && about.workingAreas.length > 0 && (
+                <div className="relative mt-6">
+                  <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-purple-400">
+                    Çalışma Alanları
+                  </p>
+                  <ul className="space-y-2">
+                    {about.workingAreas.map((item, index) => (
+                      <li
+                        key={index}
+                        className="flex items-center gap-2 text-sm text-gray-600"
+                      >
+                        <span
+                          className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400"
+                          aria-hidden="true"
+                        />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <FlowerStem
+                    className="pointer-events-none absolute bottom-4 right-15 h-20 w-20"
+                    aria-hidden="true"
+                  />
+                  <Link
+                    href="/calisma-alanlari"
+                    className="mt-5 inline-flex items-center gap-1 rounded-full border border-violet-300 px-5 py-2 text-sm font-semibold text-violet-700 transition-colors hover:bg-violet-100"
+                  >
+                    Çalışma Alanlarım →
+                  </Link>
+                </div>
               )}
             </div>
           </div>
