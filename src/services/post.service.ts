@@ -1,7 +1,8 @@
-import { apiClient } from "@/lib/api";
+import { apiClient, ApiException } from "@/lib/api";
 import { serverFetch } from "@/lib/server-fetch";
 import { ApiSuccess } from "@/types/common";
 import {
+  AdminPost,
   Comment,
   CommentAdminResponse,
   CreateCommentRequest,
@@ -36,6 +37,20 @@ export async function getPost(slug: string): Promise<PostDetail | null> {
   });
 }
 
+export async function fetchPostDetailBySlug(
+  slug: string,
+): Promise<PostDetail | null> {
+  try {
+    const response = await apiClient.get<PostDetail>(
+      `/api/posts/${encodeURIComponent(slug)}`,
+    );
+    return response.data;
+  } catch (err) {
+    if (err instanceof ApiException && err.error.status === 404) return null;
+    throw err;
+  }
+}
+
 // ── Public mutations (client-side, Axios) ─────────────────────────────────
 
 export async function submitComment(
@@ -51,8 +66,13 @@ export async function submitComment(
 
 // ── Admin (client-side, Axios) ────────────────────────────────────────────────
 
-export async function getAdminPosts(): Promise<Post[]> {
-  const response = await apiClient.get<Post[]>("/api/admin/posts");
+export async function getAdminPosts(): Promise<AdminPost[]> {
+  const response = await apiClient.get<AdminPost[]>("/api/admin/posts");
+  return response.data;
+}
+
+export async function fetchAdminPostById(id: number): Promise<PostDetail> {
+  const response = await apiClient.get<PostDetail>(`/api/admin/posts/${id}`);
   return response.data;
 }
 

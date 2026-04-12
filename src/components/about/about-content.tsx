@@ -17,32 +17,32 @@ interface AboutContentProps {
 export default function AboutContent({ about }: AboutContentProps) {
   return (
     <>
-      <section className="relative overflow-hidden bg-linear-to-br from-violet-500 via-purple-400 to-pink-400">
+      <section className="relative overflow-hidden bg-violet-100">
         <Daisy
-          className="pointer-events-none absolute top-6 left-8 h-16 w-16 text-white/20"
+          className="pointer-events-none absolute top-6 left-8 h-16 w-16 text-violet-300/40"
           aria-hidden="true"
         />
         <Star
-          className="pointer-events-none absolute top-4 right-1/4 h-10 w-10 text-white/20"
+          className="pointer-events-none absolute top-4 right-1/4 h-10 w-10 text-violet-400/30"
           aria-hidden="true"
         />
         <Rose
-          className="pointer-events-none absolute bottom-4 right-10 h-12 w-12 text-pink-200/25"
+          className="pointer-events-none absolute bottom-4 right-10 h-12 w-12 text-rose-300/35"
           aria-hidden="true"
         />
         <Butterfly
-          className="pointer-events-none absolute bottom-3 left-1/4 h-12 w-12 text-white/20"
+          className="pointer-events-none absolute bottom-3 left-1/4 h-12 w-12 text-violet-300/35"
           aria-hidden="true"
         />
         <div className="relative">
           <div className="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-20 lg:px-8">
-            <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-purple-100/80">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-violet-500">
               Hakkımda
             </p>
-            <h1 className="text-4xl font-bold text-white sm:text-5xl">
+            <h1 className="text-4xl font-bold text-violet-900 sm:text-5xl">
               {SITE_NAME}
             </h1>
-            <p className="mx-auto mt-4 max-w-xl text-base text-purple-100/90">
+            <p className="mx-auto mt-4 max-w-xl text-base text-violet-700/80">
               Çocuğunuzun iç dünyasını anlamak ve birlikte büyümek için
               buradayım. Güvenli, sıcak ve destekleyici bir ortamda
               yanınızdayım.

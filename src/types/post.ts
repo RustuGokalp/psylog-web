@@ -17,7 +17,8 @@ export interface CommentAdminResponse {
   createdAt: string;
 }
 
-export interface Post {
+// Base fields shared by public and admin list shapes
+interface PostBase {
   id: number;
   title: string;
   slug: string;
@@ -25,12 +26,25 @@ export interface Post {
   coverImage: string | null;
   tags: string[];
   published: boolean;
+  publishAt?: string | null;
   createdAt: string;
+  readingTime: number | null;
 }
 
-export interface PostDetail extends Post {
+// Public list endpoint: GET /api/posts
+export interface Post extends PostBase {}
+
+// Admin list endpoint: GET /api/admin/posts
+export interface AdminPost extends PostBase {
+  updatedAt: string;
+  comments: CommentAdminResponse[];
+}
+
+// Public + admin detail: GET /api/posts/{slug}, GET /api/admin/posts/{id}
+export interface PostDetail extends PostBase {
   content: string;
   updatedAt: string;
+  publishAt?: string | null;
   comments: Comment[];
 }
 
@@ -42,6 +56,7 @@ export interface CreatePostRequest {
   tags: string[];
   published: boolean;
   publishAt?: string | null;
+  readingTime?: number | null;
 }
 
 export interface UpdatePostRequest {
@@ -52,6 +67,7 @@ export interface UpdatePostRequest {
   tags: string[];
   published: boolean;
   publishAt?: string | null;
+  readingTime?: number | null;
 }
 
 export interface CreateCommentRequest {

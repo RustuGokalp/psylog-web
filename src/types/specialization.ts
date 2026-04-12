@@ -1,7 +1,9 @@
 export interface Specialization {
   id: number;
   title: string;
-  description: string;
+  slug: string;
+  summary: string;
+  content: string;
   image: string | null;
   displayOrder: number | null;
   createdAt: string;
@@ -10,7 +12,8 @@ export interface Specialization {
 
 export interface SpecializationRequest {
   title: string;
-  description: string;
+  summary: string;
+  content: string;
   image?: string | null;
   displayOrder?: number | null;
 }

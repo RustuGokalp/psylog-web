@@ -3,16 +3,27 @@ import { serverFetch } from "@/lib/server-fetch";
 import { Specialization, SpecializationRequest } from "@/types/specialization";
 import { ApiSuccess } from "@/types/common";
 
-// ── Public (server-side, ISR) ──────────────────────────────────────────────
-
 export async function getSpecializations(): Promise<Specialization[]> {
   const data = await serverFetch<Specialization[]>("/api/specializations", {
-    next: { revalidate: 3600 },
+    next: { revalidate: 300 },
   });
   return data ?? [];
 }
 
-// ── Admin (client-side, Axios) ─────────────────────────────────────────────
+export async function getSpecializationBySlug(
+  slug: string,
+): Promise<Specialization | null> {
+  return serverFetch<Specialization>(`/api/specializations/${slug}`, {
+    next: { revalidate: 300 },
+  });
+}
+
+export async function fetchSpecializationBySlug(
+  slug: string,
+): Promise<Specialization> {
+  const response = await apiClient.get<Specialization>(`/api/specializations/${slug}`);
+  return response.data;
+}
 
 export async function getAdminSpecializations(): Promise<Specialization[]> {
   const response = await apiClient.get<Specialization[]>("/api/admin/specializations");

@@ -17,21 +17,21 @@ export const metadata: Metadata = createMetadata({
 export default function ContactPage() {
   return (
     <main>
-      <section className="relative overflow-hidden bg-linear-to-br from-orange-400 via-amber-200 to-yellow-200">
+      <section className="relative overflow-hidden bg-orange-100">
         <Daisy
-          className="pointer-events-none absolute top-6 left-8 h-16 w-16 text-white/30"
+          className="pointer-events-none absolute top-6 left-8 h-16 w-16 text-orange-300/40"
           aria-hidden="true"
         />
         <Daisy
-          className="pointer-events-none absolute bottom-4 right-10 h-10 w-10 rotate-45 text-orange-400/35"
+          className="pointer-events-none absolute bottom-4 right-10 h-10 w-10 rotate-45 text-orange-300/35"
           aria-hidden="true"
         />
         <Rose
-          className="pointer-events-none absolute top-4 right-1/4 h-12 w-12 text-orange-500/25"
+          className="pointer-events-none absolute top-4 right-1/4 h-12 w-12 text-rose-300/35"
           aria-hidden="true"
         />
         <Butterfly
-          className="pointer-events-none absolute bottom-3 left-1/4 h-12 w-12 text-orange-400/30"
+          className="pointer-events-none absolute bottom-3 left-1/4 h-12 w-12 text-orange-300/30"
           aria-hidden="true"
         />
         <Balloon
@@ -40,13 +40,13 @@ export default function ContactPage() {
         />
         <div className="relative">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 text-center">
-            <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-orange-800/70">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-orange-500">
               Randevu ve Bilgi
             </p>
-            <h1 className="text-4xl font-bold text-white sm:text-5xl">
+            <h1 className="text-4xl font-bold text-orange-900 sm:text-5xl">
               İletişime Geçin
             </h1>
-            <p className="mx-auto mt-4 max-w-xl text-base text-orange-900/80">
+            <p className="mx-auto mt-4 max-w-xl text-base text-orange-800/70">
               Çocuğunuz veya ergeniniz için profesyonel destek almak
               istiyorsanız, aşağıdaki formu doldurabilir veya doğrudan iletişim
               bilgilerimi kullanabilirsiniz.
