@@ -7,7 +7,7 @@ import { ApiSuccess } from "@/types/common";
 
 export async function getAbout(): Promise<About | null> {
   return serverFetch<About>("/api/about", {
-    cache: "no-store",
+    next: { revalidate: 300 },
   });
 }
 
