@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { createMetadata } from "@/lib/metadata";
 import {
   getSpecializations,
@@ -36,5 +37,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SpecializationDetailPage({ params }: Props) {
   const { slug } = await params;
-  return <SpecializationDetail slug={slug} />;
+  const item = await getSpecializationBySlug(slug);
+
+  if (!item) notFound();
+
+  return <SpecializationDetail item={item} />;
 }

@@ -8,7 +8,6 @@ import { Separator } from "@/components/ui/separator";
 import { logout } from "@/services/auth.service";
 import { toast } from "sonner";
 import {
-  LayoutDashboard,
   FileText,
   LogOut,
   Menu,
@@ -30,26 +29,14 @@ const navItems: NavItem[] = [
   },
 ];
 
-export default function AdminSidebar() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const [mobileOpen, setMobileOpen] = useState(false);
+interface SidebarContentProps {
+  isActive: (href: string) => boolean;
+  onLogout: () => void;
+  onNavClick?: () => void;
+}
 
-  async function handleLogout() {
-    try {
-      await logout();
-      router.push("/admin/login");
-      router.refresh();
-    } catch {
-      toast.error("Çıkış yapılırken bir hata oluştu.");
-    }
-  }
-
-  function isActive(href: string) {
-    return pathname === href || pathname.startsWith(href + "/");
-  }
-
-  const SidebarContent = () => (
+function SidebarContent({ isActive, onLogout, onNavClick }: SidebarContentProps) {
+  return (
     <div className="flex h-full flex-col">
       {/* Brand */}
       <div className="flex items-center gap-2 px-6 py-5">
@@ -72,7 +59,7 @@ export default function AdminSidebar() {
           <Link
             key={item.href}
             href={item.href}
-            onClick={() => setMobileOpen(false)}
+            onClick={onNavClick}
             className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
               isActive(item.href)
                 ? "bg-violet-100 text-violet-700"
@@ -93,7 +80,7 @@ export default function AdminSidebar() {
           variant="ghost"
           size="sm"
           className="w-full justify-start gap-3 text-gray-600 hover:text-red-600 hover:bg-red-50"
-          onClick={handleLogout}
+          onClick={onLogout}
         >
           <LogOut className="h-4 w-4" />
           Çıkış Yap
@@ -101,12 +88,32 @@ export default function AdminSidebar() {
       </div>
     </div>
   );
+}
+
+export default function AdminSidebar() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  async function handleLogout() {
+    try {
+      await logout();
+      router.push("/admin/login");
+      router.refresh();
+    } catch {
+      toast.error("Çıkış yapılırken bir hata oluştu.");
+    }
+  }
+
+  function isActive(href: string) {
+    return pathname === href || pathname.startsWith(href + "/");
+  }
 
   return (
     <>
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:w-60 lg:flex-shrink-0 lg:flex-col border-r border-gray-200 bg-white">
-        <SidebarContent />
+        <SidebarContent isActive={isActive} onLogout={handleLogout} />
       </aside>
 
       {/* Mobile top bar */}
@@ -151,7 +158,11 @@ export default function AdminSidebar() {
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            <SidebarContent />
+            <SidebarContent
+              isActive={isActive}
+              onLogout={handleLogout}
+              onNavClick={() => setMobileOpen(false)}
+            />
           </div>
         </div>
       )}

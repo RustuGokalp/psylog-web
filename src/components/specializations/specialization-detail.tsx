@@ -1,98 +1,17 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import DOMPurify from "dompurify";
 import { Specialization } from "@/types/specialization";
-import { fetchSpecializationBySlug } from "@/services/specialization.service";
-import { ApiException } from "@/lib/api";
+import HtmlContent from "@/components/html-content";
 import Daisy from "@/components/icons/daisy";
 import Butterfly from "@/components/icons/butterfly";
 import Star from "@/components/icons/star";
 import Rose from "@/components/icons/rose";
 
 interface Props {
-  slug: string;
+  item: Specialization;
 }
 
-function SpecializationDetailSkeleton() {
-  return (
-    <main>
-      <section className="relative overflow-hidden bg-purple-100">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-          <div className="mb-6 h-4 w-32 animate-pulse rounded bg-purple-200" />
-          <div className="mb-2 h-3 w-24 animate-pulse rounded bg-purple-200" />
-          <div className="h-10 w-2/3 animate-pulse rounded bg-purple-200 sm:h-12" />
-        </div>
-      </section>
-      <section className="bg-violet-50">
-        <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-          <div className="mb-10 h-72 w-full animate-pulse rounded-2xl bg-violet-200 sm:h-96" />
-          <div className="space-y-3">
-            <div className="h-4 w-full animate-pulse rounded bg-violet-200" />
-            <div className="h-4 w-5/6 animate-pulse rounded bg-violet-200" />
-            <div className="h-4 w-4/6 animate-pulse rounded bg-violet-200" />
-            <div className="mt-6 h-4 w-full animate-pulse rounded bg-violet-200" />
-            <div className="h-4 w-5/6 animate-pulse rounded bg-violet-200" />
-          </div>
-        </div>
-      </section>
-    </main>
-  );
-}
-
-export default function SpecializationDetail({ slug }: Props) {
-  const [data, setData] = useState<Specialization | null>(null);
-  const [status, setStatus] = useState<
-    "loading" | "success" | "not-found" | "error"
-  >("loading");
-
-  useEffect(() => {
-    let cancelled = false;
-
-    fetchSpecializationBySlug(slug)
-      .then((json) => {
-        if (!cancelled) {
-          setData(json);
-          setStatus("success");
-        }
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        if (err instanceof ApiException && err.error.status === 404) {
-          setStatus("not-found");
-        } else {
-          setStatus("error");
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [slug]);
-
-  if (status === "loading") return <SpecializationDetailSkeleton />;
-  if (status === "not-found") return notFound();
-  if (status === "error" || !data) {
-    return (
-      <main className="flex min-h-96 items-center justify-center bg-violet-50">
-        <div className="text-center">
-          <p className="text-base text-slate-600">
-            Sayfa yüklenirken bir hata oluştu.
-          </p>
-          <Link
-            href="/calisma-alanlari"
-            className="mt-4 inline-block text-sm font-semibold text-violet-600 hover:underline"
-          >
-            ← Çalışma Alanlarına Dön
-          </Link>
-        </div>
-      </main>
-    );
-  }
-
+export default function SpecializationDetail({ item }: Props) {
   return (
     <main>
       {/* Hero */}
@@ -125,7 +44,7 @@ export default function SpecializationDetail({ slug }: Props) {
               Uzmanlık Alanı
             </p>
             <h1 className="text-4xl font-bold text-purple-900 sm:text-5xl">
-              {data.title}
+              {item.title}
             </h1>
           </div>
         </div>
@@ -134,11 +53,11 @@ export default function SpecializationDetail({ slug }: Props) {
       {/* Content */}
       <section className="bg-violet-50">
         <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-          {data.image && (
+          {item.image && (
             <div className="relative mb-10 h-72 w-full overflow-hidden rounded-2xl shadow-sm sm:h-96">
               <Image
-                src={data.image}
-                alt={data.title}
+                src={item.image}
+                alt={item.title}
                 fill
                 priority
                 className="object-cover"
@@ -147,16 +66,14 @@ export default function SpecializationDetail({ slug }: Props) {
             </div>
           )}
 
-          <div
+          <HtmlContent
+            html={item.content}
             className="prose prose-slate prose-lg max-w-none
               prose-headings:text-violet-900
               prose-a:text-violet-600 prose-a:no-underline hover:prose-a:underline
               prose-strong:text-slate-800
               prose-li:text-slate-600
               prose-p:text-slate-600 prose-p:leading-relaxed"
-            dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(data.content),
-            }}
           />
 
           <div className="mt-14 flex flex-col items-center gap-4 border-t border-violet-200 pt-10 text-center">
