@@ -6,14 +6,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ActionAlert } from "@/components/action-alert";
+import { ApiException } from "@/lib/api";
 import { logout } from "@/services/auth.service";
-import {
-  FileText,
-  LogOut,
-  Menu,
-  X,
-  Brain,
-} from "lucide-react";
+import { FileText, LogOut, Menu, X, Brain } from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -35,7 +30,11 @@ interface SidebarContentProps {
   onNavClick?: () => void;
 }
 
-function SidebarContent({ isActive, onLogout, onNavClick }: SidebarContentProps) {
+function SidebarContent({
+  isActive,
+  onLogout,
+  onNavClick,
+}: SidebarContentProps) {
   return (
     <div className="flex h-full flex-col">
       {/* Brand */}
@@ -94,15 +93,21 @@ export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [logoutError, setLogoutError] = useState(false);
+  const [logoutConfirm, setLogoutConfirm] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
 
-  async function handleLogout() {
+  async function executeLogout() {
+    setLogoutConfirm(false);
     try {
       await logout();
       router.push("/admin/login");
       router.refresh();
-    } catch {
-      setLogoutError(true);
+    } catch (err) {
+      const msg =
+        err instanceof ApiException
+          ? err.message
+          : "Çıkış yapılırken bir hata oluştu.";
+      setLogoutError(msg);
     }
   }
 
@@ -114,7 +119,10 @@ export default function AdminSidebar() {
     <>
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:w-60 lg:flex-shrink-0 lg:flex-col border-r border-gray-200 bg-white">
-        <SidebarContent isActive={isActive} onLogout={handleLogout} />
+        <SidebarContent
+          isActive={isActive}
+          onLogout={() => setLogoutConfirm(true)}
+        />
       </aside>
 
       {/* Mobile top bar */}
@@ -138,11 +146,21 @@ export default function AdminSidebar() {
       </div>
 
       <ActionAlert
-        open={logoutError}
+        open={logoutConfirm}
+        type="warning"
+        title="Çıkış Yap"
+        description="Oturumunuzu kapatmak istediğinizden emin misiniz?"
+        onClose={() => setLogoutConfirm(false)}
+        onConfirm={executeLogout}
+        confirmLabel="Çıkış Yap"
+      />
+
+      <ActionAlert
+        open={!!logoutError}
         type="error"
         title="Çıkış Yapılamadı"
-        description="Çıkış yapılırken bir hata oluştu. Lütfen tekrar deneyin."
-        onClose={() => setLogoutError(false)}
+        description={logoutError ?? undefined}
+        onClose={() => setLogoutError(null)}
       />
 
       {/* Mobile drawer overlay */}
@@ -169,7 +187,7 @@ export default function AdminSidebar() {
             </div>
             <SidebarContent
               isActive={isActive}
-              onLogout={handleLogout}
+              onLogout={() => setLogoutConfirm(true)}
               onNavClick={() => setMobileOpen(false)}
             />
           </div>

@@ -20,7 +20,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ActionAlert, AlertType } from "@/components/action-alert";
+import { ApiException } from "@/lib/api";
 import {
   deletePost,
   fetchAdminPostById,
@@ -43,26 +50,27 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
   const router = useRouter();
   const [posts, setPosts] = useState<AdminPost[]>(initialPosts);
   const [togglingId, setTogglingId] = useState<number | null>(null);
+  const [draftTarget, setDraftTarget] = useState<AdminPost | null>(null);
+  const [toggleTarget, setToggleTarget] = useState<AdminPost | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminPost | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [feedbackAlert, setFeedbackAlert] = useState<FeedbackAlert>(null);
 
-  async function handleTogglePublish(post: AdminPost) {
+  function handleTogglePublish(post: AdminPost) {
     if (!post.published) {
-      setFeedbackAlert({
-        type: "info",
-        title: "Taslak Düzenleme",
-        description: "Taslağı yayınlamak için düzenleyip kaydedin.",
-      });
-      router.push(`/admin/posts/${post.id}/edit`);
+      setDraftTarget(post);
       return;
     }
+    setToggleTarget(post);
+  }
 
-    setTogglingId(post.id);
+  async function handleConfirmToggle() {
+    if (!toggleTarget) return;
+    setToggleTarget(null);
+    setTogglingId(toggleTarget.id);
     try {
-      const detail = await fetchAdminPostById(post.id);
-
-      const updated = await updatePost(post.id, {
+      const detail = await fetchAdminPostById(toggleTarget.id);
+      const updated = await updatePost(toggleTarget.id, {
         title: detail.title,
         summary: detail.summary,
         content: detail.content,
@@ -73,7 +81,7 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
       });
       setPosts((prev) =>
         prev.map((p) =>
-          p.id === post.id ? { ...p, published: updated.published } : p,
+          p.id === toggleTarget.id ? { ...p, published: updated.published } : p,
         ),
       );
       setFeedbackAlert({
@@ -81,12 +89,12 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
         title: "Taslağa Alındı",
         description: "Yazı başarıyla taslağa alındı.",
       });
-    } catch {
-      setFeedbackAlert({
-        type: "error",
-        title: "Hata",
-        description: "Durum güncellenirken bir hata oluştu.",
-      });
+    } catch (err) {
+      const msg =
+        err instanceof ApiException
+          ? err.message
+          : "Durum güncellenirken bir hata oluştu.";
+      setFeedbackAlert({ type: "error", title: "Hata", description: msg });
     } finally {
       setTogglingId(null);
     }
@@ -105,13 +113,13 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
         title: "Yazı Silindi",
         description: `"${title}" başarıyla silindi.`,
       });
-    } catch {
+    } catch (err) {
+      const msg =
+        err instanceof ApiException
+          ? err.message
+          : "Yazı silinirken bir hata oluştu.";
       setDeleteTarget(null);
-      setFeedbackAlert({
-        type: "error",
-        title: "Hata",
-        description: "Yazı silinirken bir hata oluştu.",
-      });
+      setFeedbackAlert({ type: "error", title: "Hata", description: msg });
     } finally {
       setIsDeleting(false);
     }
@@ -211,25 +219,40 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
 
                 {/* Etiketler */}
                 <TableCell className="hidden md:table-cell">
-                  <div className="flex flex-wrap gap-1">
-                    {post.tags.slice(0, 3).map((tag) => (
-                      <Badge
-                        key={tag}
-                        variant="outline"
-                        className="text-xs font-normal"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                    {post.tags.length > 3 && (
-                      <Badge
-                        variant="outline"
-                        className="text-xs font-normal text-slate-400"
-                      >
-                        +{post.tags.length - 3}
-                      </Badge>
-                    )}
-                  </div>
+                  {post.tags.length === 0 ? (
+                    <span className="text-xs text-slate-300">—</span>
+                  ) : (
+                    <div className="flex flex-wrap gap-1">
+                      {post.tags.slice(0, 3).map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="outline"
+                          className="text-xs font-normal"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                      {post.tags.length > 3 && (
+                        <TooltipProvider delay={200}>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Badge
+                                variant="outline"
+                                className="text-xs font-normal text-slate-400 cursor-default"
+                              >
+                                +{post.tags.length - 3}
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="flex flex-col gap-0.5">
+                              {post.tags.slice(3).map((tag) => (
+                                <span key={tag}>{tag}</span>
+                              ))}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+                    </div>
+                  )}
                 </TableCell>
 
                 {/* Oluşturulma */}
@@ -315,6 +338,40 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
           </TableBody>
         </Table>
       </div>
+
+      {/* Draft edit prompt */}
+      <ActionAlert
+        open={!!draftTarget}
+        type="info"
+        title="Taslak Yazı"
+        description={
+          draftTarget
+            ? `"${draftTarget.title}" taslak durumunda. Yayınlamak için önce düzenleme sayfasına gidin.`
+            : undefined
+        }
+        onClose={() => setDraftTarget(null)}
+        onConfirm={() => {
+          if (!draftTarget) return;
+          router.push(`/admin/posts/${draftTarget.id}/edit`);
+          setDraftTarget(null);
+        }}
+        confirmLabel="Düzenle"
+      />
+
+      {/* Unpublish confirmation */}
+      <ActionAlert
+        open={!!toggleTarget}
+        type="warning"
+        title="Yazıyı Taslağa Al"
+        description={
+          toggleTarget
+            ? `"${toggleTarget.title}" adlı yazı yayından kaldırılacak ve taslağa alınacak. Onaylıyor musunuz?`
+            : undefined
+        }
+        onClose={() => setToggleTarget(null)}
+        onConfirm={handleConfirmToggle}
+        confirmLabel="Taslağa Al"
+      />
 
       {/* Delete confirmation */}
       <ActionAlert

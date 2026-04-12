@@ -1,6 +1,12 @@
 "use client";
 
-import { CheckCircle2, XCircle, TriangleAlert, Info, Loader2 } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  TriangleAlert,
+  Info,
+  Loader2,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -75,9 +81,7 @@ export function ActionAlert({
         <DialogHeader className="items-center text-center">
           <Icon className={`size-18 ${iconClass} mb-1`} />
           <DialogTitle>{title}</DialogTitle>
-          {description && (
-            <DialogDescription>{description}</DialogDescription>
-          )}
+          {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         <DialogFooter className="justify-center">
           <Button variant="outline" onClick={onClose} disabled={loading}>
