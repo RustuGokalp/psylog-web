@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -13,16 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ActionAlert, AlertType } from "@/components/action-alert";
 import {
   deletePost,
   fetchAdminPostById,
@@ -42,16 +33,27 @@ interface PostTableProps {
   posts: AdminPost[];
 }
 
+type FeedbackAlert = {
+  type: AlertType;
+  title: string;
+  description?: string;
+} | null;
+
 export default function PostTable({ posts: initialPosts }: PostTableProps) {
   const router = useRouter();
   const [posts, setPosts] = useState<AdminPost[]>(initialPosts);
   const [togglingId, setTogglingId] = useState<number | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminPost | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [feedbackAlert, setFeedbackAlert] = useState<FeedbackAlert>(null);
 
   async function handleTogglePublish(post: AdminPost) {
     if (!post.published) {
-      toast.info("Taslağı yayınlamak için düzenleyip kaydedin.");
+      setFeedbackAlert({
+        type: "info",
+        title: "Taslak Düzenleme",
+        description: "Taslağı yayınlamak için düzenleyip kaydedin.",
+      });
       router.push(`/admin/posts/${post.id}/edit`);
       return;
     }
@@ -74,9 +76,17 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
           p.id === post.id ? { ...p, published: updated.published } : p,
         ),
       );
-      toast.success("Yazı taslağa alındı.");
+      setFeedbackAlert({
+        type: "success",
+        title: "Taslağa Alındı",
+        description: "Yazı başarıyla taslağa alındı.",
+      });
     } catch {
-      toast.error("Durum güncellenirken bir hata oluştu.");
+      setFeedbackAlert({
+        type: "error",
+        title: "Hata",
+        description: "Durum güncellenirken bir hata oluştu.",
+      });
     } finally {
       setTogglingId(null);
     }
@@ -85,13 +95,23 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
   async function handleDelete() {
     if (!deleteTarget) return;
     setIsDeleting(true);
+    const title = deleteTarget.title;
     try {
       await deletePost(deleteTarget.id);
       setPosts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
-      toast.success("Yazı silindi.");
       setDeleteTarget(null);
+      setFeedbackAlert({
+        type: "success",
+        title: "Yazı Silindi",
+        description: `"${title}" başarıyla silindi.`,
+      });
     } catch {
-      toast.error("Yazı silinirken bir hata oluştu.");
+      setDeleteTarget(null);
+      setFeedbackAlert({
+        type: "error",
+        title: "Hata",
+        description: "Yazı silinirken bir hata oluştu.",
+      });
     } finally {
       setIsDeleting(false);
     }
@@ -296,37 +316,30 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
         </Table>
       </div>
 
-      {/* Delete confirmation dialog */}
-      <Dialog
+      {/* Delete confirmation */}
+      <ActionAlert
         open={!!deleteTarget}
-        onOpenChange={(open) => !open && setDeleteTarget(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Yazıyı sil</DialogTitle>
-            <DialogDescription>
-              <strong>&quot;{deleteTarget?.title}&quot;</strong> adlı yazıyı
-              silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteTarget(null)}
-              disabled={isDeleting}
-            >
-              İptal
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? "Siliniyor..." : "Sil"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        type="warning"
+        title="Yazıyı Sil"
+        description={
+          deleteTarget
+            ? `"${deleteTarget.title}" adlı yazıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`
+            : undefined
+        }
+        onClose={() => !isDeleting && setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        confirmLabel="Sil"
+        loading={isDeleting}
+      />
+
+      {/* Feedback */}
+      <ActionAlert
+        open={!!feedbackAlert}
+        type={feedbackAlert?.type ?? "info"}
+        title={feedbackAlert?.title ?? ""}
+        description={feedbackAlert?.description}
+        onClose={() => setFeedbackAlert(null)}
+      />
     </>
   );
 }

@@ -8,7 +8,7 @@ import { ApiException } from "@/lib/api";
 import PostForm, { resolvePublishMode } from "@/components/admin/post-form";
 import { PostFormValues } from "@/schemas/post.schema";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "sonner";
+import { ActionAlert } from "@/components/action-alert";
 
 export default function EditPostPage() {
   const params = useParams();
@@ -18,6 +18,7 @@ export default function EditPostPage() {
   const [post, setPost] = useState<PostDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (isNaN(postId)) {
@@ -37,8 +38,7 @@ export default function EditPostPage() {
         }
         const msg =
           err instanceof ApiException ? err.message : "Yazı yüklenemedi.";
-        toast.error(msg);
-        router.push("/admin/posts");
+        setErrorMsg(msg);
       } finally {
         setLoading(false);
       }
@@ -59,6 +59,13 @@ export default function EditPostPage() {
             <Skeleton key={i} className="h-10 w-full rounded-md" />
           ))}
         </div>
+        <ActionAlert
+          open={!!errorMsg}
+          type="error"
+          title="Yükleme Hatası"
+          description={errorMsg ?? undefined}
+          onClose={() => router.push("/admin/posts")}
+        />
       </div>
     );
   }

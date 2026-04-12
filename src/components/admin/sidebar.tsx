@@ -5,8 +5,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { ActionAlert } from "@/components/action-alert";
 import { logout } from "@/services/auth.service";
-import { toast } from "sonner";
 import {
   FileText,
   LogOut,
@@ -94,6 +94,7 @@ export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [logoutError, setLogoutError] = useState(false);
 
   async function handleLogout() {
     try {
@@ -101,7 +102,7 @@ export default function AdminSidebar() {
       router.push("/admin/login");
       router.refresh();
     } catch {
-      toast.error("Çıkış yapılırken bir hata oluştu.");
+      setLogoutError(true);
     }
   }
 
@@ -135,6 +136,14 @@ export default function AdminSidebar() {
           <Menu className="h-5 w-5" />
         </Button>
       </div>
+
+      <ActionAlert
+        open={logoutError}
+        type="error"
+        title="Çıkış Yapılamadı"
+        description="Çıkış yapılırken bir hata oluştu. Lütfen tekrar deneyin."
+        onClose={() => setLogoutError(false)}
+      />
 
       {/* Mobile drawer overlay */}
       {mobileOpen && (
