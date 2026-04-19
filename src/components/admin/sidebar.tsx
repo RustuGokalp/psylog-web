@@ -118,7 +118,7 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:w-60 lg:flex-shrink-0 lg:flex-col border-r border-gray-200 bg-white">
+      <aside className="hidden lg:flex lg:w-60 lg:shrink-0 lg:flex-col border-r border-gray-200 bg-white">
         <SidebarContent
           isActive={isActive}
           onLogout={() => setLogoutConfirm(true)}

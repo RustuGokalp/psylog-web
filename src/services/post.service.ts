@@ -7,28 +7,51 @@ import {
   CommentAdminResponse,
   CreateCommentRequest,
   CreatePostRequest,
+  PaginatedResponse,
+  PatchPostRequest,
   Post,
   PostDetail,
   UpdatePostRequest,
 } from "@/types/post";
 
-// ── Public (server-side, ISR) ──────────────────────────────────────────────
-
 export async function getPosts(params?: {
   keyword?: string;
   tag?: string;
-}): Promise<Post[]> {
+  page?: number;
+  size?: number;
+}): Promise<PaginatedResponse<Post>> {
   const searchParams = new URLSearchParams();
   if (params?.keyword) searchParams.set("keyword", params.keyword);
   if (params?.tag) searchParams.set("tag", params.tag);
+  if (params?.page !== undefined) searchParams.set("page", String(params.page));
+  if (params?.size !== undefined) searchParams.set("size", String(params.size));
 
   const query = searchParams.toString();
   const path = query ? `/api/posts?${query}` : "/api/posts";
 
-  const data = await serverFetch<Post[]>(path, {
+  const data = await serverFetch<PaginatedResponse<Post>>(path, {
     next: { revalidate: 60 },
   });
-  return data ?? [];
+  return data ?? { content: [], page: 0, size: 10, totalElements: 0, totalPages: 0, last: true };
+}
+
+export async function fetchPublicPosts(params?: {
+  keyword?: string;
+  tag?: string;
+  page?: number;
+  size?: number;
+}): Promise<PaginatedResponse<Post>> {
+  const searchParams = new URLSearchParams();
+  if (params?.keyword) searchParams.set("keyword", params.keyword);
+  if (params?.tag) searchParams.set("tag", params.tag);
+  if (params?.page !== undefined) searchParams.set("page", String(params.page));
+  if (params?.size !== undefined) searchParams.set("size", String(params.size));
+
+  const query = searchParams.toString();
+  const response = await apiClient.get<PaginatedResponse<Post>>(
+    query ? `/api/posts?${query}` : "/api/posts"
+  );
+  return response.data;
 }
 
 export async function getPost(slug: string): Promise<PostDetail | null> {
@@ -51,8 +74,6 @@ export async function fetchPostDetailBySlug(
   }
 }
 
-// ── Public mutations (client-side, Axios) ─────────────────────────────────
-
 export async function submitComment(
   postId: number,
   body: CreateCommentRequest
@@ -63,8 +84,6 @@ export async function submitComment(
   );
   return response.data;
 }
-
-// ── Admin (client-side, Axios) ────────────────────────────────────────────────
 
 export async function getAdminPosts(): Promise<AdminPost[]> {
   const response = await apiClient.get<AdminPost[]>("/api/admin/posts");
@@ -92,14 +111,23 @@ export async function updatePost(
   return response.data;
 }
 
+export async function patchPost(
+  id: number,
+  body: PatchPostRequest
+): Promise<PostDetail> {
+  const response = await apiClient.patch<PostDetail>(
+    `/api/admin/posts/${id}`,
+    body
+  );
+  return response.data;
+}
+
 export async function deletePost(id: number): Promise<ApiSuccess> {
   const response = await apiClient.delete<ApiSuccess>(
     `/api/admin/posts/${id}`
   );
   return response.data;
 }
-
-// ── Admin Comments ────────────────────────────────────────────────────────────
 
 export async function getPendingComments(): Promise<CommentAdminResponse[]> {
   const response = await apiClient.get<CommentAdminResponse[]>(

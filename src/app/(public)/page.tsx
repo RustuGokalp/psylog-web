@@ -20,7 +20,7 @@ export default async function HomePage() {
   const [about, specializations, posts] = await Promise.all([
     getAbout(),
     getSpecializations(),
-    getPosts(),
+    getPosts({ page: 0, size: 3 }),
   ]);
 
   return (
@@ -30,7 +30,7 @@ export default async function HomePage() {
       <SpecializationsPreviewSection
         specializations={specializations.slice(0, 3)}
       />
-      <PostsPreviewSection posts={posts.slice(0, 3)} />
+      <PostsPreviewSection posts={posts.content} />
       <ContactCtaSection />
     </>
   );
