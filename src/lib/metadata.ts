@@ -26,12 +26,16 @@ export function createMetadata({
 }: CreateMetadataOptions): Metadata {
   const url = `${siteConfig.url}${path}`;
   const resolvedDescription = description ?? siteConfig.description;
+  const brandedTitle = `${title} | ${siteConfig.name}`;
 
   return {
     title,
     description: resolvedDescription,
+    alternates: {
+      canonical: url,
+    },
     openGraph: {
-      title,
+      title: brandedTitle,
       description: resolvedDescription,
       url,
       type: "website",
@@ -41,7 +45,7 @@ export function createMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: brandedTitle,
       description: resolvedDescription,
     },
   };

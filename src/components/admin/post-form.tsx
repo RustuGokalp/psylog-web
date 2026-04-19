@@ -5,9 +5,10 @@ import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 import { format, parse, isValid } from "date-fns";
 import { tr } from "date-fns/locale";
-import { createPost, updatePost } from "@/services/post.service";
+import { createPost, patchPost } from "@/services/post.service";
 import { ApiException } from "@/lib/api";
 import { postSchema, PostFormValues, PublishMode } from "@/schemas/post.schema";
+import { PatchPostRequest } from "@/types/post";
 import { ActionAlert } from "@/components/action-alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -72,7 +73,50 @@ function buildPayload(values: PostFormValues) {
   };
 }
 
-// Derive publishMode + publishAt from raw post data (for edit initialValues)
+function buildPatchPayload(
+  values: PostFormValues,
+  initial: PostFormValues,
+): PatchPostRequest {
+  const patch: PatchPostRequest = {};
+
+  if (values.title !== initial.title) patch.title = values.title;
+  if (values.summary !== initial.summary) patch.summary = values.summary;
+  if (values.content !== initial.content) patch.content = values.content;
+
+  const newCoverImage = values.coverImage || null;
+  const initialCoverImage = initial.coverImage || null;
+  if (newCoverImage !== initialCoverImage) patch.coverImage = newCoverImage;
+
+  if (JSON.stringify(values.tags) !== JSON.stringify(initial.tags))
+    patch.tags = values.tags;
+
+  const newPublished = values.publishMode === "publish";
+  const initialPublished = initial.publishMode === "publish";
+  if (newPublished !== initialPublished) patch.published = newPublished;
+
+  const newPublishAt =
+    values.publishMode === "schedule" && values.publishAt
+      ? values.publishAt
+      : null;
+  const initialPublishAt =
+    initial.publishMode === "schedule" && initial.publishAt
+      ? initial.publishAt
+      : null;
+  if (newPublishAt !== initialPublishAt) patch.publishAt = newPublishAt;
+
+  const newReadingTime =
+    values.readingTime !== "" && values.readingTime !== undefined
+      ? Number(values.readingTime)
+      : null;
+  const initialReadingTime =
+    initial.readingTime !== "" && initial.readingTime !== undefined
+      ? Number(initial.readingTime)
+      : null;
+  if (newReadingTime !== initialReadingTime) patch.readingTime = newReadingTime;
+
+  return patch;
+}
+
 export function resolvePublishMode(
   published: boolean,
   publishAt: string | null | undefined,
@@ -115,7 +159,6 @@ export default function PostForm({
     validationSchema: postSchema,
     enableReinitialize: true,
     onSubmit: async (values, { setSubmitting }) => {
-      // Only handles create mode — edit mode goes through handleEditSaveClick
       setServerError(null);
       try {
         await createPost(buildPayload(values));
@@ -133,8 +176,6 @@ export default function PostForm({
     },
   });
 
-  // ── Edit mode: validate → confirm dialog → execute ────────────────────────
-
   async function handleEditSaveClick() {
     const errors = await formik.validateForm();
     if (Object.keys(errors).length > 0) {
@@ -151,7 +192,8 @@ export default function PostForm({
     setConfirmOpen(false);
     formik.setSubmitting(true);
     try {
-      await updatePost(postId!, buildPayload(formik.values));
+      const patch = buildPatchPayload(formik.values, formik.initialValues);
+      await patchPost(postId!, patch);
       setResultAlert({
         type: "success",
         title: "Değişiklikler Kaydedildi",
@@ -162,13 +204,15 @@ export default function PostForm({
         err instanceof ApiException
           ? err.message
           : "Bir hata oluştu. Lütfen tekrar deneyin.";
-      setResultAlert({ type: "error", title: "Güncelleme Hatası", description: msg });
+      setResultAlert({
+        type: "error",
+        title: "Güncelleme Hatası",
+        description: msg,
+      });
     } finally {
       formik.setSubmitting(false);
     }
   }
-
-  // ── Tag handlers ──────────────────────────────────────────────────────────
 
   function handleAddTag() {
     const value = tagInput.trim();
@@ -195,8 +239,6 @@ export default function PostForm({
     }
   }
 
-  // ── Date/time helpers ─────────────────────────────────────────────────────
-
   const selectedDate = formik.values.publishAt
     ? parse(formik.values.publishAt, "yyyy-MM-dd'T'HH:mm:ss", new Date())
     : undefined;
@@ -204,9 +246,7 @@ export default function PostForm({
   const validSelectedDate =
     selectedDate && isValid(selectedDate) ? selectedDate : undefined;
 
-  const timeValue = validSelectedDate
-    ? format(validSelectedDate, "HH:mm")
-    : "";
+  const timeValue = validSelectedDate ? format(validSelectedDate, "HH:mm") : "";
 
   function handleCalendarSelect(day: Date | undefined) {
     if (!day) return;
@@ -225,8 +265,6 @@ export default function PostForm({
     formik.setFieldValue("publishAt", format(updated, "yyyy-MM-dd'T'HH:mm:ss"));
   }
 
-  // ── Render ────────────────────────────────────────────────────────────────
-
   return (
     <>
       <form
@@ -234,7 +272,6 @@ export default function PostForm({
         noValidate
         className="flex flex-col gap-6"
       >
-        {/* Title */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="title" className="text-slate-700 font-medium">
             Başlık <span className="text-red-500">*</span>
@@ -250,7 +287,9 @@ export default function PostForm({
             disabled={formik.isSubmitting}
             aria-describedby="title-error"
             className={
-              formik.touched.title && formik.errors.title ? "border-red-400" : ""
+              formik.touched.title && formik.errors.title
+                ? "border-red-400"
+                : ""
             }
           />
           {formik.touched.title && formik.errors.title && (
@@ -260,7 +299,6 @@ export default function PostForm({
           )}
         </div>
 
-        {/* Summary */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="summary" className="text-slate-700 font-medium">
             Özet <span className="text-red-500">*</span>
@@ -288,7 +326,6 @@ export default function PostForm({
           )}
         </div>
 
-        {/* Content */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="content" className="text-slate-700 font-medium">
             İçerik <span className="text-red-500">*</span>
@@ -316,7 +353,6 @@ export default function PostForm({
           )}
         </div>
 
-        {/* Cover image + reading time */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="coverImage" className="text-slate-700 font-medium">
@@ -349,10 +385,7 @@ export default function PostForm({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label
-              htmlFor="readingTime"
-              className="text-slate-700 font-medium"
-            >
+            <Label htmlFor="readingTime" className="text-slate-700 font-medium">
               Okuma Süresi (dk){" "}
               <span className="text-slate-400 font-normal text-xs">
                 (isteğe bağlı)
@@ -383,7 +416,6 @@ export default function PostForm({
           </div>
         </div>
 
-        {/* Tags */}
         <div className="flex flex-col gap-2">
           <Label className="text-slate-700 font-medium">
             Etiketler{" "}
@@ -440,7 +472,6 @@ export default function PostForm({
           </div>
         </div>
 
-        {/* Publish mode */}
         <div className="flex flex-col gap-3">
           <Label className="text-slate-700 font-medium">Yayın Durumu</Label>
 
@@ -468,14 +499,13 @@ export default function PostForm({
             ))}
           </div>
 
-          {/* Schedule picker */}
           {formik.values.publishMode === "schedule" && (
             <div className="flex flex-col gap-2 rounded-lg border border-violet-100 bg-violet-50 p-4">
               <p className="text-xs text-slate-500">
-                Yazı belirlediğiniz tarih ve saatte otomatik olarak yayınlanacak.
+                Yazı belirlediğiniz tarih ve saatte otomatik olarak
+                yayınlanacak.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
-                {/* Date picker */}
                 <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                   <PopoverTrigger
                     disabled={formik.isSubmitting}
@@ -512,7 +542,6 @@ export default function PostForm({
                   </PopoverContent>
                 </Popover>
 
-                {/* Time picker */}
                 <div className="flex items-center gap-2">
                   <Input
                     type="time"
@@ -553,7 +582,6 @@ export default function PostForm({
           )}
         </div>
 
-        {/* Dates (edit mode only) */}
         {isEdit && (createdAt || updatedAt) && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {createdAt && (
@@ -583,14 +611,12 @@ export default function PostForm({
           </div>
         )}
 
-        {/* Inline error (create mode only) */}
         {serverError && (
           <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
             {serverError}
           </p>
         )}
 
-        {/* Actions */}
         <div className="flex items-center gap-3 pt-2">
           {isEdit ? (
             <Button
@@ -636,7 +662,6 @@ export default function PostForm({
         </div>
       </form>
 
-      {/* Edit confirmation */}
       {isEdit && (
         <ActionAlert
           open={confirmOpen}
@@ -649,7 +674,6 @@ export default function PostForm({
         />
       )}
 
-      {/* Edit result */}
       {isEdit && (
         <ActionAlert
           open={!!resultAlert}

@@ -17,7 +17,6 @@ export interface CommentAdminResponse {
   createdAt: string;
 }
 
-// Base fields shared by public and admin list shapes
 interface PostBase {
   id: number;
   title: string;
@@ -31,16 +30,13 @@ interface PostBase {
   readingTime: number | null;
 }
 
-// Public list endpoint: GET /api/posts
-export interface Post extends PostBase {}
+export type Post = PostBase
 
-// Admin list endpoint: GET /api/admin/posts
 export interface AdminPost extends PostBase {
   updatedAt: string;
   comments: CommentAdminResponse[];
 }
 
-// Public + admin detail: GET /api/posts/{slug}, GET /api/admin/posts/{id}
 export interface PostDetail extends PostBase {
   content: string;
   updatedAt: string;
@@ -68,6 +64,26 @@ export interface UpdatePostRequest {
   published: boolean;
   publishAt?: string | null;
   readingTime?: number | null;
+}
+
+export interface PatchPostRequest {
+  title?: string;
+  summary?: string;
+  content?: string;
+  coverImage?: string | null;
+  tags?: string[];
+  published?: boolean;
+  publishAt?: string | null;
+  readingTime?: number | null;
+}
+
+export interface PaginatedResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
 }
 
 export interface CreateCommentRequest {
