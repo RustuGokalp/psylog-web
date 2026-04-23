@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { createMetadata, siteConfig } from "@/lib/metadata";
 import { getPosts } from "@/services/post.service";
 import { Post } from "@/types/post";
@@ -10,6 +9,7 @@ import Star from "@/components/icons/star";
 import Blob from "@/components/icons/blob";
 import Wildflower from "@/components/icons/wildflower";
 import FlowerStem from "@/components/icons/flower-stem";
+import PageCta from "@/components/page-cta";
 
 export const metadata: Metadata = createMetadata({
   title: "Yazılarım",
@@ -113,7 +113,10 @@ export default async function YazilarimPage() {
         </div>
       </section>
 
-      <CtaSection />
+      <PageCta
+        description="Sorularınız veya randevu talepleriniz için benimle iletişime geçebilirsiniz."
+        className="bg-violet-50"
+      />
     </>
   );
 }
@@ -126,28 +129,5 @@ function EmptyState() {
         Henüz yazı yayınlanmamış. Lütfen daha sonra tekrar ziyaret edin.
       </p>
     </div>
-  );
-}
-
-function CtaSection() {
-  return (
-    <section className="relative overflow-hidden bg-violet-50">
-      <Daisy
-        className="pointer-events-none absolute -bottom-4 -right-4 h-24 w-24 text-violet-200/40"
-        aria-hidden="true"
-      />
-      <div className="mx-auto max-w-6xl px-4 py-14 text-center sm:px-6 lg:px-8">
-        <p className="text-base text-slate-600">
-          Sorularınız veya randevu talepleriniz için benimle iletişime
-          geçebilirsiniz.
-        </p>
-        <Link
-          href="/iletisim"
-          className="mt-5 inline-flex items-center justify-center rounded-full bg-rose-500 px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-rose-600"
-        >
-          İletişime Geç →
-        </Link>
-      </div>
-    </section>
   );
 }

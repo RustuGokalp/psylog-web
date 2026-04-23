@@ -13,6 +13,7 @@ import Rose from "@/components/icons/rose";
 import Star from "@/components/icons/star";
 import Daisy from "@/components/icons/daisy";
 import Butterfly from "@/components/icons/butterfly";
+import PageCta from "@/components/page-cta";
 import Wildflower from "@/components/icons/wildflower";
 
 interface Props {
@@ -237,19 +238,10 @@ export default async function PostDetailPage({ params }: Props) {
         <CommentSection postId={post.id} initialComments={post.comments} />
       </div>
 
-      <section className="bg-[#fdf4f5]">
-        <div className="mx-auto max-w-3xl px-4 py-14 text-center sm:px-6 lg:px-8">
-          <p className="text-base italic text-slate-500">
-            Sorularınız için benimle iletişime geçebilirsiniz.
-          </p>
-          <Link
-            href="/iletisim"
-            className="mt-5 inline-flex items-center justify-center rounded-full bg-rose-600 px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-rose-700"
-          >
-            İletişime Geç →
-          </Link>
-        </div>
-      </section>
+      <PageCta
+        description="Sorularınız için benimle iletişime geçebilirsiniz."
+        className="bg-[#fdf4f5]"
+      />
     </>
   );
 }
