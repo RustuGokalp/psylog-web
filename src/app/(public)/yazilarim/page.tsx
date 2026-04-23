@@ -61,7 +61,7 @@ export default async function YazilarimPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(posts)) }}
       />
 
-      <section className="relative overflow-hidden bg-rose-50">
+      <section className="relative overflow-hidden bg-[#FAEEF5]">
         <Blob
           className="pointer-events-none absolute -top-8 -left-8 h-48 w-48 text-rose-200/30"
           aria-hidden="true"
@@ -85,9 +85,13 @@ export default async function YazilarimPage() {
 
         <div className="relative">
           <div className="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-20 lg:px-8">
-            <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-rose-500">
-              Blog
-            </p>
+            <div className="mb-4 flex items-center justify-center gap-3">
+              <span className="h-px w-7 bg-rose-400" aria-hidden="true" />
+              <span className="text-xs font-semibold uppercase tracking-widest text-rose-500">
+                Blog
+              </span>
+              <span className="h-px w-7 bg-rose-400" aria-hidden="true" />
+            </div>
             <h1 className="text-4xl font-bold text-rose-900 sm:text-5xl">
               Yazılarım
             </h1>
@@ -99,7 +103,7 @@ export default async function YazilarimPage() {
         </div>
       </section>
 
-      <section className="bg-slate-50">
+      <section className="bg-[#FDF8F6]">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           {posts.length === 0 ? (
             <EmptyState />

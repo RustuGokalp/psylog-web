@@ -49,7 +49,9 @@ export default function PostsPreviewSection({
       <div className="relative">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <div className="mb-10 text-center">
-            <h2 className="text-3xl text-slate-800 sm:text-4xl">Son Yazılarım</h2>
+            <h2 className="text-3xl text-slate-800 sm:text-4xl">
+              Son Yazılarım
+            </h2>
             <p className="mt-4 text-base text-slate-500">
               Çocuk ve ergen psikolojisi üzerine kaleme aldığım son yazılar.
             </p>
@@ -78,7 +80,7 @@ export default function PostsPreviewSection({
                           alt={post.title}
                           fill
                           className="object-cover"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                         />
                       ) : (
                         <div

@@ -54,7 +54,7 @@ export default function SpecializationDetail({ item }: Props) {
       <section className="bg-violet-50">
         <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           {item.image && (
-            <div className="relative mb-10 h-72 w-full overflow-hidden rounded-2xl shadow-sm sm:h-96">
+            <div className="relative mb-10 mx-auto h-72 w-full max-w-2xl overflow-hidden rounded-2xl shadow-sm sm:h-96">
               <Image
                 src={item.image}
                 alt={item.title}
