@@ -34,24 +34,29 @@ export default function PostCard({
   const placeholderColor =
     PLACEHOLDER_COLORS[index % PLACEHOLDER_COLORS.length];
   const summary =
-    post.summary.length > 160
-      ? post.summary.slice(0, 160) + "..."
+    post.summary.length > 300
+      ? post.summary.slice(0, 300) + "..."
+      : post.summary;
+
+  const mobileSummary =
+    post.summary.length > 120
+      ? post.summary.slice(0, 120) + "..."
       : post.summary;
 
   return (
     <Link
       href={`/yazilarim/${post.slug}`}
-      className="group block rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+      className="group block rounded-xl px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 sm:px-10"
     >
-      <article className="flex flex-row overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100 transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-0.5">
-        <div className="relative aspect-square w-1/3 shrink-0 overflow-hidden">
+      <article className="flex h-auto flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-100 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-lg sm:h-60 sm:flex-row">
+        <div className="relative h-52 w-full shrink-0 overflow-hidden sm:h-auto sm:w-1/3 sm:self-stretch">
           {post.coverImage ? (
             <Image
               src={post.coverImage}
               alt={post.title}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-              sizes="(max-width: 640px) 33vw, (max-width: 1024px) 33vw, 400px"
+              className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 400px"
             />
           ) : (
             <div
@@ -59,33 +64,16 @@ export default function PostCard({
               aria-hidden="true"
             />
           )}
-
-          {post.readingTime !== null && (
-            <span className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-xs font-medium text-slate-600 shadow-sm backdrop-blur-sm">
-              <svg
-                className="h-3 w-3 text-rose-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
-              {post.readingTime} dk
-            </span>
-          )}
         </div>
 
-        <div className="flex flex-1 flex-col gap-2 p-4 sm:p-5">
+        <div className="flex flex-1 flex-col gap-1.5 p-4">
           {post.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
-              {post.tags.slice(0, 3).map((tag) => (
+              {post.tags.map((tag) => (
                 <Badge
                   key={tag}
                   variant="secondary"
-                  className="rounded-full bg-violet-50 px-2.5 py-0.5 text-xs font-medium text-violet-600 hover:bg-violet-100"
+                  className="rounded-full bg-purple-50 px-2.5 py-0.5 text-xs font-medium text-purple-400 hover:bg-purple-100"
                 >
                   {tag}
                 </Badge>
@@ -98,11 +86,24 @@ export default function PostCard({
           </h2>
 
           <p className="flex-1 text-xs leading-relaxed text-slate-500 sm:text-sm">
-            {summary}
+            <span className="sm:hidden">{mobileSummary}</span>
+            <span className="hidden sm:inline">{summary}</span>
           </p>
 
           <div className="flex items-center justify-between pt-1">
-            {commentsCount !== undefined && commentsCount > 0 ? (
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <time dateTime={post.createdAt}>
+                {formatTurkishDate(post.createdAt)}
+              </time>
+              {post.readingTime !== null && (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <span>{post.readingTime} dk okuma</span>
+                </>
+              )}
+            </div>
+
+            {commentsCount !== undefined && commentsCount > 0 && (
               <span className="flex items-center gap-1 text-xs text-slate-400">
                 <svg
                   className="h-3.5 w-3.5"
@@ -120,13 +121,7 @@ export default function PostCard({
                 </svg>
                 {commentsCount}
               </span>
-            ) : (
-              <span />
             )}
-
-            <time dateTime={post.createdAt} className="text-xs text-slate-400">
-              {formatTurkishDate(post.createdAt)}
-            </time>
           </div>
         </div>
       </article>

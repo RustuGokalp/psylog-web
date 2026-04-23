@@ -8,7 +8,7 @@ import Rose from "@/components/icons/rose";
 import Butterfly from "@/components/icons/butterfly";
 import Star from "@/components/icons/star";
 import HtmlContent from "@/components/html-content";
-import FlowerStem from "@/components/icons/flower-stem";
+import Wildflower from "@/components/icons/wildflower";
 
 interface AboutContentProps {
   about: About | null;
@@ -111,9 +111,9 @@ export default function AboutContent({ about }: AboutContentProps) {
                     Eğitim
                   </p>
                   <ul className="space-y-2">
-                    {about.education.map((item, index) => (
+                    {about.education.map((item) => (
                       <li
-                        key={index}
+                        key={item}
                         className="flex items-center gap-2 text-sm text-gray-600"
                       >
                         <span
@@ -133,9 +133,9 @@ export default function AboutContent({ about }: AboutContentProps) {
                     Çalışma Alanları
                   </p>
                   <ul className="space-y-2">
-                    {about.workingAreas.map((item, index) => (
+                    {about.workingAreas.map((item) => (
                       <li
-                        key={index}
+                        key={item}
                         className="flex items-center gap-2 text-sm text-gray-600"
                       >
                         <span
@@ -146,8 +146,8 @@ export default function AboutContent({ about }: AboutContentProps) {
                       </li>
                     ))}
                   </ul>
-                  <FlowerStem
-                    className="pointer-events-none absolute bottom-4 right-15 h-20 w-20"
+                  <Wildflower
+                    className="pointer-events-none absolute bottom-4 right-16 h-20 w-20"
                     aria-hidden="true"
                   />
                   <Link
