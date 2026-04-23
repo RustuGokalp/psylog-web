@@ -6,6 +6,8 @@ import Daisy from "@/components/icons/daisy";
 import Butterfly from "@/components/icons/butterfly";
 import Star from "@/components/icons/star";
 import Rose from "@/components/icons/rose";
+import PageHero from "@/components/page-hero";
+import PageCta from "@/components/page-cta";
 
 interface Props {
   item: Specialization;
@@ -14,41 +16,41 @@ interface Props {
 export default function SpecializationDetail({ item }: Props) {
   return (
     <main>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-purple-100">
-        <Daisy
-          className="pointer-events-none absolute top-6 right-16 h-14 w-14 text-purple-300/40"
-          aria-hidden="true"
-        />
-        <Butterfly
-          className="pointer-events-none absolute bottom-4 left-12 h-12 w-12 text-violet-300/35"
-          aria-hidden="true"
-        />
-        <Star
-          className="pointer-events-none absolute top-1/2 right-8 h-8 w-8 -translate-y-1/2 text-purple-400/30"
-          aria-hidden="true"
-        />
-        <Rose
-          className="pointer-events-none absolute bottom-4 right-1/3 h-10 w-10 text-rose-300/30"
-          aria-hidden="true"
-        />
-        <div className="relative">
-          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-            <Link
-              href="/calisma-alanlari"
-              className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-purple-600 hover:text-purple-800 hover:underline"
-            >
-              ← Çalışma Alanlarım
-            </Link>
-            <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-purple-500">
-              Uzmanlık Alanı
-            </p>
-            <h1 className="text-4xl font-bold text-purple-900 sm:text-5xl">
-              {item.title}
-            </h1>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        className="bg-purple-100"
+        label="Uzmanlık Alanı"
+        labelClassName="text-purple-500"
+        lineClassName="bg-purple-400"
+        title={item.title}
+        titleClassName="text-purple-900"
+        icons={
+          <>
+            <Daisy
+              className="pointer-events-none absolute top-6 right-16 h-14 w-14 text-purple-300/40"
+              aria-hidden="true"
+            />
+            <Butterfly
+              className="pointer-events-none absolute bottom-4 left-12 h-12 w-12 text-violet-300/35"
+              aria-hidden="true"
+            />
+            <Star
+              className="pointer-events-none absolute top-1/2 right-8 h-8 w-8 -translate-y-1/2 text-purple-400/30"
+              aria-hidden="true"
+            />
+            <Rose
+              className="pointer-events-none absolute bottom-4 right-1/3 h-10 w-10 text-rose-300/30"
+              aria-hidden="true"
+            />
+          </>
+        }
+      >
+        <Link
+          href="/calisma-alanlari"
+          className="mb-6 flex w-full items-center gap-1 text-sm font-medium text-purple-600 hover:text-purple-800 hover:underline"
+        >
+          ← Çalışma Alanlarım
+        </Link>
+      </PageHero>
 
       {/* Content */}
       <section className="bg-violet-50">
@@ -75,28 +77,14 @@ export default function SpecializationDetail({ item }: Props) {
               prose-li:text-slate-600
               prose-p:text-slate-600 prose-p:leading-relaxed"
           />
-
-          <div className="mt-14 flex flex-col items-center gap-4 border-t border-violet-200 pt-10 text-center">
-            <p className="text-base text-slate-600">
-              Bu alanda destek almak ister misiniz?
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <Link
-                href="/iletisim"
-                className="inline-flex items-center justify-center rounded-full bg-violet-500 px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-violet-600"
-              >
-                Randevu Al
-              </Link>
-              <Link
-                href="/calisma-alanlari"
-                className="inline-flex items-center justify-center rounded-full border border-violet-300 px-7 py-3 text-sm font-semibold text-violet-700 transition-colors hover:bg-violet-100"
-              >
-                Diğer Alanlar
-              </Link>
-            </div>
-          </div>
         </div>
       </section>
+
+      <PageCta
+        description="Bu alanda destek almak ister misiniz?"
+        className="bg-violet-50"
+        secondaryButton={{ label: "Diğer Alanlar", href: "/calisma-alanlari" }}
+      />
     </main>
   );
 }

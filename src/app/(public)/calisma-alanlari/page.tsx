@@ -9,6 +9,8 @@ import Butterfly from "@/components/icons/butterfly";
 import Star from "@/components/icons/star";
 import Blob from "@/components/icons/blob";
 import Rose from "@/components/icons/rose";
+import PageHero from "@/components/page-hero";
+import PageCta from "@/components/page-cta";
 
 export const metadata: Metadata = createMetadata({
   title: "Çalışma Alanlarım",
@@ -38,43 +40,40 @@ export default async function CalismaAlanlariPage() {
 
   return (
     <main>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-purple-100">
-        <Blob
-          className="pointer-events-none absolute -top-10 -left-10 h-52 w-52 text-purple-200/30"
-          aria-hidden="true"
-        />
-        <Daisy
-          className="pointer-events-none absolute top-6 right-16 h-14 w-14 text-purple-300/40"
-          aria-hidden="true"
-        />
-        <Butterfly
-          className="pointer-events-none absolute bottom-4 left-1/4 h-12 w-12 text-violet-300/35"
-          aria-hidden="true"
-        />
-        <Star
-          className="pointer-events-none absolute top-1/2 right-8 h-8 w-8 -translate-y-1/2 text-purple-400/30"
-          aria-hidden="true"
-        />
-        <Rose
-          className="pointer-events-none absolute bottom-4 right-1/3 h-10 w-10 text-rose-300/30"
-          aria-hidden="true"
-        />
-        <div className="relative">
-          <div className="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-20 lg:px-8">
-            <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-purple-500">
-              Uzmanlık Alanları
-            </p>
-            <h1 className="text-4xl font-bold text-purple-900 sm:text-5xl">
-              Çalışma Alanlarım
-            </h1>
-            <p className="mx-auto mt-4 max-w-xl text-base text-purple-800/70">
-              Danışanlarımla yürüttüğüm terapötik çalışmalarda odaklandığım
-              başlıca uzmanlık alanlarını aşağıda bulabilirsiniz.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        className="bg-purple-100"
+        label="Uzmanlık Alanları"
+        labelClassName="text-purple-500"
+        lineClassName="bg-purple-400"
+        title="Çalışma Alanlarım"
+        titleClassName="text-purple-900"
+        description="Danışanlarımla yürüttüğüm terapötik çalışmalarda odaklandığım başlıca uzmanlık alanlarını aşağıda bulabilirsiniz."
+        descriptionClassName="text-purple-800/70"
+        icons={
+          <>
+            <Blob
+              className="pointer-events-none absolute -top-10 -left-10 h-52 w-52 text-purple-200/30"
+              aria-hidden="true"
+            />
+            <Daisy
+              className="pointer-events-none absolute top-6 right-16 h-14 w-14 text-purple-300/40"
+              aria-hidden="true"
+            />
+            <Butterfly
+              className="pointer-events-none absolute bottom-4 left-1/4 h-12 w-12 text-violet-300/35"
+              aria-hidden="true"
+            />
+            <Star
+              className="pointer-events-none absolute top-1/2 right-8 h-8 w-8 -translate-y-1/2 text-purple-400/30"
+              aria-hidden="true"
+            />
+            <Rose
+              className="pointer-events-none absolute bottom-4 right-1/3 h-10 w-10 text-rose-300/30"
+              aria-hidden="true"
+            />
+          </>
+        }
+      />
 
       {/* List */}
       <section className="bg-violet-50">
@@ -151,17 +150,13 @@ export default async function CalismaAlanlariPage() {
               })}
             </div>
           )}
-
-          <div className="mt-16 text-center">
-            <Link
-              href="/iletisim"
-              className="inline-flex items-center justify-center rounded-full bg-violet-500 px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-violet-600"
-            >
-              Randevu Al →
-            </Link>
-          </div>
         </div>
       </section>
+
+      <PageCta
+        description="Danışanlarımla terapötik bir süreç başlatmak için benimle iletişime geçebilirsiniz."
+        className="bg-violet-50"
+      />
     </main>
   );
 }

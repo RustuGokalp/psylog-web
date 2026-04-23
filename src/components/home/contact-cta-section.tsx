@@ -56,8 +56,8 @@ export default function ContactCtaSection() {
               Benimle İletişime Geçin
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-slate-500">
-              Çocuğunuz veya ergeniniz için profesyonel destek almak istiyorsanız
-              benimle iletişime geçebilir, randevu alabilirsiniz.
+              Çocuğunuz veya ergeniniz için profesyonel destek almak
+              istiyorsanız benimle iletişime geçebilir, randevu alabilirsiniz.
             </p>
           </div>
 
