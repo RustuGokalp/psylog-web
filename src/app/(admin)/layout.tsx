@@ -10,15 +10,18 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
 
-  // Login page renders without the admin shell
   if (pathname === "/admin/login") {
     return <>{children}</>;
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 lg:flex-row">
+    <div className="min-h-screen bg-slate-50">
       <AdminSidebar />
-      <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+      <div className="lg:pl-64">
+        <main className="min-h-screen pt-14 lg:pt-0 overflow-x-hidden">
+          <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">{children}</div>
+        </main>
+      </div>
     </div>
   );
 }

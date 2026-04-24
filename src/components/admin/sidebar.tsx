@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { ActionAlert } from "@/components/action-alert";
 import { ApiException } from "@/lib/api";
 import { logout } from "@/services/auth.service";
-import { FileText, LogOut, Menu, X, Brain } from "lucide-react";
+import { FileText, LogOut, Mail, Menu, Brain } from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -21,6 +21,11 @@ const navItems: NavItem[] = [
     label: "Yazılar",
     href: "/admin/posts",
     icon: <FileText className="h-4 w-4" />,
+  },
+  {
+    label: "İletişim",
+    href: "/admin/contact",
+    icon: <Mail className="h-4 w-4" />,
   },
 ];
 
@@ -78,7 +83,7 @@ function SidebarContent({
         <Button
           variant="ghost"
           size="sm"
-          className="w-full justify-start gap-3 text-gray-600 hover:text-red-600 hover:bg-red-50"
+          className="w-full justify-start gap-3 text-gray-600 hover:text-red-600 hover:bg-red-50 cursor-pointer"
           onClick={onLogout}
         >
           <LogOut className="h-4 w-4" />
@@ -117,16 +122,16 @@ export default function AdminSidebar() {
 
   return (
     <>
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:w-60 lg:shrink-0 lg:flex-col border-r border-gray-200 bg-white">
+      {/* Desktop sidebar — fixed */}
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-30 lg:flex lg:w-64 lg:flex-col border-r border-gray-200 bg-white">
         <SidebarContent
           isActive={isActive}
           onLogout={() => setLogoutConfirm(true)}
         />
       </aside>
 
-      {/* Mobile top bar */}
-      <div className="flex lg:hidden items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
+      {/* Mobile top bar — fixed */}
+      <header className="fixed top-0 left-0 right-0 z-20 flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4 lg:hidden">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-600">
             <Brain className="h-4 w-4 text-white" />
@@ -143,7 +148,28 @@ export default function AdminSidebar() {
         >
           <Menu className="h-5 w-5" />
         </Button>
-      </div>
+      </header>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setMobileOpen(false)}
+            aria-hidden="true"
+          />
+
+          {/* Drawer panel */}
+          <aside className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl">
+            <SidebarContent
+              isActive={isActive}
+              onLogout={() => setLogoutConfirm(true)}
+              onNavClick={() => setMobileOpen(false)}
+            />
+          </aside>
+        </div>
+      )}
 
       <ActionAlert
         open={logoutConfirm}
@@ -162,37 +188,6 @@ export default function AdminSidebar() {
         description={logoutError ?? undefined}
         onClose={() => setLogoutError(null)}
       />
-
-      {/* Mobile drawer overlay */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setMobileOpen(false)}
-            aria-hidden="true"
-          />
-
-          {/* Drawer panel */}
-          <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl">
-            <div className="flex items-center justify-end px-4 py-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setMobileOpen(false)}
-                aria-label="Menüyü kapat"
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-            <SidebarContent
-              isActive={isActive}
-              onLogout={() => setLogoutConfirm(true)}
-              onNavClick={() => setMobileOpen(false)}
-            />
-          </div>
-        </div>
-      )}
     </>
   );
 }

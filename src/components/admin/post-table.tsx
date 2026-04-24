@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -12,13 +12,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
@@ -34,10 +29,11 @@ import {
   updatePost,
 } from "@/services/post.service";
 import { AdminPost } from "@/types/post";
-import { MessageSquare, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { MessageSquare, Pencil, Trash2 } from "lucide-react";
 
 interface PostTableProps {
   posts: AdminPost[];
+  onDeleteSuccess?: () => void;
 }
 
 type FeedbackAlert = {
@@ -46,9 +42,16 @@ type FeedbackAlert = {
   description?: string;
 } | null;
 
-export default function PostTable({ posts: initialPosts }: PostTableProps) {
+export default function PostTable({
+  posts: initialPosts,
+  onDeleteSuccess,
+}: PostTableProps) {
   const router = useRouter();
   const [posts, setPosts] = useState<AdminPost[]>(initialPosts);
+
+  useEffect(() => {
+    setPosts(initialPosts);
+  }, [initialPosts]);
   const [togglingId, setTogglingId] = useState<number | null>(null);
   const [draftTarget, setDraftTarget] = useState<AdminPost | null>(null);
   const [toggleTarget, setToggleTarget] = useState<AdminPost | null>(null);
@@ -113,6 +116,7 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
         title: "Yazı Silindi",
         description: `"${title}" başarıyla silindi.`,
       });
+      onDeleteSuccess?.();
     } catch (err) {
       const msg =
         err instanceof ApiException
@@ -133,30 +137,116 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
     });
   }
 
-  if (posts.length === 0) {
+  const emptyState = (
+    <div className="rounded-xl border border-dashed border-slate-300 bg-white py-16 text-center">
+      <p className="text-sm text-slate-500">Henüz yazı yok.</p>
+      <Link
+        href="/admin/posts/new"
+        className="mt-4 inline-flex items-center rounded-lg bg-violet-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
+      >
+        Yeni Yazı Oluştur
+      </Link>
+    </div>
+  );
+
+  if (posts.length === 0) return emptyState;
+
+  function renderStatusBadge(post: AdminPost) {
+    if (post.published)
+      return (
+        <Badge className="bg-green-100 text-green-700 hover:bg-green-100 shrink-0">
+          Yayında
+        </Badge>
+      );
+    if (post.publishAt)
+      return (
+        <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 shrink-0">
+          Zamanlandı
+        </Badge>
+      );
     return (
-      <div className="rounded-xl border border-dashed border-slate-300 bg-white py-16 text-center">
-        <p className="text-sm text-slate-500">Henüz yazı yok.</p>
-        <Link
-          href="/admin/posts/new"
-          className="mt-4 inline-flex items-center rounded-lg bg-violet-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
-        >
-          Yeni Yazı Oluştur
-        </Link>
-      </div>
+      <Badge className="bg-slate-100 text-slate-600 hover:bg-slate-100 shrink-0">
+        Taslak
+      </Badge>
     );
   }
 
   return (
     <>
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+      {/* Mobile card list — hidden on sm+ */}
+      <div className="sm:hidden flex flex-col divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+        {posts.map((post) => {
+          const pendingCount =
+            post.comments?.filter((c) => c.status === "PENDING").length ?? 0;
+          return (
+            <div key={post.id} className="flex flex-col gap-2.5 p-4">
+              <div className="flex items-start justify-between gap-2">
+                <p className="flex-1 text-sm font-medium leading-snug text-slate-800 line-clamp-2">
+                  {post.title}
+                </p>
+                {renderStatusBadge(post)}
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-400">
+                  {formatDate(post.createdAt)}
+                  {post.readingTime != null && ` · ${post.readingTime} dk`}
+                </span>
+                {pendingCount > 0 && (
+                  <Link
+                    href={`/admin/posts/${post.id}/comments`}
+                    className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-700 hover:bg-violet-200 transition-colors"
+                  >
+                    <MessageSquare className="h-3 w-3" />
+                    {pendingCount} bekliyor
+                  </Link>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between border-t border-slate-100 pt-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500">Yayınla</span>
+                  {togglingId === post.id ? (
+                    <Skeleton className="h-5 w-9 rounded-full" />
+                  ) : (
+                    <Switch
+                      checked={post.published}
+                      onCheckedChange={() => handleTogglePublish(post)}
+                      aria-label={post.published ? "Taslağa al" : "Yayınla"}
+                    />
+                  )}
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => router.push(`/admin/posts/${post.id}/edit`)}
+                    className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
+                    aria-label="Düzenle"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setDeleteTarget(post)}
+                    className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                    aria-label="Sil"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop table — hidden on mobile */}
+      <div className="hidden sm:block overflow-x-auto rounded-xl border border-slate-200 bg-white">
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-50 hover:bg-slate-50">
               <TableHead className="min-w-50 font-semibold text-slate-600">
                 Başlık
               </TableHead>
-              <TableHead className="hidden sm:table-cell font-semibold text-slate-600">
+              <TableHead className="font-semibold text-slate-600">
                 Durum
               </TableHead>
               <TableHead className="hidden md:table-cell font-semibold text-slate-600">
@@ -177,7 +267,9 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
               <TableHead className="w-20 text-center font-semibold text-slate-600">
                 Yayınla
               </TableHead>
-              <TableHead className="w-12.5" />
+              <TableHead className="w-20 text-center font-semibold text-slate-600">
+                Action
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -185,18 +277,13 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
               <TableRow key={post.id} className="hover:bg-slate-50">
                 {/* Başlık */}
                 <TableCell>
-                  <div>
-                    <p className="font-medium text-slate-800 line-clamp-1">
-                      {post.title}
-                    </p>
-                    <p className="text-xs text-slate-400 sm:hidden mt-0.5">
-                      {formatDate(post.createdAt)}
-                    </p>
-                  </div>
+                  <p className="font-medium text-slate-800 line-clamp-1">
+                    {post.title}
+                  </p>
                 </TableCell>
 
                 {/* Durum */}
-                <TableCell className="hidden sm:table-cell">
+                <TableCell>
                   {post.published ? (
                     <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
                       Yayında
@@ -243,7 +330,10 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
                                 +{post.tags.length - 3}
                               </Badge>
                             </TooltipTrigger>
-                            <TooltipContent side="top" className="flex flex-col gap-0.5">
+                            <TooltipContent
+                              side="top"
+                              className="flex flex-col gap-0.5"
+                            >
                               {post.tags.slice(3).map((tag) => (
                                 <span key={tag}>{tag}</span>
                               ))}
@@ -307,31 +397,26 @@ export default function PostTable({ posts: initialPosts }: PostTableProps) {
 
                 {/* Aksiyonlar */}
                 <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      aria-label="İşlemler"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 focus:outline-none"
+                  <div className="flex items-center justify-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => router.push(`/admin/posts/${post.id}/edit`)}
+                      className="h-8 w-8 cursor-pointer text-amber-400 hover:text-amber-500 hover:bg-amber-50"
+                      aria-label="Düzenle"
                     >
-                      <MoreHorizontal className="h-4 w-4" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() =>
-                          router.push(`/admin/posts/${post.id}/edit`)
-                        }
-                      >
-                        <Pencil className="mr-2 h-4 w-4" />
-                        Düzenle
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                        onClick={() => setDeleteTarget(post)}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Sil
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setDeleteTarget(post)}
+                      className="h-8 w-8 cursor-pointer text-red-400 hover:text-red-600 hover:bg-red-50"
+                      aria-label="Sil"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

@@ -85,8 +85,17 @@ export async function submitComment(
   return response.data;
 }
 
-export async function getAdminPosts(): Promise<AdminPost[]> {
-  const response = await apiClient.get<AdminPost[]>("/api/admin/posts");
+export async function getAdminPosts(params?: {
+  page?: number;
+  size?: number;
+}): Promise<PaginatedResponse<AdminPost>> {
+  const searchParams = new URLSearchParams();
+  if (params?.page !== undefined) searchParams.set("page", String(params.page));
+  if (params?.size !== undefined) searchParams.set("size", String(params.size));
+  const query = searchParams.toString();
+  const response = await apiClient.get<PaginatedResponse<AdminPost>>(
+    query ? `/api/admin/posts?${query}` : "/api/admin/posts"
+  );
   return response.data;
 }
 

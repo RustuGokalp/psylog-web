@@ -3,23 +3,30 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { getAdminPosts } from "@/services/post.service";
-import { AdminPost } from "@/types/post";
+import { AdminPost, PaginatedResponse } from "@/types/post";
 import { ApiException } from "@/lib/api";
 import PostTable from "@/components/admin/post-table";
+import AdminPagination from "@/components/admin/admin-pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ActionAlert } from "@/components/action-alert";
 import { Plus } from "lucide-react";
 
+const PAGE_SIZE = 10;
+
 export default function AdminPostsPage() {
-  const [posts, setPosts] = useState<AdminPost[]>([]);
+  const [data, setData] = useState<PaginatedResponse<AdminPost> | null>(null);
+  const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const fetchPosts = useCallback(async () => {
+  const fetchPosts = useCallback(async (currentPage: number) => {
     setLoading(true);
     try {
-      const data = await getAdminPosts();
-      setPosts(data);
+      const result = await getAdminPosts({
+        page: currentPage,
+        size: PAGE_SIZE,
+      });
+      setData(result);
     } catch (err) {
       const msg =
         err instanceof ApiException ? err.message : "Yazılar yüklenemedi.";
@@ -30,8 +37,13 @@ export default function AdminPostsPage() {
   }, []);
 
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    fetchPosts(page);
+  }, [fetchPosts, page]);
+
+  function handlePageChange(newPage: number) {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -39,7 +51,9 @@ export default function AdminPostsPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Yazılar</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Tüm blog yazılarını yönetin
+            {data != null
+              ? `${data.totalElements} yazı · Sayfa ${page + 1} / ${data.totalPages}`
+              : "Tüm blog yazılarını yönetin"}
           </p>
         </div>
         <Link
@@ -59,7 +73,19 @@ export default function AdminPostsPage() {
           ))}
         </div>
       ) : (
-        <PostTable posts={posts} />
+        <>
+          <PostTable
+            posts={data?.content ?? []}
+            onDeleteSuccess={() => fetchPosts(page)}
+          />
+          {data && (
+            <AdminPagination
+              page={page}
+              totalPages={data.totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
+        </>
       )}
 
       <ActionAlert
