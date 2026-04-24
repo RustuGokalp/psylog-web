@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import { Comment } from "@/types/post";
 import { submitComment } from "@/services/post.service";
 import { ActionAlert, AlertType } from "@/components/action-alert";
 import { ApiException } from "@/lib/api";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   postId: number;
@@ -16,6 +21,20 @@ interface ResultAlert {
   title: string;
   description?: string;
 }
+
+const commentSchema = Yup.object({
+  author: Yup.string().trim().required("Adınızı girin."),
+  email: Yup.string()
+    .trim()
+    .email("Geçerli bir e-posta adresi girin.")
+    .optional(),
+  content: Yup.string()
+    .trim()
+    .required("Yorum alanı boş bırakılamaz.")
+    .max(1000, "Yorum en fazla 1000 karakter olabilir."),
+});
+
+type CommentFormValues = Yup.InferType<typeof commentSchema>;
 
 function formatTurkishDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("tr-TR", {
@@ -30,28 +49,32 @@ function getInitial(name: string): string {
 }
 
 export default function CommentSection({ postId, initialComments }: Props) {
-  const [author, setAuthor] = useState("");
-  const [content, setContent] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [resultAlert, setResultAlert] = useState<ResultAlert | null>(null);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!author.trim() || !content.trim()) return;
-    setConfirmOpen(true);
-  }
+  const formik = useFormik<CommentFormValues>({
+    initialValues: { author: "", email: "", content: "" },
+    validationSchema: commentSchema,
+    validateOnBlur: true,
+    validateOnChange: true,
+    onSubmit: (_values, helpers) => {
+      helpers.setSubmitting(false);
+      setConfirmOpen(true);
+    },
+  });
 
   async function handleConfirm() {
-    setIsSubmitting(true);
+    setIsLoading(true);
     try {
+      const trimmedEmail = formik.values.email?.trim();
       await submitComment(postId, {
-        author: author.trim(),
-        content: content.trim(),
+        author: formik.values.author.trim(),
+        ...(trimmedEmail && { email: trimmedEmail }),
+        content: formik.values.content.trim(),
       });
-      setAuthor("");
-      setContent("");
+      formik.resetForm();
       setSubmitted(true);
       setConfirmOpen(false);
       setResultAlert({
@@ -71,7 +94,7 @@ export default function CommentSection({ postId, initialComments }: Props) {
         description: message,
       });
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   }
 
@@ -85,8 +108,9 @@ export default function CommentSection({ postId, initialComments }: Props) {
         description="Yorumunuz onaylandıktan sonra yayınlanacaktır."
         onConfirm={handleConfirm}
         confirmLabel="Gönder"
+        confirmClassName="bg-green-600 hover:bg-green-700 text-white"
         closeLabel="İptal"
-        loading={isSubmitting}
+        loading={isLoading}
       />
 
       <ActionAlert
@@ -153,37 +177,70 @@ export default function CommentSection({ postId, initialComments }: Props) {
             </div>
           ) : (
             <form
-              onSubmit={handleSubmit}
+              onSubmit={formik.handleSubmit}
               className="flex flex-col gap-3"
               noValidate
             >
-              <input
-                type="text"
-                placeholder="Adınız"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                disabled={isSubmitting}
-                required
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none transition-colors focus:border-rose-400 focus:ring-2 focus:ring-rose-100 disabled:opacity-50"
-              />
-              <textarea
-                placeholder="Yorumunuzu yazın..."
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                disabled={isSubmitting}
-                required
-                rows={4}
-                className="w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none transition-colors focus:border-rose-400 focus:ring-2 focus:ring-rose-100 disabled:opacity-50"
-              />
+              <div className="flex flex-col gap-1">
+                <Input
+                  type="text"
+                  id="author"
+                  placeholder="Adınız"
+                  {...formik.getFieldProps("author")}
+                  disabled={isLoading}
+                  aria-invalid={
+                    !!(formik.touched.author && formik.errors.author)
+                  }
+                />
+                {formik.touched.author && formik.errors.author && (
+                  <p className="text-xs text-destructive">
+                    {formik.errors.author}
+                  </p>
+                )}
+              </div>
 
-              <div>
-                <button
+              <div className="flex flex-col gap-1">
+                <Input
+                  type="email"
+                  id="email"
+                  placeholder="E-posta adresiniz (opsiyonel)"
+                  {...formik.getFieldProps("email")}
+                  disabled={isLoading}
+                  aria-invalid={!!(formik.touched.email && formik.errors.email)}
+                />
+                {formik.touched.email && formik.errors.email && (
+                  <p className="text-xs text-destructive">
+                    {formik.errors.email}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <Textarea
+                  id="content"
+                  placeholder="Yorumunuzu yazın..."
+                  {...formik.getFieldProps("content")}
+                  disabled={isLoading}
+                  rows={4}
+                  aria-invalid={
+                    !!(formik.touched.content && formik.errors.content)
+                  }
+                />
+                {formik.touched.content && formik.errors.content && (
+                  <p className="text-xs text-destructive">
+                    {formik.errors.content}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex justify-end">
+                <Button
                   type="submit"
-                  disabled={isSubmitting || !author.trim() || !content.trim()}
-                  className="cursor-pointer rounded-full bg-rose-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={isLoading}
+                  className="rounded-xl bg-rose-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-rose-700"
                 >
-                  {isSubmitting ? "Gönderiliyor..." : "Gönder"}
-                </button>
+                  {formik.isSubmitting ? "Gönderiliyor..." : "Gönder"}
+                </Button>
               </div>
             </form>
           )}

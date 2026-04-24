@@ -124,8 +124,8 @@
   body {
     @apply bg-background text-foreground font-sans;
   }
-  h1,
-  h2 {
+  main h1,
+  main h2 {
     font-family: var(--font-display);
   }
 }
