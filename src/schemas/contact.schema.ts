@@ -30,3 +30,5 @@ export const contactSchema = Yup.object({
     .min(20, "Mesaj en az 20 karakter olmalıdır.")
     .max(1000, "Mesaj en fazla 1000 karakter olabilir."),
 });
+
+export type ContactFormValues = Yup.InferType<typeof contactSchema>;

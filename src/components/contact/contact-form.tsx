@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useFormik } from "formik";
-import { contactSchema } from "@/schemas/contact.schema";
+import { contactSchema, ContactFormValues } from "@/schemas/contact.schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,6 +23,9 @@ function maskPhone(raw: string): string {
 }
 
 export default function ContactForm() {
+  const honeypotRef = useRef<HTMLInputElement>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState<{
     open: boolean;
     type: "success" | "error";
@@ -30,7 +33,7 @@ export default function ContactForm() {
     description: string;
   }>({ open: false, type: "success", title: "", description: "" });
 
-  const formik = useFormik({
+  const formik = useFormik<ContactFormValues>({
     initialValues: {
       fullName: "",
       email: "",
@@ -41,51 +44,97 @@ export default function ContactForm() {
     validationSchema: contactSchema,
     validateOnBlur: true,
     validateOnChange: true,
-    onSubmit: async (values, { setSubmitting, resetForm }) => {
-      const payload: ContactRequest = {
-        fullName: values.fullName.trim(),
-        email: values.email.trim(),
-        subject: values.subject.trim(),
-        message: values.message.trim(),
-      };
-
-      if (values.mobilePhone?.trim()) {
-        payload.mobilePhone = values.mobilePhone.trim();
-      }
-
-      try {
-        await sendContact(payload);
-        resetForm();
-        setAlert({
-          open: true,
-          type: "success",
-          title: "Mesajınız İletildi",
-          description: "En kısa sürede size dönüş yapacağım.",
-        });
-      } catch (err) {
-        const msg =
-          err instanceof ApiException
-            ? err.message
-            : "Bir hata oluştu. Lütfen tekrar deneyin.";
-        setAlert({
-          open: true,
-          type: "error",
-          title: "Bir Hata Oluştu",
-          description: msg,
-        });
-      } finally {
-        setSubmitting(false);
-      }
+    onSubmit: (_values, { setSubmitting }) => {
+      if (honeypotRef.current?.value) return;
+      setSubmitting(false);
+      setConfirmOpen(true);
     },
   });
 
+  async function handleConfirm() {
+    const values = formik.values;
+    setConfirmOpen(false);
+    setIsLoading(true);
+
+    const payload: ContactRequest = {
+      fullName: values.fullName.trim(),
+      email: values.email.trim(),
+      subject: values.subject.trim(),
+      message: values.message.trim(),
+    };
+
+    if (values.mobilePhone?.trim()) {
+      payload.mobilePhone = values.mobilePhone.trim();
+    }
+
+    try {
+      await sendContact(payload);
+      formik.resetForm();
+      setAlert({
+        open: true,
+        type: "success",
+        title: "Mesajınız İletildi",
+        description: "En kısa sürede size dönüş yapacağım.",
+      });
+    } catch (err) {
+      const msg =
+        err instanceof ApiException
+          ? err.message
+          : "Bir hata oluştu. Lütfen tekrar deneyin.";
+      setAlert({
+        open: true,
+        type: "error",
+        title: "Bir Hata Oluştu",
+        description: msg,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <>
+      <ActionAlert
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        type="warning"
+        title="Mesajınızı göndermek istiyor musunuz?"
+        description="Formu göndermeden önce bilgilerinizi kontrol edin."
+        onConfirm={handleConfirm}
+        confirmLabel="Gönder"
+        confirmClassName="bg-green-600 hover:bg-green-700 text-white"
+        closeLabel="İptal"
+        loading={isLoading}
+      />
+
+      <ActionAlert
+        open={alert.open}
+        onClose={() => setAlert((prev) => ({ ...prev, open: false }))}
+        type={alert.type}
+        title={alert.title}
+        description={alert.description}
+      />
+
       <form
         onSubmit={formik.handleSubmit}
         noValidate
         className="flex flex-col gap-5"
       >
+        {/* Honeypot — bots fill this, humans don't see it */}
+        <div
+          className="absolute opacity-0 pointer-events-none"
+          style={{ left: "-9999px" }}
+          aria-hidden="true"
+        >
+          <input
+            ref={honeypotRef}
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </div>
+
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="fullName" className="text-orange-800 font-medium">
             Ad Soyad <span className="text-orange-500">*</span>
@@ -97,13 +146,21 @@ export default function ContactForm() {
             placeholder="Adınız ve soyadınız"
             maxLength={100}
             {...formik.getFieldProps("fullName")}
-            disabled={formik.isSubmitting}
+            disabled={isLoading}
             aria-invalid={!!(formik.touched.fullName && formik.errors.fullName)}
-            aria-describedby="fullName-error"
+            aria-describedby={
+              formik.touched.fullName && formik.errors.fullName
+                ? "fullName-error"
+                : undefined
+            }
             className="border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.fullName && formik.errors.fullName && (
-            <p id="fullName-error" className="text-xs text-destructive mt-1">
+            <p
+              id="fullName-error"
+              role="alert"
+              className="text-xs text-destructive mt-1"
+            >
               {formik.errors.fullName}
             </p>
           )}
@@ -120,13 +177,21 @@ export default function ContactForm() {
             placeholder="ornek@email.com"
             maxLength={255}
             {...formik.getFieldProps("email")}
-            disabled={formik.isSubmitting}
+            disabled={isLoading}
             aria-invalid={!!(formik.touched.email && formik.errors.email)}
-            aria-describedby="email-error"
+            aria-describedby={
+              formik.touched.email && formik.errors.email
+                ? "email-error"
+                : undefined
+            }
             className="border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.email && formik.errors.email && (
-            <p id="email-error" className="text-xs text-destructive mt-1">
+            <p
+              id="email-error"
+              role="alert"
+              className="text-xs text-destructive mt-1"
+            >
               {formik.errors.email}
             </p>
           )}
@@ -139,16 +204,25 @@ export default function ContactForm() {
           <Input
             id="subject"
             type="text"
+            autoComplete="off"
             placeholder="Mesajınızın konusu"
             maxLength={150}
             {...formik.getFieldProps("subject")}
-            disabled={formik.isSubmitting}
+            disabled={isLoading}
             aria-invalid={!!(formik.touched.subject && formik.errors.subject)}
-            aria-describedby="subject-error"
+            aria-describedby={
+              formik.touched.subject && formik.errors.subject
+                ? "subject-error"
+                : undefined
+            }
             className="border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.subject && formik.errors.subject && (
-            <p id="subject-error" className="text-xs text-destructive mt-1">
+            <p
+              id="subject-error"
+              role="alert"
+              className="text-xs text-destructive mt-1"
+            >
               {formik.errors.subject}
             </p>
           )}
@@ -156,7 +230,7 @@ export default function ContactForm() {
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="mobilePhone" className="text-orange-800 font-medium">
-            Telefon{" "}
+            Telefon
             <span className="text-muted-foreground text-xs font-normal">
               (isteğe bağlı)
             </span>
@@ -170,15 +244,23 @@ export default function ContactForm() {
             onChange={(e) =>
               formik.setFieldValue("mobilePhone", maskPhone(e.target.value))
             }
-            disabled={formik.isSubmitting}
+            disabled={isLoading}
             aria-invalid={
               !!(formik.touched.mobilePhone && formik.errors.mobilePhone)
             }
-            aria-describedby="mobilePhone-error"
+            aria-describedby={
+              formik.touched.mobilePhone && formik.errors.mobilePhone
+                ? "mobilePhone-error"
+                : undefined
+            }
             className="border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.mobilePhone && formik.errors.mobilePhone && (
-            <p id="mobilePhone-error" className="text-xs text-destructive mt-1">
+            <p
+              id="mobilePhone-error"
+              role="alert"
+              className="text-xs text-destructive mt-1"
+            >
               {formik.errors.mobilePhone}
             </p>
           )}
@@ -193,14 +275,22 @@ export default function ContactForm() {
             placeholder="Mesajınızı buraya yazın..."
             maxLength={1000}
             {...formik.getFieldProps("message")}
-            disabled={formik.isSubmitting}
+            disabled={isLoading}
             rows={5}
             aria-invalid={!!(formik.touched.message && formik.errors.message)}
-            aria-describedby="message-error"
+            aria-describedby={
+              formik.touched.message && formik.errors.message
+                ? "message-error"
+                : undefined
+            }
             className="resize-none border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.message && formik.errors.message && (
-            <p id="message-error" className="text-xs text-destructive mt-1">
+            <p
+              id="message-error"
+              role="alert"
+              className="text-xs text-destructive mt-1"
+            >
               {formik.errors.message}
             </p>
           )}
@@ -208,20 +298,12 @@ export default function ContactForm() {
 
         <Button
           type="submit"
-          disabled={formik.isSubmitting}
+          disabled={formik.isSubmitting || isLoading}
           className="w-full bg-orange-600 text-white hover:bg-orange-700 h-10"
         >
-          {formik.isSubmitting ? "Gönderiliyor..." : "Mesaj Gönder"}
+          {isLoading ? "Gönderiliyor..." : "Mesaj Gönder"}
         </Button>
       </form>
-
-      <ActionAlert
-        open={alert.open}
-        onClose={() => setAlert((prev) => ({ ...prev, open: false }))}
-        type={alert.type}
-        title={alert.title}
-        description={alert.description}
-      />
     </>
   );
 }
