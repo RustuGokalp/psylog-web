@@ -39,20 +39,23 @@ export default function ContactForm() {
       message: "",
     },
     validationSchema: contactSchema,
-    onSubmit: async (values, { setSubmitting }) => {
+    validateOnBlur: true,
+    validateOnChange: true,
+    onSubmit: async (values, { setSubmitting, resetForm }) => {
       const payload: ContactRequest = {
-        fullName: values.fullName,
-        email: values.email,
-        subject: values.subject,
-        message: values.message,
+        fullName: values.fullName.trim(),
+        email: values.email.trim(),
+        subject: values.subject.trim(),
+        message: values.message.trim(),
       };
 
-      if (values.mobilePhone && values.mobilePhone.trim() !== "") {
+      if (values.mobilePhone?.trim()) {
         payload.mobilePhone = values.mobilePhone.trim();
       }
 
       try {
         await sendContact(payload);
+        resetForm();
         setAlert({
           open: true,
           type: "success",
@@ -76,14 +79,6 @@ export default function ContactForm() {
     },
   });
 
-  function handleAlertClose() {
-    const wasSuccess = alert.type === "success";
-    setAlert((prev) => ({ ...prev, open: false }));
-    if (wasSuccess) {
-      formik.resetForm();
-    }
-  }
-
   return (
     <>
       <form
@@ -97,23 +92,18 @@ export default function ContactForm() {
           </Label>
           <Input
             id="fullName"
-            name="fullName"
             type="text"
             autoComplete="name"
             placeholder="Adınız ve soyadınız"
-            value={formik.values.fullName}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            maxLength={100}
+            {...formik.getFieldProps("fullName")}
             disabled={formik.isSubmitting}
+            aria-invalid={!!(formik.touched.fullName && formik.errors.fullName)}
             aria-describedby="fullName-error"
-            className={`border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60${
-              formik.touched.fullName && formik.errors.fullName
-                ? " border-red-400"
-                : ""
-            }`}
+            className="border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.fullName && formik.errors.fullName && (
-            <p id="fullName-error" className="text-xs text-red-500 mt-1">
+            <p id="fullName-error" className="text-xs text-destructive mt-1">
               {formik.errors.fullName}
             </p>
           )}
@@ -125,23 +115,18 @@ export default function ContactForm() {
           </Label>
           <Input
             id="email"
-            name="email"
             type="email"
             autoComplete="email"
             placeholder="ornek@email.com"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            maxLength={255}
+            {...formik.getFieldProps("email")}
             disabled={formik.isSubmitting}
+            aria-invalid={!!(formik.touched.email && formik.errors.email)}
             aria-describedby="email-error"
-            className={`border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60${
-              formik.touched.email && formik.errors.email
-                ? " border-red-400"
-                : ""
-            }`}
+            className="border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.email && formik.errors.email && (
-            <p id="email-error" className="text-xs text-red-500 mt-1">
+            <p id="email-error" className="text-xs text-destructive mt-1">
               {formik.errors.email}
             </p>
           )}
@@ -153,22 +138,17 @@ export default function ContactForm() {
           </Label>
           <Input
             id="subject"
-            name="subject"
             type="text"
             placeholder="Mesajınızın konusu"
-            value={formik.values.subject}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            maxLength={150}
+            {...formik.getFieldProps("subject")}
             disabled={formik.isSubmitting}
+            aria-invalid={!!(formik.touched.subject && formik.errors.subject)}
             aria-describedby="subject-error"
-            className={`border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60${
-              formik.touched.subject && formik.errors.subject
-                ? " border-red-400"
-                : ""
-            }`}
+            className="border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.subject && formik.errors.subject && (
-            <p id="subject-error" className="text-xs text-red-500 mt-1">
+            <p id="subject-error" className="text-xs text-destructive mt-1">
               {formik.errors.subject}
             </p>
           )}
@@ -183,25 +163,22 @@ export default function ContactForm() {
           </Label>
           <Input
             id="mobilePhone"
-            name="mobilePhone"
             type="tel"
             autoComplete="tel"
             placeholder="(538) 110 00 00"
-            value={formik.values.mobilePhone}
+            {...formik.getFieldProps("mobilePhone")}
             onChange={(e) =>
               formik.setFieldValue("mobilePhone", maskPhone(e.target.value))
             }
-            onBlur={formik.handleBlur}
             disabled={formik.isSubmitting}
+            aria-invalid={
+              !!(formik.touched.mobilePhone && formik.errors.mobilePhone)
+            }
             aria-describedby="mobilePhone-error"
-            className={`border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60${
-              formik.touched.mobilePhone && formik.errors.mobilePhone
-                ? " border-red-400"
-                : ""
-            }`}
+            className="border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.mobilePhone && formik.errors.mobilePhone && (
-            <p id="mobilePhone-error" className="text-xs text-red-500 mt-1">
+            <p id="mobilePhone-error" className="text-xs text-destructive mt-1">
               {formik.errors.mobilePhone}
             </p>
           )}
@@ -213,22 +190,17 @@ export default function ContactForm() {
           </Label>
           <Textarea
             id="message"
-            name="message"
             placeholder="Mesajınızı buraya yazın..."
-            value={formik.values.message}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            maxLength={1000}
+            {...formik.getFieldProps("message")}
             disabled={formik.isSubmitting}
             rows={5}
+            aria-invalid={!!(formik.touched.message && formik.errors.message)}
             aria-describedby="message-error"
-            className={`resize-none border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60${
-              formik.touched.message && formik.errors.message
-                ? " border-red-400"
-                : ""
-            }`}
+            className="resize-none border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.message && formik.errors.message && (
-            <p id="message-error" className="text-xs text-red-500 mt-1">
+            <p id="message-error" className="text-xs text-destructive mt-1">
               {formik.errors.message}
             </p>
           )}
@@ -245,7 +217,7 @@ export default function ContactForm() {
 
       <ActionAlert
         open={alert.open}
-        onClose={handleAlertClose}
+        onClose={() => setAlert((prev) => ({ ...prev, open: false }))}
         type={alert.type}
         title={alert.title}
         description={alert.description}

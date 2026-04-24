@@ -2,17 +2,20 @@ import * as Yup from "yup";
 
 export const contactSchema = Yup.object({
   fullName: Yup.string()
-    .required("Ad soyad en az 2, en fazla 100 karakter olmalıdır")
-    .min(2, "Ad soyad en az 2, en fazla 100 karakter olmalıdır")
-    .max(100, "Ad soyad en az 2, en fazla 100 karakter olmalıdır"),
+    .trim()
+    .required("Ad soyad zorunludur.")
+    .min(2, "Ad soyad en az 2 karakter olmalıdır.")
+    .max(100, "Ad soyad en fazla 100 karakter olabilir."),
   email: Yup.string()
-    .required("Geçerli bir e-posta adresi girin")
-    .email("Geçerli bir e-posta adresi girin")
-    .max(255, "Geçerli bir e-posta adresi girin"),
+    .trim()
+    .required("E-posta adresi zorunludur.")
+    .email("Geçerli bir e-posta adresi girin.")
+    .max(255, "E-posta adresi en fazla 255 karakter olabilir."),
   subject: Yup.string()
-    .required("Konu en az 2, en fazla 150 karakter olmalıdır")
-    .min(2, "Konu en az 2, en fazla 150 karakter olmalıdır")
-    .max(150, "Konu en az 2, en fazla 150 karakter olmalıdır"),
+    .trim()
+    .required("Konu zorunludur.")
+    .min(2, "Konu en az 2 karakter olmalıdır.")
+    .max(150, "Konu en fazla 150 karakter olabilir."),
   mobilePhone: Yup.string().test(
     "phone",
     "Geçerli bir telefon numarası girin (ör: (538) 110 00 00)",
@@ -22,7 +25,8 @@ export const contactSchema = Yup.object({
     },
   ),
   message: Yup.string()
-    .required("Mesaj en az 20, en fazla 1000 karakter olmalıdır")
-    .min(20, "Mesaj en az 20, en fazla 1000 karakter olmalıdır")
-    .max(1000, "Mesaj en az 20, en fazla 1000 karakter olmalıdır"),
+    .trim()
+    .required("Mesaj zorunludur.")
+    .min(20, "Mesaj en az 20 karakter olmalıdır.")
+    .max(1000, "Mesaj en fazla 1000 karakter olabilir."),
 });

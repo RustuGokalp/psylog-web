@@ -25,9 +25,10 @@ interface ActionAlertProps {
   type: AlertType;
   title: string;
   description?: string;
-  // Confirm mode — when provided, a second "Onayla" button is shown
+  content?: React.ReactNode;
   onConfirm?: () => void;
   confirmLabel?: string;
+  confirmClassName?: string;
   closeLabel?: string;
   loading?: boolean;
 }
@@ -68,8 +69,10 @@ export function ActionAlert({
   type,
   title,
   description,
+  content,
   onConfirm,
   confirmLabel = "Onayla",
+  confirmClassName,
   closeLabel = "Kapat",
   loading = false,
 }: ActionAlertProps) {
@@ -83,6 +86,11 @@ export function ActionAlert({
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
+        {content && (
+          <div className="rounded-lg border border-slate-100 bg-slate-50 px-4 py-3 text-sm">
+            {content}
+          </div>
+        )}
         <DialogFooter className="justify-center">
           <Button variant="outline" onClick={onClose} disabled={loading}>
             {closeLabel}
@@ -92,6 +100,7 @@ export function ActionAlert({
               variant={confirmVariant}
               onClick={onConfirm}
               disabled={loading}
+              className={confirmClassName}
             >
               {loading ? (
                 <span className="flex items-center gap-2">

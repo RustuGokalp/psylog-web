@@ -8,7 +8,14 @@ import { Separator } from "@/components/ui/separator";
 import { ActionAlert } from "@/components/action-alert";
 import { ApiException } from "@/lib/api";
 import { logout } from "@/services/auth.service";
-import { FileText, LogOut, Mail, Menu, Brain } from "lucide-react";
+import {
+  FileText,
+  LogOut,
+  Mail,
+  Menu,
+  Brain,
+  MessageSquare,
+} from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -26,6 +33,11 @@ const navItems: NavItem[] = [
     label: "İletişim",
     href: "/admin/contact",
     icon: <Mail className="h-4 w-4" />,
+  },
+  {
+    label: "Bekleyen Yorumlar",
+    href: "/admin/comments",
+    icon: <MessageSquare className="h-4 w-4" />,
   },
 ];
 
