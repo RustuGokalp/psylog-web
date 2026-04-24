@@ -24,6 +24,8 @@ function maskPhone(raw: string): string {
 
 export default function ContactForm() {
   const honeypotRef = useRef<HTMLInputElement>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState<{
     open: boolean;
     type: "success" | "error";
@@ -42,53 +44,88 @@ export default function ContactForm() {
     validationSchema: contactSchema,
     validateOnBlur: true,
     validateOnChange: true,
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: (_values, { setSubmitting }) => {
       if (honeypotRef.current?.value) return;
-
-      const payload: ContactRequest = {
-        fullName: values.fullName.trim(),
-        email: values.email.trim(),
-        subject: values.subject.trim(),
-        message: values.message.trim(),
-      };
-
-      if (values.mobilePhone?.trim()) {
-        payload.mobilePhone = values.mobilePhone.trim();
-      }
-
-      try {
-        await sendContact(payload);
-        resetForm();
-        setAlert({
-          open: true,
-          type: "success",
-          title: "Mesajınız İletildi",
-          description: "En kısa sürede size dönüş yapacağım.",
-        });
-      } catch (err) {
-        const msg =
-          err instanceof ApiException
-            ? err.message
-            : "Bir hata oluştu. Lütfen tekrar deneyin.";
-        setAlert({
-          open: true,
-          type: "error",
-          title: "Bir Hata Oluştu",
-          description: msg,
-        });
-      }
+      setSubmitting(false);
+      setConfirmOpen(true);
     },
   });
 
+  async function handleConfirm() {
+    const values = formik.values;
+    setConfirmOpen(false);
+    setIsLoading(true);
+
+    const payload: ContactRequest = {
+      fullName: values.fullName.trim(),
+      email: values.email.trim(),
+      subject: values.subject.trim(),
+      message: values.message.trim(),
+    };
+
+    if (values.mobilePhone?.trim()) {
+      payload.mobilePhone = values.mobilePhone.trim();
+    }
+
+    try {
+      await sendContact(payload);
+      formik.resetForm();
+      setAlert({
+        open: true,
+        type: "success",
+        title: "Mesajınız İletildi",
+        description: "En kısa sürede size dönüş yapacağım.",
+      });
+    } catch (err) {
+      const msg =
+        err instanceof ApiException
+          ? err.message
+          : "Bir hata oluştu. Lütfen tekrar deneyin.";
+      setAlert({
+        open: true,
+        type: "error",
+        title: "Bir Hata Oluştu",
+        description: msg,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <>
+      <ActionAlert
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        type="warning"
+        title="Mesajınızı göndermek istiyor musunuz?"
+        description="Formu göndermeden önce bilgilerinizi kontrol edin."
+        onConfirm={handleConfirm}
+        confirmLabel="Gönder"
+        confirmClassName="bg-green-600 hover:bg-green-700 text-white"
+        closeLabel="İptal"
+        loading={isLoading}
+      />
+
+      <ActionAlert
+        open={alert.open}
+        onClose={() => setAlert((prev) => ({ ...prev, open: false }))}
+        type={alert.type}
+        title={alert.title}
+        description={alert.description}
+      />
+
       <form
         onSubmit={formik.handleSubmit}
         noValidate
         className="flex flex-col gap-5"
       >
         {/* Honeypot — bots fill this, humans don't see it */}
-        <div className="absolute -left-2499.75 opacity-0" aria-hidden="true">
+        <div
+          className="absolute opacity-0 pointer-events-none"
+          style={{ left: "-9999px" }}
+          aria-hidden="true"
+        >
           <input
             ref={honeypotRef}
             type="text"
@@ -109,7 +146,7 @@ export default function ContactForm() {
             placeholder="Adınız ve soyadınız"
             maxLength={100}
             {...formik.getFieldProps("fullName")}
-            disabled={formik.isSubmitting}
+            disabled={isLoading}
             aria-invalid={!!(formik.touched.fullName && formik.errors.fullName)}
             aria-describedby={
               formik.touched.fullName && formik.errors.fullName
@@ -140,7 +177,7 @@ export default function ContactForm() {
             placeholder="ornek@email.com"
             maxLength={255}
             {...formik.getFieldProps("email")}
-            disabled={formik.isSubmitting}
+            disabled={isLoading}
             aria-invalid={!!(formik.touched.email && formik.errors.email)}
             aria-describedby={
               formik.touched.email && formik.errors.email
@@ -171,7 +208,7 @@ export default function ContactForm() {
             placeholder="Mesajınızın konusu"
             maxLength={150}
             {...formik.getFieldProps("subject")}
-            disabled={formik.isSubmitting}
+            disabled={isLoading}
             aria-invalid={!!(formik.touched.subject && formik.errors.subject)}
             aria-describedby={
               formik.touched.subject && formik.errors.subject
@@ -193,7 +230,7 @@ export default function ContactForm() {
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="mobilePhone" className="text-orange-800 font-medium">
-            Telefon{" "}
+            Telefon
             <span className="text-muted-foreground text-xs font-normal">
               (isteğe bağlı)
             </span>
@@ -207,7 +244,7 @@ export default function ContactForm() {
             onChange={(e) =>
               formik.setFieldValue("mobilePhone", maskPhone(e.target.value))
             }
-            disabled={formik.isSubmitting}
+            disabled={isLoading}
             aria-invalid={
               !!(formik.touched.mobilePhone && formik.errors.mobilePhone)
             }
@@ -238,7 +275,7 @@ export default function ContactForm() {
             placeholder="Mesajınızı buraya yazın..."
             maxLength={1000}
             {...formik.getFieldProps("message")}
-            disabled={formik.isSubmitting}
+            disabled={isLoading}
             rows={5}
             aria-invalid={!!(formik.touched.message && formik.errors.message)}
             aria-describedby={
@@ -261,20 +298,12 @@ export default function ContactForm() {
 
         <Button
           type="submit"
-          disabled={formik.isSubmitting}
+          disabled={formik.isSubmitting || isLoading}
           className="w-full bg-orange-600 text-white hover:bg-orange-700 h-10"
         >
-          {formik.isSubmitting ? "Gönderiliyor..." : "Mesaj Gönder"}
+          {isLoading ? "Gönderiliyor..." : "Mesaj Gönder"}
         </Button>
       </form>
-
-      <ActionAlert
-        open={alert.open}
-        onClose={() => setAlert((prev) => ({ ...prev, open: false }))}
-        type={alert.type}
-        title={alert.title}
-        description={alert.description}
-      />
     </>
   );
 }
