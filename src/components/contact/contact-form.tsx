@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useFormik } from "formik";
-import { contactSchema } from "@/schemas/contact.schema";
+import { contactSchema, ContactFormValues } from "@/schemas/contact.schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,6 +23,7 @@ function maskPhone(raw: string): string {
 }
 
 export default function ContactForm() {
+  const honeypotRef = useRef<HTMLInputElement>(null);
   const [alert, setAlert] = useState<{
     open: boolean;
     type: "success" | "error";
@@ -30,7 +31,7 @@ export default function ContactForm() {
     description: string;
   }>({ open: false, type: "success", title: "", description: "" });
 
-  const formik = useFormik({
+  const formik = useFormik<ContactFormValues>({
     initialValues: {
       fullName: "",
       email: "",
@@ -41,7 +42,9 @@ export default function ContactForm() {
     validationSchema: contactSchema,
     validateOnBlur: true,
     validateOnChange: true,
-    onSubmit: async (values, { setSubmitting, resetForm }) => {
+    onSubmit: async (values, { resetForm }) => {
+      if (honeypotRef.current?.value) return;
+
       const payload: ContactRequest = {
         fullName: values.fullName.trim(),
         email: values.email.trim(),
@@ -73,8 +76,6 @@ export default function ContactForm() {
           title: "Bir Hata Oluştu",
           description: msg,
         });
-      } finally {
-        setSubmitting(false);
       }
     },
   });
@@ -86,6 +87,17 @@ export default function ContactForm() {
         noValidate
         className="flex flex-col gap-5"
       >
+        {/* Honeypot — bots fill this, humans don't see it */}
+        <div className="absolute -left-2499.75 opacity-0" aria-hidden="true">
+          <input
+            ref={honeypotRef}
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </div>
+
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="fullName" className="text-orange-800 font-medium">
             Ad Soyad <span className="text-orange-500">*</span>
@@ -99,11 +111,19 @@ export default function ContactForm() {
             {...formik.getFieldProps("fullName")}
             disabled={formik.isSubmitting}
             aria-invalid={!!(formik.touched.fullName && formik.errors.fullName)}
-            aria-describedby="fullName-error"
+            aria-describedby={
+              formik.touched.fullName && formik.errors.fullName
+                ? "fullName-error"
+                : undefined
+            }
             className="border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.fullName && formik.errors.fullName && (
-            <p id="fullName-error" className="text-xs text-destructive mt-1">
+            <p
+              id="fullName-error"
+              role="alert"
+              className="text-xs text-destructive mt-1"
+            >
               {formik.errors.fullName}
             </p>
           )}
@@ -122,11 +142,19 @@ export default function ContactForm() {
             {...formik.getFieldProps("email")}
             disabled={formik.isSubmitting}
             aria-invalid={!!(formik.touched.email && formik.errors.email)}
-            aria-describedby="email-error"
+            aria-describedby={
+              formik.touched.email && formik.errors.email
+                ? "email-error"
+                : undefined
+            }
             className="border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.email && formik.errors.email && (
-            <p id="email-error" className="text-xs text-destructive mt-1">
+            <p
+              id="email-error"
+              role="alert"
+              className="text-xs text-destructive mt-1"
+            >
               {formik.errors.email}
             </p>
           )}
@@ -139,16 +167,25 @@ export default function ContactForm() {
           <Input
             id="subject"
             type="text"
+            autoComplete="off"
             placeholder="Mesajınızın konusu"
             maxLength={150}
             {...formik.getFieldProps("subject")}
             disabled={formik.isSubmitting}
             aria-invalid={!!(formik.touched.subject && formik.errors.subject)}
-            aria-describedby="subject-error"
+            aria-describedby={
+              formik.touched.subject && formik.errors.subject
+                ? "subject-error"
+                : undefined
+            }
             className="border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.subject && formik.errors.subject && (
-            <p id="subject-error" className="text-xs text-destructive mt-1">
+            <p
+              id="subject-error"
+              role="alert"
+              className="text-xs text-destructive mt-1"
+            >
               {formik.errors.subject}
             </p>
           )}
@@ -174,11 +211,19 @@ export default function ContactForm() {
             aria-invalid={
               !!(formik.touched.mobilePhone && formik.errors.mobilePhone)
             }
-            aria-describedby="mobilePhone-error"
+            aria-describedby={
+              formik.touched.mobilePhone && formik.errors.mobilePhone
+                ? "mobilePhone-error"
+                : undefined
+            }
             className="border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.mobilePhone && formik.errors.mobilePhone && (
-            <p id="mobilePhone-error" className="text-xs text-destructive mt-1">
+            <p
+              id="mobilePhone-error"
+              role="alert"
+              className="text-xs text-destructive mt-1"
+            >
               {formik.errors.mobilePhone}
             </p>
           )}
@@ -196,11 +241,19 @@ export default function ContactForm() {
             disabled={formik.isSubmitting}
             rows={5}
             aria-invalid={!!(formik.touched.message && formik.errors.message)}
-            aria-describedby="message-error"
+            aria-describedby={
+              formik.touched.message && formik.errors.message
+                ? "message-error"
+                : undefined
+            }
             className="resize-none border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.message && formik.errors.message && (
-            <p id="message-error" className="text-xs text-destructive mt-1">
+            <p
+              id="message-error"
+              role="alert"
+              className="text-xs text-destructive mt-1"
+            >
               {formik.errors.message}
             </p>
           )}
