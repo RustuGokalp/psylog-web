@@ -1,9 +1,13 @@
 import { apiClient } from "@/lib/api";
+import { PagedResponse } from "@/types/common";
 import { CommentAdminResponse } from "@/types/post";
 
-export async function getAdminComments(): Promise<CommentAdminResponse[]> {
-  const response = await apiClient.get<CommentAdminResponse[]>(
-    "/api/admin/comments"
+export async function getAdminComments(
+  page = 0,
+  size = 10,
+): Promise<PagedResponse<CommentAdminResponse>> {
+  const response = await apiClient.get<PagedResponse<CommentAdminResponse>>(
+    `/api/admin/comments?page=${page}&size=${size}`,
   );
   return response.data;
 }

@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api";
-import { ApiSuccess } from "@/types/common";
+import { ApiSuccess, PagedResponse } from "@/types/common";
 import { ContactMessage, ContactRequest } from "@/types/contact";
 
 export async function sendContact(body: ContactRequest): Promise<ApiSuccess> {
@@ -7,7 +7,12 @@ export async function sendContact(body: ContactRequest): Promise<ApiSuccess> {
   return response.data;
 }
 
-export async function getAdminContacts(): Promise<ContactMessage[]> {
-  const response = await apiClient.get<ContactMessage[]>("/api/admin/contact");
+export async function getAdminContacts(
+  page = 0,
+  size = 10,
+): Promise<PagedResponse<ContactMessage>> {
+  const response = await apiClient.get<PagedResponse<ContactMessage>>(
+    `/api/admin/contact?page=${page}&size=${size}`,
+  );
   return response.data;
 }

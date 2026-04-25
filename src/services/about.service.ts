@@ -13,6 +13,15 @@ export async function getAbout(): Promise<About | null> {
 
 // ── Admin (client-side, Axios) ─────────────────────────────────────────────
 
+export async function getAboutAdmin(): Promise<About | null> {
+  try {
+    const response = await apiClient.get<About>("/api/about");
+    return response.data;
+  } catch {
+    return null;
+  }
+}
+
 export async function createAbout(body: CreateAboutRequest): Promise<About> {
   const response = await apiClient.post<About>("/api/admin/about", body);
   return response.data;
