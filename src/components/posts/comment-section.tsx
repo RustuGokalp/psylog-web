@@ -225,6 +225,7 @@ export default function CommentSection({ postId, initialComments }: Props) {
                   aria-invalid={
                     !!(formik.touched.content && formik.errors.content)
                   }
+                  className="resize-none max-h-48"
                 />
                 {formik.touched.content && formik.errors.content && (
                   <p className="text-xs text-destructive">

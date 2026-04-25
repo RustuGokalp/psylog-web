@@ -1,5 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface AdminPaginationProps {
   page: number;
@@ -40,54 +47,54 @@ export default function AdminPagination({
 
   const windows = buildPageWindows(page, totalPages);
 
+  function go(e: React.MouseEvent, target: number) {
+    e.preventDefault();
+    onPageChange(target);
+  }
+
   return (
-    <div className="flex items-center justify-center gap-1">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => onPageChange(page - 1)}
-        disabled={page === 0}
-        className="gap-1 text-slate-600"
-      >
-        <ChevronLeft className="h-4 w-4" />
-        <span className="hidden sm:inline">Önceki</span>
-      </Button>
-
-      {windows.map((item, index) =>
-        item === "..." ? (
-          <span
-            key={`ellipsis-${index}`}
-            className="px-2 text-sm text-slate-400 select-none"
-          >
-            …
-          </span>
-        ) : (
-          <Button
-            key={item}
-            variant={item === page ? "default" : "ghost"}
-            size="sm"
-            onClick={() => onPageChange(item)}
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious
+            text="Önceki"
+            onClick={(e) => go(e, page - 1)}
             className={
-              item === page
-                ? "bg-violet-600 text-white hover:bg-violet-700 min-w-9"
-                : "text-slate-600 min-w-9"
+              page === 0 ? "pointer-events-none opacity-40" : "cursor-pointer"
             }
-          >
-            {item + 1}
-          </Button>
-        ),
-      )}
+          />
+        </PaginationItem>
 
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => onPageChange(page + 1)}
-        disabled={page === totalPages - 1}
-        className="gap-1 text-slate-600"
-      >
-        <span className="hidden sm:inline">Sonraki</span>
-        <ChevronRight className="h-4 w-4" />
-      </Button>
-    </div>
+        {windows.map((item, index) =>
+          item === "..." ? (
+            <PaginationItem key={`ellipsis-${index}`}>
+              <PaginationEllipsis />
+            </PaginationItem>
+          ) : (
+            <PaginationItem key={item}>
+              <PaginationLink
+                isActive={item === page}
+                onClick={(e) => go(e, item)}
+                className="cursor-pointer"
+              >
+                {item + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ),
+        )}
+
+        <PaginationItem>
+          <PaginationNext
+            text="Sonraki"
+            onClick={(e) => go(e, page + 1)}
+            className={
+              page >= totalPages - 1
+                ? "pointer-events-none opacity-40"
+                : "cursor-pointer"
+            }
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
   );
 }

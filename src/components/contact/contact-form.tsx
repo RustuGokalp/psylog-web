@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useFormik } from "formik";
 import { contactSchema, ContactFormValues } from "@/schemas/contact.schema";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,6 @@ function maskPhone(raw: string): string {
 }
 
 export default function ContactForm() {
-  const honeypotRef = useRef<HTMLInputElement>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState<{
@@ -45,7 +44,6 @@ export default function ContactForm() {
     validateOnBlur: true,
     validateOnChange: true,
     onSubmit: (_values, { setSubmitting }) => {
-      if (honeypotRef.current?.value) return;
       setSubmitting(false);
       setConfirmOpen(true);
     },
@@ -53,7 +51,6 @@ export default function ContactForm() {
 
   async function handleConfirm() {
     const values = formik.values;
-    setConfirmOpen(false);
     setIsLoading(true);
 
     const payload: ContactRequest = {
@@ -89,6 +86,7 @@ export default function ContactForm() {
       });
     } finally {
       setIsLoading(false);
+      setConfirmOpen(false);
     }
   }
 
@@ -120,21 +118,6 @@ export default function ContactForm() {
         noValidate
         className="flex flex-col gap-5"
       >
-        {/* Honeypot — bots fill this, humans don't see it */}
-        <div
-          className="absolute opacity-0 pointer-events-none"
-          style={{ left: "-9999px" }}
-          aria-hidden="true"
-        >
-          <input
-            ref={honeypotRef}
-            type="text"
-            name="website"
-            tabIndex={-1}
-            autoComplete="off"
-          />
-        </div>
-
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="fullName" className="text-orange-800 font-medium">
             Ad Soyad <span className="text-orange-500">*</span>

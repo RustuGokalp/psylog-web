@@ -15,6 +15,7 @@ import {
   Menu,
   Brain,
   MessageSquare,
+  User,
 } from "lucide-react";
 
 interface NavItem {
@@ -38,6 +39,11 @@ const navItems: NavItem[] = [
     label: "Bekleyen Yorumlar",
     href: "/admin/comments",
     icon: <MessageSquare className="h-4 w-4" />,
+  },
+  {
+    label: "Hakkımda",
+    href: "/admin/about",
+    icon: <User className="h-4 w-4" />,
   },
 ];
 

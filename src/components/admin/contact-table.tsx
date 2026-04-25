@@ -27,10 +27,12 @@ export default function ContactTable({ messages }: ContactTableProps) {
   const [selected, setSelected] = useState<ContactMessage | null>(null);
 
   function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString("tr-TR", {
+    return new Date(iso).toLocaleString("tr-TR", {
       day: "2-digit",
       month: "short",
       year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   }
 
