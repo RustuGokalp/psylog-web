@@ -7,6 +7,7 @@ import { getPost } from "@/services/post.service";
 import { getAbout } from "@/services/about.service";
 import { PostDetail } from "@/types/post";
 import PostContent from "@/components/posts/post-content";
+import { Badge } from "@/components/ui/badge";
 import CommentSection from "@/components/posts/comment-section";
 import Blob from "@/components/icons/blob";
 import Rose from "@/components/icons/rose";
@@ -68,6 +69,13 @@ function formatTurkishDate(dateStr: string): string {
   });
 }
 
+function formatReadingTime(minutes: number): string {
+  if (minutes <= 60) return `${minutes} dk`;
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return mins > 0 ? `${hours}s. ${mins}dk` : `${hours}s.`;
+}
+
 export default async function PostDetailPage({ params }: Props) {
   const { slug } = await params;
   const [post, about] = await Promise.all([getPost(slug), getAbout()]);
@@ -117,13 +125,13 @@ export default async function PostDetailPage({ params }: Props) {
           {post.tags.length > 0 && (
             <div className="mb-4 flex flex-wrap gap-1.5">
               {post.tags.map((tag) => (
-                <span
+                <Badge
                   key={tag}
-                  className="rounded-full px-2.5 py-0.5 text-xs font-medium text-white"
-                  style={{ backgroundColor: "#8b7eb8" }}
+                  variant="secondary"
+                  className="rounded-full bg-purple-50 px-2.5 py-0.5 text-xs font-medium text-purple-400 hover:bg-purple-100"
                 >
-                  {tag}
-                </span>
+                  #{tag}
+                </Badge>
               ))}
             </div>
           )}
@@ -170,7 +178,7 @@ export default async function PostDetailPage({ params }: Props) {
                   <span className="text-slate-300" aria-hidden="true">
                     |
                   </span>
-                  <span>{post.readingTime} dk okuma</span>
+                  <span>{formatReadingTime(post.readingTime)} okuma</span>
                 </>
               )}
             </div>

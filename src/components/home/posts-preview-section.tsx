@@ -23,6 +23,13 @@ function formatTurkishDate(dateStr: string): string {
   });
 }
 
+function formatReadingTime(minutes: number): string {
+  if (minutes <= 60) return `${minutes} dk. okuma`;
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return mins > 0 ? `${hours}s. ${mins}dk. okuma` : `${hours}s. okuma`;
+}
+
 export default function PostsPreviewSection({
   posts,
 }: PostsPreviewSectionProps) {
@@ -72,8 +79,8 @@ export default function PostsPreviewSection({
                   href={`/yazilarim/${post.slug}`}
                   className="group block rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <Card className="h-full overflow-hidden rounded-2xl shadow-sm transition-shadow group-hover:shadow-md">
-                    <div className="relative h-44 w-full">
+                  <Card className="flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-shadow group-hover:shadow-md">
+                    <div className="relative h-44 w-full shrink-0">
                       {post.coverImage ? (
                         <Image
                           src={post.coverImage}
@@ -98,27 +105,38 @@ export default function PostsPreviewSection({
                       </CardTitle>
                     </CardHeader>
 
-                    <CardContent className="flex flex-col gap-3">
-                      <p className="text-sm text-muted-foreground">
+                    <CardContent className="flex flex-1 flex-col gap-3">
+                      <p className="flex-1 text-sm text-muted-foreground">
                         {truncatedSummary}
                       </p>
 
-                      <time
-                        dateTime={post.createdAt}
-                        className="text-xs text-muted-foreground"
-                      >
-                        {formatTurkishDate(post.createdAt)}
-                      </time>
-
-                      {post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {post.tags.map((tag) => (
-                            <Badge key={tag} variant="secondary">
-                              {tag}
-                            </Badge>
-                          ))}
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <time dateTime={post.createdAt}>
+                            {formatTurkishDate(post.createdAt)}
+                          </time>
+                          {post.readingTime != null && (
+                            <>
+                              <span aria-hidden="true">|</span>
+                              <span>{formatReadingTime(post.readingTime)}</span>
+                            </>
+                          )}
                         </div>
-                      )}
+
+                        {post.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {post.tags.slice(0, 4).map((tag) => (
+                              <Badge
+                                key={tag}
+                                variant="secondary"
+                                className="rounded-full bg-purple-50 px-2.5 py-0.5 text-xs font-medium text-purple-400 hover:bg-purple-100"
+                              >
+                                #{tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 </Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Table,
@@ -16,9 +16,31 @@ import { ApiException } from "@/lib/api";
 import { approveComment, rejectComment } from "@/services/comment.service";
 import { CommentAdminResponse } from "@/types/post";
 import { Check, MessageSquare, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
+function StatusBadge({ status }: { status: CommentAdminResponse["status"] }) {
+  const map = {
+    APPROVED: {
+      label: "Onaylı",
+      className: "bg-green-100 text-green-700 border-green-200",
+    },
+    REJECTED: {
+      label: "Reddedildi",
+      className: "bg-red-100 text-red-600 border-red-200",
+    },
+    PENDING: {
+      label: "Bekliyor",
+      className: "bg-yellow-100 text-yellow-700 border-yellow-200",
+    },
+  };
+  const { label, className } = map[status];
+  return <Badge className={className}>{label}</Badge>;
+}
 
 interface CommentTableProps {
   comments: CommentAdminResponse[];
+  onRefresh?: () => void;
+  emptyMessage?: string;
 }
 
 type FeedbackAlert = {
@@ -53,9 +75,15 @@ function CommentDetail({ comment }: { comment: CommentAdminResponse }) {
 
 export default function CommentTable({
   comments: initialComments,
+  onRefresh,
+  emptyMessage = "Bekleyen yorum bulunmuyor.",
 }: CommentTableProps) {
   const [comments, setComments] =
     useState<CommentAdminResponse[]>(initialComments);
+
+  useEffect(() => {
+    setComments(initialComments);
+  }, [initialComments]);
   const [approveTarget, setApproveTarget] =
     useState<CommentAdminResponse | null>(null);
   const [rejectTarget, setRejectTarget] = useState<CommentAdminResponse | null>(
@@ -81,7 +109,11 @@ export default function CommentTable({
     setProcessingId(target.id);
     try {
       await approveComment(target.id);
-      setComments((prev) => prev.filter((c) => c.id !== target.id));
+      if (onRefresh) {
+        onRefresh();
+      } else {
+        setComments((prev) => prev.filter((c) => c.id !== target.id));
+      }
       setFeedbackAlert({
         type: "success",
         title: "Yorum Onaylandı",
@@ -105,7 +137,11 @@ export default function CommentTable({
     setProcessingId(target.id);
     try {
       await rejectComment(target.id);
-      setComments((prev) => prev.filter((c) => c.id !== target.id));
+      if (onRefresh) {
+        onRefresh();
+      } else {
+        setComments((prev) => prev.filter((c) => c.id !== target.id));
+      }
       setFeedbackAlert({
         type: "success",
         title: "Yorum Reddedildi",
@@ -126,9 +162,7 @@ export default function CommentTable({
     return (
       <div className="rounded-xl border border-dashed border-slate-300 bg-white py-16 text-center">
         <MessageSquare className="mx-auto h-8 w-8 text-slate-300" />
-        <p className="mt-3 text-sm text-slate-500">
-          Bekleyen yorum bulunmuyor.
-        </p>
+        <p className="mt-3 text-sm text-slate-500">{emptyMessage}</p>
       </div>
     );
   }
@@ -148,39 +182,46 @@ export default function CommentTable({
               </span>
             </div>
 
-            <Link
-              href={`/yazilarim/${comment.postSlug}`}
-              target="_blank"
-              className="text-xs font-medium text-violet-600 hover:underline line-clamp-1"
-            >
-              {comment.postTitle}
-            </Link>
+            <div className="flex items-center justify-between gap-2">
+              <Link
+                href={`/yazilarim/${comment.postSlug}`}
+                target="_blank"
+                className="text-xs font-medium text-violet-600 hover:underline line-clamp-1"
+              >
+                {comment.postTitle}
+              </Link>
+              <StatusBadge status={comment.status} />
+            </div>
 
             <p className="line-clamp-2 text-xs text-slate-500">
               {comment.content}
             </p>
 
             <div className="flex items-center gap-2 border-t border-slate-100 pt-2.5">
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={processingId === comment.id}
-                onClick={() => setApproveTarget(comment)}
-                className="h-8 flex-1 cursor-pointer gap-1.5 text-xs text-green-600 hover:text-green-700 hover:bg-green-50"
-              >
-                <Check className="h-3.5 w-3.5" />
-                Onayla
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={processingId === comment.id}
-                onClick={() => setRejectTarget(comment)}
-                className="h-8 flex-1 cursor-pointer gap-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50"
-              >
-                <X className="h-3.5 w-3.5" />
-                Reddet
-              </Button>
+              {comment.status !== "APPROVED" && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={processingId === comment.id}
+                  onClick={() => setApproveTarget(comment)}
+                  className="h-8 flex-1 cursor-pointer gap-1.5 text-xs text-green-600 hover:text-green-700 hover:bg-green-50"
+                >
+                  <Check className="h-3.5 w-3.5" />
+                  Onayla
+                </Button>
+              )}
+              {comment.status !== "REJECTED" && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={processingId === comment.id}
+                  onClick={() => setRejectTarget(comment)}
+                  className="h-8 flex-1 cursor-pointer gap-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50"
+                >
+                  <X className="h-3.5 w-3.5" />
+                  Reddet
+                </Button>
+              )}
             </div>
           </div>
         ))}
@@ -202,6 +243,9 @@ export default function CommentTable({
               </TableHead>
               <TableHead className="font-semibold text-slate-600">
                 İçerik
+              </TableHead>
+              <TableHead className="font-semibold text-slate-600">
+                Durum
               </TableHead>
               <TableHead className="hidden lg:table-cell font-semibold text-slate-600">
                 Tarih
@@ -229,9 +273,7 @@ export default function CommentTable({
                 </TableCell>
 
                 <TableCell className="hidden md:table-cell text-sm text-slate-500">
-                  {comment.email ?? (
-                    <span className="text-slate-300">—</span>
-                  )}
+                  {comment.email ?? <span className="text-slate-300">—</span>}
                 </TableCell>
 
                 <TableCell className="max-w-64">
@@ -240,32 +282,40 @@ export default function CommentTable({
                   </p>
                 </TableCell>
 
+                <TableCell>
+                  <StatusBadge status={comment.status} />
+                </TableCell>
+
                 <TableCell className="hidden lg:table-cell whitespace-nowrap text-sm text-slate-500">
                   {formatDate(comment.createdAt)}
                 </TableCell>
 
                 <TableCell>
                   <div className="flex items-center justify-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      disabled={processingId === comment.id}
-                      onClick={() => setApproveTarget(comment)}
-                      className="h-8 w-8 cursor-pointer text-green-500 hover:text-green-700 hover:bg-green-50"
-                      aria-label="Onayla"
-                    >
-                      <Check className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      disabled={processingId === comment.id}
-                      onClick={() => setRejectTarget(comment)}
-                      className="h-8 w-8 cursor-pointer text-red-400 hover:text-red-600 hover:bg-red-50"
-                      aria-label="Reddet"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+                    {comment.status !== "APPROVED" && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={processingId === comment.id}
+                        onClick={() => setApproveTarget(comment)}
+                        className="h-8 w-8 cursor-pointer text-green-500 hover:text-green-700 hover:bg-green-50"
+                        aria-label="Onayla"
+                      >
+                        <Check className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {comment.status !== "REJECTED" && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={processingId === comment.id}
+                        onClick={() => setRejectTarget(comment)}
+                        className="h-8 w-8 cursor-pointer text-red-400 hover:text-red-600 hover:bg-red-50"
+                        aria-label="Reddet"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

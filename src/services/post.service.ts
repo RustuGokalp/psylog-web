@@ -88,10 +88,14 @@ export async function submitComment(
 export async function getAdminPosts(params?: {
   page?: number;
   size?: number;
+  keyword?: string;
+  tag?: string;
 }): Promise<PaginatedResponse<AdminPost>> {
   const searchParams = new URLSearchParams();
   if (params?.page !== undefined) searchParams.set("page", String(params.page));
   if (params?.size !== undefined) searchParams.set("size", String(params.size));
+  if (params?.keyword) searchParams.set("keyword", params.keyword);
+  if (params?.tag) searchParams.set("tag", params.tag);
   const query = searchParams.toString();
   const response = await apiClient.get<PaginatedResponse<AdminPost>>(
     query ? `/api/admin/posts?${query}` : "/api/admin/posts"

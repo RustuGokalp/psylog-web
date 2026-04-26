@@ -30,6 +30,13 @@ export async function getAdminSpecializations(): Promise<Specialization[]> {
   return response.data;
 }
 
+export async function getAdminSpecializationById(
+  id: number,
+): Promise<Specialization> {
+  const response = await apiClient.get<Specialization>(`/api/admin/specializations/${id}`);
+  return response.data;
+}
+
 export async function createSpecialization(
   data: SpecializationRequest,
 ): Promise<Specialization> {

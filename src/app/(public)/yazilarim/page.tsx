@@ -3,6 +3,7 @@ import { createMetadata, siteConfig } from "@/lib/metadata";
 import { getPosts } from "@/services/post.service";
 import { Post } from "@/types/post";
 import PostList from "@/components/posts/post-list";
+import PostSearchFilter from "@/components/posts/post-search-filter";
 import Daisy from "@/components/icons/daisy";
 import Rose from "@/components/icons/rose";
 import Star from "@/components/icons/star";
@@ -50,8 +51,13 @@ function buildJsonLd(posts: Post[]) {
   };
 }
 
-export default async function YazilarimPage() {
-  const initialData = await getPosts({ page: 0, size: 10 });
+interface YazilarimPageProps {
+  searchParams: Promise<{ keyword?: string; tag?: string }>;
+}
+
+export default async function YazilarimPage({ searchParams }: YazilarimPageProps) {
+  const { keyword, tag } = await searchParams;
+  const initialData = await getPosts({ page: 0, size: 10, keyword, tag });
   const posts = initialData.content;
 
   return (
@@ -104,11 +110,17 @@ export default async function YazilarimPage() {
       </section>
 
       <section className="bg-[#FDF8F6]">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+        <div className="mx-auto max-w-6xl px-4 pt-8 pb-16 sm:px-6 sm:pt-10 sm:pb-20 lg:px-8">
+          <PostSearchFilter initialKeyword={keyword} initialTag={tag} />
           {posts.length === 0 ? (
-            <EmptyState />
+            <EmptyState filtered={!!(keyword || tag)} />
           ) : (
-            <PostList initialPosts={posts} initialLast={initialData.last} />
+            <PostList
+              initialPosts={posts}
+              initialLast={initialData.last}
+              keyword={keyword}
+              tag={tag}
+            />
           )}
         </div>
       </section>
@@ -121,12 +133,14 @@ export default async function YazilarimPage() {
   );
 }
 
-function EmptyState() {
+function EmptyState({ filtered }: { filtered?: boolean }) {
   return (
     <div className="flex flex-col items-center gap-4 py-20 text-center">
       <FlowerStem className="h-16 w-16 text-rose-200" aria-hidden="true" />
       <p className="text-base text-slate-500">
-        Henüz yazı yayınlanmamış. Lütfen daha sonra tekrar ziyaret edin.
+        {filtered
+          ? "Arama kriterlerine uygun yazı bulunamadı."
+          : "Henüz yazı yayınlanmamış. Lütfen daha sonra tekrar ziyaret edin."}
       </p>
     </div>
   );

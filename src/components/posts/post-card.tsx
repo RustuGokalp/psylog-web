@@ -26,6 +26,13 @@ function formatTurkishDate(dateStr: string): string {
   });
 }
 
+function formatReadingTime(minutes: number): string {
+  if (minutes <= 60) return `${minutes} dk okuma`;
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return mins > 0 ? `${hours}s. ${mins}dk okuma` : `${hours}s. okuma`;
+}
+
 export default function PostCard({
   post,
   index = 0,
@@ -46,7 +53,7 @@ export default function PostCard({
   return (
     <Link
       href={`/yazilarim/${post.slug}`}
-      className="group block rounded-xl px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 sm:px-10"
+      className="group block rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
     >
       <article className="flex h-auto flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-100 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-lg sm:h-60 sm:flex-row">
         <div className="relative h-52 w-full shrink-0 overflow-hidden sm:h-auto sm:w-1/3 sm:self-stretch">
@@ -67,20 +74,6 @@ export default function PostCard({
         </div>
 
         <div className="flex flex-1 flex-col gap-1.5 p-4">
-          {post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {post.tags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="secondary"
-                  className="rounded-full bg-purple-50 px-2.5 py-0.5 text-xs font-medium text-purple-400 hover:bg-purple-100"
-                >
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          )}
-
           <h2 className="text-sm font-semibold leading-snug text-slate-800 transition-colors group-hover:text-rose-600 sm:text-base">
             {post.title}
           </h2>
@@ -97,8 +90,8 @@ export default function PostCard({
               </time>
               {post.readingTime !== null && (
                 <>
-                  <span aria-hidden="true">·</span>
-                  <span>{post.readingTime} dk okuma</span>
+                  <span aria-hidden="true">|</span>
+                  <span>{formatReadingTime(post.readingTime!)}</span>
                 </>
               )}
             </div>
@@ -123,6 +116,20 @@ export default function PostCard({
               </span>
             )}
           </div>
+
+          {post.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {post.tags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="secondary"
+                  className="rounded-full bg-purple-50 px-2.5 py-0.5 text-xs font-medium text-purple-400 hover:bg-purple-100"
+                >
+                  #{tag}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
       </article>
     </Link>
