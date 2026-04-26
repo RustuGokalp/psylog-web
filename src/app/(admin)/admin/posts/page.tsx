@@ -7,6 +7,7 @@ import { AdminPost, PaginatedResponse } from "@/types/post";
 import { ApiException } from "@/lib/api";
 import PostTable from "@/components/admin/post-table";
 import AdminPagination from "@/components/admin/admin-pagination";
+import AdminPostFilter from "@/components/admin/admin-post-filter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ActionAlert } from "@/components/action-alert";
 import { Plus } from "lucide-react";
@@ -16,15 +17,19 @@ const PAGE_SIZE = 10;
 export default function AdminPostsPage() {
   const [data, setData] = useState<PaginatedResponse<AdminPost> | null>(null);
   const [page, setPage] = useState(0);
+  const [keyword, setKeyword] = useState("");
+  const [tag, setTag] = useState("");
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const fetchPosts = useCallback(async (currentPage: number) => {
+  const fetchPosts = useCallback(async (currentPage: number, kw: string, tg: string) => {
     setLoading(true);
     try {
       const result = await getAdminPosts({
         page: currentPage,
         size: PAGE_SIZE,
+        keyword: kw || undefined,
+        tag: tg || undefined,
       });
       setData(result);
     } catch (err) {
@@ -37,8 +42,14 @@ export default function AdminPostsPage() {
   }, []);
 
   useEffect(() => {
-    fetchPosts(page);
-  }, [fetchPosts, page]);
+    fetchPosts(page, keyword, tag);
+  }, [fetchPosts, page, keyword, tag]);
+
+  function handleSearch(kw: string, tg: string) {
+    setKeyword(kw);
+    setTag(tg);
+    setPage(0);
+  }
 
   function handlePageChange(newPage: number) {
     setPage(newPage);
@@ -66,6 +77,8 @@ export default function AdminPostsPage() {
         </Link>
       </div>
 
+      <AdminPostFilter onSearch={handleSearch} />
+
       {loading ? (
         <div className="bg-white rounded-xl border border-slate-200 p-4 flex flex-col gap-3">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -76,7 +89,7 @@ export default function AdminPostsPage() {
         <>
           <PostTable
             posts={data?.content ?? []}
-            onDeleteSuccess={() => fetchPosts(page)}
+            onDeleteSuccess={() => fetchPosts(page, keyword, tag)}
           />
           {data && (
             <AdminPagination

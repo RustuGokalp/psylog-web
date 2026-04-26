@@ -16,6 +16,7 @@ import {
   Brain,
   MessageSquare,
   User,
+  Stethoscope,
 } from "lucide-react";
 
 interface NavItem {
@@ -44,6 +45,11 @@ const navItems: NavItem[] = [
     label: "Hakkımda",
     href: "/admin/about",
     icon: <User className="h-4 w-4" />,
+  },
+  {
+    label: "Çalışma Alanları",
+    href: "/admin/specializations",
+    icon: <Stethoscope className="h-4 w-4" />,
   },
 ];
 

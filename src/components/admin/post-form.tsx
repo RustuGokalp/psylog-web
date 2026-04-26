@@ -671,6 +671,7 @@ export default function PostForm({
           onClose={() => setConfirmOpen(false)}
           onConfirm={executeUpdate}
           confirmLabel="Kaydet"
+          confirmClassName="bg-green-600 hover:bg-green-700 text-white"
         />
       )}
 

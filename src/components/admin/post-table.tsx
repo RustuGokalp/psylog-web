@@ -29,7 +29,7 @@ import {
   updatePost,
 } from "@/services/post.service";
 import { AdminPost } from "@/types/post";
-import { MessageSquare, Pencil, Trash2 } from "lucide-react";
+import { MessageSquare, MessagesSquare, Pencil, Trash2 } from "lucide-react";
 
 interface PostTableProps {
   posts: AdminPost[];
@@ -218,6 +218,13 @@ export default function PostTable({
                 </div>
                 <div className="flex items-center gap-1">
                   <button
+                    onClick={() => router.push(`/admin/posts/${post.id}/comments`)}
+                    className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-violet-400 transition-colors hover:bg-violet-50 hover:text-violet-600"
+                    aria-label="Yorumları Gör"
+                  >
+                    <MessagesSquare className="h-4 w-4" />
+                  </button>
+                  <button
                     onClick={() => router.push(`/admin/posts/${post.id}/edit`)}
                     className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
                     aria-label="Düzenle"
@@ -398,6 +405,15 @@ export default function PostTable({
                 {/* Aksiyonlar */}
                 <TableCell>
                   <div className="flex items-center justify-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => router.push(`/admin/posts/${post.id}/comments`)}
+                      className="h-8 w-8 cursor-pointer text-violet-400 hover:text-violet-600 hover:bg-violet-50"
+                      aria-label="Yorumları Gör"
+                    >
+                      <MessagesSquare className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"

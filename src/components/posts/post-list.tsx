@@ -8,9 +8,11 @@ import PostCard from "@/components/posts/post-card";
 interface PostListProps {
   initialPosts: Post[];
   initialLast: boolean;
+  keyword?: string;
+  tag?: string;
 }
 
-export default function PostList({ initialPosts, initialLast }: PostListProps) {
+export default function PostList({ initialPosts, initialLast, keyword, tag }: PostListProps) {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [page, setPage] = useState(0);
   const [isLast, setIsLast] = useState(initialLast);
@@ -21,7 +23,7 @@ export default function PostList({ initialPosts, initialLast }: PostListProps) {
     setPosts(initialPosts);
     setPage(0);
     setIsLast(initialLast);
-  }, [initialPosts, initialLast]);
+  }, [initialPosts, initialLast, keyword, tag]);
 
   useEffect(() => {
     if (isLast) return;
@@ -30,7 +32,7 @@ export default function PostList({ initialPosts, initialLast }: PostListProps) {
       setIsLoading(true);
       try {
         const nextPage = page + 1;
-        const data = await fetchPublicPosts({ page: nextPage, size: 10 });
+        const data = await fetchPublicPosts({ page: nextPage, size: 10, keyword, tag });
         setPosts((prev) => [...prev, ...data.content]);
         setPage(nextPage);
         setIsLast(data.last);
