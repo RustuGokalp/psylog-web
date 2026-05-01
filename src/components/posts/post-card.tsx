@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Post } from "@/types/post";
+import { formatTurkishDate, formatReadingTime } from "@/lib/format";
 
 interface PostCardProps {
   post: Post;
@@ -16,22 +17,6 @@ const PLACEHOLDER_COLORS = [
   "bg-purple-100",
   "bg-pink-100",
 ];
-
-function formatTurkishDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("tr-TR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-function formatReadingTime(minutes: number): string {
-  if (minutes <= 60) return `${minutes} dk okuma`;
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return mins > 0 ? `${hours}s. ${mins}dk okuma` : `${hours}s. okuma`;
-}
 
 export default function PostCard({
   post,
@@ -91,7 +76,7 @@ export default function PostCard({
               {post.readingTime !== null && (
                 <>
                   <span aria-hidden="true">|</span>
-                  <span>{formatReadingTime(post.readingTime!)}</span>
+                  <span>{formatReadingTime(post.readingTime!)} okuma</span>
                 </>
               )}
             </div>

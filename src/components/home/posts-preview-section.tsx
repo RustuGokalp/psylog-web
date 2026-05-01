@@ -7,28 +7,13 @@ import Daisy from "@/components/icons/daisy";
 import Star from "@/components/icons/star";
 import Rose from "@/components/icons/rose";
 import FlowerStem from "@/components/icons/flower-stem";
+import { formatTurkishDate, formatReadingTime } from "@/lib/format";
 
 interface PostsPreviewSectionProps {
   posts: Post[];
 }
 
 const PLACEHOLDER_COLORS = ["bg-rose-100", "bg-violet-100", "bg-sky-100"];
-
-function formatTurkishDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("tr-TR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-function formatReadingTime(minutes: number): string {
-  if (minutes <= 60) return `${minutes} dk. okuma`;
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return mins > 0 ? `${hours}s. ${mins}dk. okuma` : `${hours}s. okuma`;
-}
 
 export default function PostsPreviewSection({
   posts,
@@ -118,7 +103,7 @@ export default function PostsPreviewSection({
                           {post.readingTime != null && (
                             <>
                               <span aria-hidden="true">|</span>
-                              <span>{formatReadingTime(post.readingTime)}</span>
+                              <span>{formatReadingTime(post.readingTime)} okuma</span>
                             </>
                           )}
                         </div>
