@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { createMetadata, siteConfig } from "@/lib/metadata";
+import { formatTurkishDate, formatReadingTime, safeJsonLd } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { getPost } from "@/services/post.service";
 import { getAbout } from "@/services/about.service";
 import { PostDetail } from "@/types/post";
@@ -16,6 +18,7 @@ import Daisy from "@/components/icons/daisy";
 import Butterfly from "@/components/icons/butterfly";
 import PageCta from "@/components/page-cta";
 import Wildflower from "@/components/icons/wildflower";
+import ShareButton from "@/components/posts/share-button";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -24,7 +27,9 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPost(slug);
-  if (!post) return {};
+  if (!post) {
+    return { robots: { index: false } };
+  }
 
   return createMetadata({
     title: post.title,
@@ -32,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     path: `/yazilarim/${post.slug}`,
     openGraph: {
       type: "article",
-      ...(post.coverImage && { images: [{ url: post.coverImage }] }),
+      images: post.coverImage ? [{ url: post.coverImage }] : undefined,
     },
   });
 }
@@ -61,21 +66,6 @@ function buildJsonLd(post: PostDetail) {
   };
 }
 
-function formatTurkishDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("tr-TR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-function formatReadingTime(minutes: number): string {
-  if (minutes <= 60) return `${minutes} dk`;
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return mins > 0 ? `${hours}s. ${mins}dk` : `${hours}s.`;
-}
-
 export default async function PostDetailPage({ params }: Props) {
   const { slug } = await params;
   const [post, about] = await Promise.all([getPost(slug), getAbout()]);
@@ -85,7 +75,7 @@ export default async function PostDetailPage({ params }: Props) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(post)) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(buildJsonLd(post)) }}
       />
 
       <section className="relative overflow-hidden bg-[#fdf4f5]">
@@ -119,7 +109,7 @@ export default async function PostDetailPage({ params }: Props) {
             href="/yazilarim"
             className="mb-6 inline-flex items-center gap-1 text-sm text-rose-500 transition-colors hover:text-rose-600"
           >
-            ← Tüm yazılar
+            <span aria-hidden="true">←</span> Tüm yazılar
           </Link>
 
           {post.tags.length > 0 && (
@@ -144,44 +134,51 @@ export default async function PostDetailPage({ params }: Props) {
             {post.summary}
           </p>
 
-          <div className="mt-6 pb-5 flex flex-wrap items-center gap-3">
-            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-rose-500">
-              {about?.profileImage ? (
-                <Image
-                  src={about.profileImage}
-                  alt={siteConfig.author}
-                  fill
-                  className="object-cover"
-                  sizes="40px"
-                />
-              ) : (
-                <span className="flex h-full w-full items-center justify-center text-sm font-bold text-white">
-                  TT
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-sm font-semibold text-slate-800">
-                {siteConfig.author}
-              </span>
-              <span className="text-xs text-slate-400">Klinik Psikolog</span>
-            </div>
-            <span className="text-slate-300" aria-hidden="true">
-              |
-            </span>
-            <div className="flex items-center gap-3 text-sm text-slate-400">
-              <time dateTime={post.createdAt}>
-                {formatTurkishDate(post.createdAt)}
-              </time>
-              {post.readingTime !== null && (
-                <>
-                  <span className="text-slate-300" aria-hidden="true">
-                    |
+          <div className="mt-6 pb-5 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-rose-500">
+                {about?.profileImage ? (
+                  <Image
+                    src={about.profileImage}
+                    alt={siteConfig.author}
+                    fill
+                    className="object-cover"
+                    sizes="40px"
+                  />
+                ) : (
+                  <span className="flex h-full w-full items-center justify-center text-sm font-bold text-white">
+                    TT
                   </span>
-                  <span>{formatReadingTime(post.readingTime)} okuma</span>
-                </>
-              )}
+                )}
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-sm font-semibold text-slate-800">
+                  {siteConfig.author}
+                </span>
+                <span className="text-xs text-slate-400">Klinik Psikolog</span>
+              </div>
+              <span className="text-slate-300" aria-hidden="true">
+                |
+              </span>
+              <div className="flex items-center gap-3 text-sm text-slate-400">
+                <time dateTime={post.createdAt}>
+                  {formatTurkishDate(post.createdAt)}
+                </time>
+                {post.readingTime !== null && (
+                  <>
+                    <span className="text-slate-300" aria-hidden="true">
+                      |
+                    </span>
+                    <span>{formatReadingTime(post.readingTime)} okuma</span>
+                  </>
+                )}
+              </div>
             </div>
+            <ShareButton
+              url={`${siteConfig.url}/yazilarim/${post.slug}`}
+              title={post.title}
+              summary={post.summary}
+            />
           </div>
         </div>
       </section>
@@ -202,13 +199,17 @@ export default async function PostDetailPage({ params }: Props) {
       )}
 
       <div
-        className={`mx-auto max-w-3xl px-4 pb-12 sm:px-6 lg:px-8 ${
-          post.coverImage ? "pt-10" : "pt-12"
-        }`}
+        className={cn(
+          "mx-auto max-w-3xl px-4 pb-12 sm:px-6 lg:px-8",
+          post.coverImage ? "pt-10" : "pt-12",
+        )}
       >
         <PostContent content={post.content} />
 
-        <div className="my-6 text-center text-base tracking-widest text-slate-300">
+        <div
+          className="my-6 text-center text-base tracking-widest text-slate-300"
+          aria-hidden="true"
+        >
           ● ● ●
         </div>
 
