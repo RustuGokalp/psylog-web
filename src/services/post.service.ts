@@ -30,7 +30,7 @@ export async function getPosts(params?: {
   const path = query ? `/api/posts?${query}` : "/api/posts";
 
   const data = await serverFetch<PaginatedResponse<Post>>(path, {
-    next: { revalidate: 60 },
+    next: { revalidate: 0 },
   });
   return data ?? { content: [], page: 0, size: 10, totalElements: 0, totalPages: 0, last: true };
 }
@@ -56,7 +56,7 @@ export async function fetchPublicPosts(params?: {
 
 export async function getPost(slug: string): Promise<PostDetail | null> {
   return serverFetch<PostDetail>(`/api/posts/${encodeURIComponent(slug)}`, {
-    next: { revalidate: 60 },
+    next: { revalidate: 0 },
   });
 }
 

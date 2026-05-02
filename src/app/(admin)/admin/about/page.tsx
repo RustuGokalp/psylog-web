@@ -13,8 +13,9 @@ import { About } from "@/types/about";
 import { ApiException } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import RichTextEditor from "@/components/admin/rich-text-editor";
+import ImageUpload from "@/components/admin/image-upload";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ActionAlert } from "@/components/action-alert";
 import { Plus, X } from "lucide-react";
@@ -222,21 +223,13 @@ export default function AdminAboutPage() {
               <Label htmlFor="message" className="text-slate-700 font-medium">
                 Hakkımda Metni <span className="text-red-500">*</span>
               </Label>
-              <Textarea
-                id="message"
-                placeholder="HTML formatında metin girin..."
-                rows={8}
-                {...formik.getFieldProps("message")}
-                disabled={isLoading}
-                aria-invalid={
-                  !!(formik.touched.message && formik.errors.message)
-                }
-                aria-describedby={
-                  formik.touched.message && formik.errors.message
-                    ? "message-error"
-                    : undefined
-                }
-                className="resize-y font-mono text-sm"
+              <RichTextEditor
+                value={formik.values.message}
+                onChange={(html) => formik.setFieldValue("message", html)}
+                onBlur={() => formik.setFieldTouched("message", true)}
+                placeholder="Hakkımda metnini buraya girin..."
+                hasError={!!(formik.touched.message && formik.errors.message)}
+                minHeight="200px"
               />
               {formik.touched.message && formik.errors.message && (
                 <p
@@ -251,39 +244,18 @@ export default function AdminAboutPage() {
 
             {/* profileImage */}
             <div className="flex flex-col gap-1.5">
-              <Label
-                htmlFor="profileImage"
-                className="text-slate-700 font-medium"
-              >
-                Profil Fotoğrafı URL{" "}
+              <Label className="text-slate-700 font-medium">
+                Profil Fotoğrafı{" "}
                 <span className="text-slate-400 font-normal text-xs">
                   (isteğe bağlı)
                 </span>
               </Label>
-              <Input
-                id="profileImage"
-                type="url"
-                placeholder="https://example.com/photo.jpg"
-                {...formik.getFieldProps("profileImage")}
-                disabled={isLoading}
-                aria-invalid={
-                  !!(formik.touched.profileImage && formik.errors.profileImage)
-                }
-                aria-describedby={
-                  formik.touched.profileImage && formik.errors.profileImage
-                    ? "profileImage-error"
-                    : undefined
-                }
+              <ImageUpload
+                value={formik.values.profileImage}
+                onChange={(url) => formik.setFieldValue("profileImage", url)}
+                aspectRatio="square"
+                label="Profil fotoğrafı"
               />
-              {formik.touched.profileImage && formik.errors.profileImage && (
-                <p
-                  id="profileImage-error"
-                  role="alert"
-                  className="text-xs text-destructive"
-                >
-                  {formik.errors.profileImage}
-                </p>
-              )}
             </div>
 
             {/* education */}
