@@ -27,3 +27,7 @@ export async function rejectComment(id: number): Promise<CommentAdminResponse> {
   );
   return response.data;
 }
+
+export async function deleteComment(id: number): Promise<void> {
+  await apiClient.delete(`/api/admin/comments/${id}`);
+}

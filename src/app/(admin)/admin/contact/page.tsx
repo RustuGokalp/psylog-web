@@ -44,7 +44,9 @@ export default function AdminContactPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-800">İletişim</h1>
         <p className="mt-0.5 text-sm text-slate-500">
-          {loading ? "Mesajlar yükleniyor..." : `${totalElements} mesaj`}
+          {loading
+            ? "Mesajlar yükleniyor..."
+            : `${totalElements} mesaj · Sayfa ${page + 1} / ${Math.max(totalPages, 1)}`}
         </p>
       </div>
 

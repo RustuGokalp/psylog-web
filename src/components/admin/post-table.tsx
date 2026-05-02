@@ -30,6 +30,7 @@ import {
 } from "@/services/post.service";
 import { AdminPost } from "@/types/post";
 import { MessageSquare, MessagesSquare, Pencil, Trash2 } from "lucide-react";
+import { formatReadingTime, formatTurkishDate } from "@/lib/format";
 
 interface PostTableProps {
   posts: AdminPost[];
@@ -189,8 +190,9 @@ export default function PostTable({
 
               <div className="flex items-center justify-between">
                 <span className="text-xs text-slate-400">
-                  {formatDate(post.createdAt)}
-                  {post.readingTime != null && ` · ${post.readingTime} dk`}
+                  {formatTurkishDate(post.createdAt)}
+                  {post.readingTime != null &&
+                    ` · ${formatReadingTime(post.readingTime)}`}
                 </span>
                 {pendingCount > 0 && (
                   <Link
@@ -218,7 +220,9 @@ export default function PostTable({
                 </div>
                 <div className="flex items-center gap-1">
                   <button
-                    onClick={() => router.push(`/admin/posts/${post.id}/comments`)}
+                    onClick={() =>
+                      router.push(`/admin/posts/${post.id}/comments`)
+                    }
                     className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-violet-400 transition-colors hover:bg-violet-50 hover:text-violet-600"
                     aria-label="Yorumları Gör"
                   >
@@ -226,7 +230,7 @@ export default function PostTable({
                   </button>
                   <button
                     onClick={() => router.push(`/admin/posts/${post.id}/edit`)}
-                    className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
+                    className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-amber-500 transition-colors hover:bg-amber-100 hover:text-amber-800"
                     aria-label="Düzenle"
                   >
                     <Pencil className="h-4 w-4" />
@@ -262,7 +266,7 @@ export default function PostTable({
               <TableHead className="hidden lg:table-cell font-semibold text-slate-600">
                 Oluşturulma
               </TableHead>
-              <TableHead className="hidden xl:table-cell font-semibold text-slate-600">
+              <TableHead className="hidden lg:table-cell font-semibold text-slate-600">
                 Güncelleme
               </TableHead>
               <TableHead className="hidden xl:table-cell font-semibold text-slate-600 text-center">
@@ -354,17 +358,19 @@ export default function PostTable({
 
                 {/* Oluşturulma */}
                 <TableCell className="hidden lg:table-cell text-sm text-slate-500 whitespace-nowrap">
-                  {formatDate(post.createdAt)}
+                  {formatTurkishDate(post.createdAt)}
                 </TableCell>
 
                 {/* Güncelleme */}
-                <TableCell className="hidden xl:table-cell text-sm text-slate-500 whitespace-nowrap">
-                  {post.updatedAt ? formatDate(post.updatedAt) : "—"}
+                <TableCell className="hidden lg:table-cell text-sm text-slate-500 whitespace-nowrap">
+                  {post.updatedAt ? formatTurkishDate(post.updatedAt) : "—"}
                 </TableCell>
 
                 {/* Okuma süresi */}
                 <TableCell className="hidden xl:table-cell text-center text-sm text-slate-500">
-                  {post.readingTime != null ? `${post.readingTime} dk` : "—"}
+                  {post.readingTime != null
+                    ? formatReadingTime(post.readingTime)
+                    : "—"}
                 </TableCell>
 
                 {/* Yorumlar */}
@@ -408,7 +414,9 @@ export default function PostTable({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => router.push(`/admin/posts/${post.id}/comments`)}
+                      onClick={() =>
+                        router.push(`/admin/posts/${post.id}/comments`)
+                      }
                       className="h-8 w-8 cursor-pointer text-violet-400 hover:text-violet-600 hover:bg-violet-50"
                       aria-label="Yorumları Gör"
                     >
@@ -417,7 +425,9 @@ export default function PostTable({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => router.push(`/admin/posts/${post.id}/edit`)}
+                      onClick={() =>
+                        router.push(`/admin/posts/${post.id}/edit`)
+                      }
                       className="h-8 w-8 cursor-pointer text-amber-400 hover:text-amber-500 hover:bg-amber-50"
                       aria-label="Düzenle"
                     >
