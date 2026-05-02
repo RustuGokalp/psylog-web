@@ -13,9 +13,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { ActionAlert, AlertType } from "@/components/action-alert";
 import { ApiException } from "@/lib/api";
-import { approveComment, rejectComment } from "@/services/comment.service";
+import {
+  approveComment,
+  rejectComment,
+  deleteComment,
+} from "@/services/comment.service";
 import { CommentAdminResponse } from "@/types/post";
-import { Check, MessageSquare, X } from "lucide-react";
+import { Check, MessageSquare, Trash2, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 function StatusBadge({ status }: { status: CommentAdminResponse["status"] }) {
@@ -89,6 +93,9 @@ export default function CommentTable({
   const [rejectTarget, setRejectTarget] = useState<CommentAdminResponse | null>(
     null,
   );
+  const [deleteTarget, setDeleteTarget] = useState<CommentAdminResponse | null>(
+    null,
+  );
   const [processingId, setProcessingId] = useState<number | null>(null);
   const [feedbackAlert, setFeedbackAlert] = useState<FeedbackAlert>(null);
 
@@ -152,6 +159,29 @@ export default function CommentTable({
         err instanceof ApiException
           ? err.message
           : "Yorum reddedilirken bir hata oluştu.";
+      setFeedbackAlert({ type: "error", title: "Hata", description: msg });
+    } finally {
+      setProcessingId(null);
+    }
+  }
+
+  async function handleDelete() {
+    if (!deleteTarget) return;
+    const target = deleteTarget;
+    setDeleteTarget(null);
+    setProcessingId(target.id);
+    try {
+      await deleteComment(target.id);
+      setFeedbackAlert({
+        type: "success",
+        title: "Yorum Silindi",
+        description: `"${target.author}" yorumu kalıcı olarak silindi.`,
+      });
+    } catch (err) {
+      const msg =
+        err instanceof ApiException
+          ? err.message
+          : "Yorum silinirken bir hata oluştu.";
       setFeedbackAlert({ type: "error", title: "Hata", description: msg });
     } finally {
       setProcessingId(null);
@@ -222,6 +252,16 @@ export default function CommentTable({
                   Reddet
                 </Button>
               )}
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={processingId === comment.id}
+                onClick={() => setDeleteTarget(comment)}
+                className="h-8 w-8 cursor-pointer p-0 text-red-400 hover:text-red-600 hover:bg-red-50"
+                aria-label="Sil"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
             </div>
           </div>
         ))}
@@ -316,6 +356,16 @@ export default function CommentTable({
                         <X className="h-4 w-4" />
                       </Button>
                     )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled={processingId === comment.id}
+                      onClick={() => setDeleteTarget(comment)}
+                      className="h-8 w-8 cursor-pointer text-red-400 hover:text-red-600 hover:bg-red-50"
+                      aria-label="Sil"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -353,13 +403,31 @@ export default function CommentTable({
         loading={processingId === rejectTarget?.id}
       />
 
+      {/* Delete confirmation */}
+      <ActionAlert
+        open={!!deleteTarget}
+        type="warning"
+        title="Yorum Silinecek"
+        description="Bu yorum kalıcı olarak silinecek ve geri alınamaz. Devam etmek istiyor musunuz?"
+        content={deleteTarget ? <CommentDetail comment={deleteTarget} /> : null}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        confirmLabel="Sil"
+        confirmClassName="bg-red-600 hover:bg-red-700 text-white"
+        loading={processingId === deleteTarget?.id}
+      />
+
       {/* Feedback */}
       <ActionAlert
         open={!!feedbackAlert}
         type={feedbackAlert?.type ?? "info"}
         title={feedbackAlert?.title ?? ""}
         description={feedbackAlert?.description}
-        onClose={() => setFeedbackAlert(null)}
+        onClose={() => {
+          const type = feedbackAlert?.type;
+          setFeedbackAlert(null);
+          if (type === "success" && onRefresh) onRefresh();
+        }}
       />
     </>
   );

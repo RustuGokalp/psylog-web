@@ -23,6 +23,8 @@ export default function SpecializationDetail({ item }: Props) {
         lineClassName="bg-purple-400"
         title={item.title}
         titleClassName="text-purple-900"
+        description={item.summary}
+        descriptionClassName="text-purple-700/70"
         icons={
           <>
             <Daisy
