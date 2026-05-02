@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import RichTextEditor from "@/components/admin/rich-text-editor";
+import ImageUpload from "@/components/admin/image-upload";
 import { Loader2 } from "lucide-react";
 
 interface SpecializationFormProps {
@@ -103,7 +105,11 @@ export default function SpecializationForm({
     try {
       await createSpecialization(buildPayload(formik.values));
       setConfirmOpen(false);
-      setResultAlert({ type: "success", title: "Çalışma Alanı Oluşturuldu", description: "Yeni çalışma alanı başarıyla oluşturuldu." });
+      setResultAlert({
+        type: "success",
+        title: "Çalışma Alanı Oluşturuldu",
+        description: "Yeni çalışma alanı başarıyla oluşturuldu.",
+      });
       setResultAlertOpen(true);
     } catch (err) {
       const msg =
@@ -111,7 +117,11 @@ export default function SpecializationForm({
           ? err.message
           : "Bir hata oluştu. Lütfen tekrar deneyin.";
       setConfirmOpen(false);
-      setResultAlert({ type: "error", title: "Oluşturma Hatası", description: msg });
+      setResultAlert({
+        type: "error",
+        title: "Oluşturma Hatası",
+        description: msg,
+      });
       setResultAlertOpen(true);
     } finally {
       formik.setSubmitting(false);
@@ -138,7 +148,11 @@ export default function SpecializationForm({
         buildPayload(formik.values),
       );
       setConfirmOpen(false);
-      setResultAlert({ type: "success", title: "Değişiklikler Kaydedildi", description: "Çalışma alanı başarıyla güncellendi." });
+      setResultAlert({
+        type: "success",
+        title: "Değişiklikler Kaydedildi",
+        description: "Çalışma alanı başarıyla güncellendi.",
+      });
       setResultAlertOpen(true);
     } catch (err) {
       const msg =
@@ -146,7 +160,11 @@ export default function SpecializationForm({
           ? err.message
           : "Bir hata oluştu. Lütfen tekrar deneyin.";
       setConfirmOpen(false);
-      setResultAlert({ type: "error", title: "Güncelleme Hatası", description: msg });
+      setResultAlert({
+        type: "error",
+        title: "Güncelleme Hatası",
+        description: msg,
+      });
       setResultAlertOpen(true);
     } finally {
       formik.setSubmitting(false);
@@ -194,14 +212,14 @@ export default function SpecializationForm({
           <Textarea
             id="summary"
             name="summary"
-            placeholder="Kısa özet (HTML desteklenir)"
+            placeholder="Kısa özet..."
             value={formik.values.summary}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             disabled={formik.isSubmitting}
-            rows={4}
+            rows={3}
             aria-describedby="summary-error"
-            className={`resize-none font-mono text-sm ${
+            className={`resize-none ${
               formik.touched.summary && formik.errors.summary
                 ? "border-red-400"
                 : ""
@@ -218,21 +236,13 @@ export default function SpecializationForm({
           <Label htmlFor="content" className="text-slate-700 font-medium">
             İçerik <span className="text-red-500">*</span>
           </Label>
-          <Textarea
-            id="content"
-            name="content"
-            placeholder="Detaylı içerik (HTML desteklenir)"
+          <RichTextEditor
             value={formik.values.content}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            disabled={formik.isSubmitting}
-            rows={14}
-            aria-describedby="content-error"
-            className={`resize-y font-mono text-sm ${
-              formik.touched.content && formik.errors.content
-                ? "border-red-400"
-                : ""
-            }`}
+            onChange={(html) => formik.setFieldValue("content", html)}
+            onBlur={() => formik.setFieldTouched("content", true)}
+            placeholder="Detaylı içerik..."
+            hasError={!!(formik.touched.content && formik.errors.content)}
+            minHeight="280px"
           />
           {formik.touched.content && formik.errors.content && (
             <p id="content-error" className="text-xs text-red-500">
@@ -243,33 +253,18 @@ export default function SpecializationForm({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="image" className="text-slate-700 font-medium">
-              Görsel URL{" "}
+            <Label className="text-slate-700 font-medium">
+              Görsel{" "}
               <span className="text-slate-400 font-normal text-xs">
                 (isteğe bağlı)
               </span>
             </Label>
-            <Input
-              id="image"
-              name="image"
-              type="url"
-              placeholder="https://example.com/image.jpg"
+            <ImageUpload
               value={formik.values.image}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              disabled={formik.isSubmitting}
-              aria-describedby="image-error"
-              className={
-                formik.touched.image && formik.errors.image
-                  ? "border-red-400"
-                  : ""
-              }
+              onChange={(url) => formik.setFieldValue("image", url)}
+              aspectRatio="video"
+              label="Çalışma alanı görseli"
             />
-            {formik.touched.image && formik.errors.image && (
-              <p id="image-error" className="text-xs text-red-500">
-                {formik.errors.image}
-              </p>
-            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -336,7 +331,6 @@ export default function SpecializationForm({
             )}
           </div>
         )}
-
 
         <div className="flex items-center justify-end gap-3 pt-2">
           {isEdit ? (

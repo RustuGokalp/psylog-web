@@ -5,7 +5,7 @@ import { ApiSuccess } from "@/types/common";
 
 export async function getSpecializations(): Promise<Specialization[]> {
   const data = await serverFetch<Specialization[]>("/api/specializations", {
-    next: { revalidate: 300 },
+    next: { revalidate: 0 },
   });
   return data ?? [];
 }
@@ -14,7 +14,7 @@ export async function getSpecializationBySlug(
   slug: string,
 ): Promise<Specialization | null> {
   return serverFetch<Specialization>(`/api/specializations/${slug}`, {
-    next: { revalidate: 300 },
+    next: { revalidate: 0 },
   });
 }
 

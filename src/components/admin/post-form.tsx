@@ -13,6 +13,8 @@ import { ActionAlert } from "@/components/action-alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import RichTextEditor from "@/components/admin/rich-text-editor";
+import ImageUpload from "@/components/admin/image-upload";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
@@ -330,21 +332,13 @@ export default function PostForm({
           <Label htmlFor="content" className="text-slate-700 font-medium">
             İçerik <span className="text-red-500">*</span>
           </Label>
-          <Textarea
-            id="content"
-            name="content"
-            placeholder="Yazının tam içeriği..."
+          <RichTextEditor
             value={formik.values.content}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            disabled={formik.isSubmitting}
-            rows={14}
-            aria-describedby="content-error"
-            className={`resize-y font-mono text-sm ${
-              formik.touched.content && formik.errors.content
-                ? "border-red-400"
-                : ""
-            }`}
+            onChange={(html) => formik.setFieldValue("content", html)}
+            onBlur={() => formik.setFieldTouched("content", true)}
+            placeholder="Yazının tam içeriği..."
+            hasError={!!(formik.touched.content && formik.errors.content)}
+            minHeight="280px"
           />
           {formik.touched.content && formik.errors.content && (
             <p id="content-error" className="text-xs text-red-500">
@@ -355,33 +349,18 @@ export default function PostForm({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="coverImage" className="text-slate-700 font-medium">
-              Kapak Görseli URL{" "}
+            <Label className="text-slate-700 font-medium">
+              Kapak Görseli{" "}
               <span className="text-slate-400 font-normal text-xs">
                 (isteğe bağlı)
               </span>
             </Label>
-            <Input
-              id="coverImage"
-              name="coverImage"
-              type="url"
-              placeholder="https://example.com/image.jpg"
+            <ImageUpload
               value={formik.values.coverImage}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              disabled={formik.isSubmitting}
-              aria-describedby="coverImage-error"
-              className={
-                formik.touched.coverImage && formik.errors.coverImage
-                  ? "border-red-400"
-                  : ""
-              }
+              onChange={(url) => formik.setFieldValue("coverImage", url)}
+              aspectRatio="video"
+              label="Kapak görseli"
             />
-            {formik.touched.coverImage && formik.errors.coverImage && (
-              <p id="coverImage-error" className="text-xs text-red-500">
-                {formik.errors.coverImage}
-              </p>
-            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
