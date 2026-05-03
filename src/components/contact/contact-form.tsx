@@ -266,7 +266,7 @@ export default function ContactForm() {
                 ? "message-error"
                 : undefined
             }
-            className="resize-none border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
+            className="resize-none max-h-48 overflow-y-auto border-orange-200 focus-visible:ring-orange-400/50 placeholder:text-muted-foreground/60"
           />
           {formik.touched.message && formik.errors.message && (
             <p
