@@ -5,7 +5,7 @@ export const contactSchema = Yup.object({
     .trim()
     .required("Ad soyad zorunludur.")
     .min(2, "Ad soyad en az 2 karakter olmalıdır.")
-    .max(100, "Ad soyad en fazla 100 karakter olabilir."),
+    .max(50, "Ad soyad en fazla 50 karakter olabilir."),
   email: Yup.string()
     .trim()
     .required("E-posta adresi zorunludur.")
@@ -28,7 +28,7 @@ export const contactSchema = Yup.object({
     .trim()
     .required("Mesaj zorunludur.")
     .min(20, "Mesaj en az 20 karakter olmalıdır.")
-    .max(1000, "Mesaj en fazla 1000 karakter olabilir."),
+    .max(750, "Mesaj en fazla 750 karakter olabilir."),
 });
 
 export type ContactFormValues = Yup.InferType<typeof contactSchema>;
