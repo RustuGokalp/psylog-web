@@ -16,6 +16,12 @@ import { ActionAlert, AlertType } from "@/components/action-alert";
 import { ApiException } from "@/lib/api";
 import { deleteSpecialization } from "@/services/specialization.service";
 import { Specialization } from "@/types/specialization";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Pencil, Trash2 } from "lucide-react";
 
 interface SpecializationTableProps {
@@ -53,7 +59,11 @@ export default function SpecializationTable({
     try {
       await deleteSpecialization(deleteTarget.id);
       setDeleteTarget(null);
-      setFeedbackAlert({ type: "success", title: "Çalışma Alanı Silindi", description: `"${title}" başarıyla silindi.` });
+      setFeedbackAlert({
+        type: "success",
+        title: "Çalışma Alanı Silindi",
+        description: `"${title}" başarıyla silindi.`,
+      });
       setFeedbackAlertOpen(true);
     } catch (err) {
       const msg =
@@ -112,22 +122,38 @@ export default function SpecializationTable({
               {formatDate(item.createdAt)}
             </span>
             <div className="flex items-center justify-end gap-1 border-t border-slate-100 pt-2.5">
-              <button
-                onClick={() =>
-                  router.push(`/admin/specializations/${item.id}/edit`)
-                }
-                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-amber-400 transition-colors hover:bg-amber-50 hover:text-amber-500"
-                aria-label="Düzenle"
-              >
-                <Pencil className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setDeleteTarget(item)}
-                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
-                aria-label="Sil"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
+              <TooltipProvider delay={200}>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <button
+                        onClick={() =>
+                          router.push(`/admin/specializations/${item.id}/edit`)
+                        }
+                        className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-amber-400 transition-colors hover:bg-amber-50 hover:text-amber-500"
+                        aria-label="Düzenle"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                    }
+                  />
+                  <TooltipContent>Düzenle</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <button
+                        onClick={() => setDeleteTarget(item)}
+                        className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                        aria-label="Sil"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    }
+                  />
+                  <TooltipContent>Sil</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         ))}
@@ -180,26 +206,44 @@ export default function SpecializationTable({
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center justify-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() =>
-                        router.push(`/admin/specializations/${item.id}/edit`)
-                      }
-                      className="h-8 w-8 cursor-pointer text-amber-400 hover:text-amber-500 hover:bg-amber-50"
-                      aria-label="Düzenle"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setDeleteTarget(item)}
-                      className="h-8 w-8 cursor-pointer text-red-400 hover:text-red-600 hover:bg-red-50"
-                      aria-label="Sil"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <TooltipProvider delay={200}>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() =>
+                                router.push(
+                                  `/admin/specializations/${item.id}/edit`,
+                                )
+                              }
+                              className="h-8 w-8 cursor-pointer text-amber-400 hover:text-amber-500 hover:bg-amber-50"
+                              aria-label="Düzenle"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>Düzenle</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setDeleteTarget(item)}
+                              className="h-8 w-8 cursor-pointer text-red-400 hover:text-red-600 hover:bg-red-50"
+                              aria-label="Sil"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>Sil</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </TableCell>
               </TableRow>

@@ -17,6 +17,12 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ContactMessage } from "@/types/contact";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Eye, Mail, Phone } from "lucide-react";
 
 interface ContactTableProps {
@@ -79,13 +85,22 @@ export default function ContactTable({ messages }: ContactTableProps) {
 
             <p className="line-clamp-2 text-xs text-slate-500">{msg.message}</p>
 
-            <button
-              onClick={() => setSelected(msg)}
-              className="mt-1 cursor-pointer self-start rounded-md p-1 text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-              aria-label="Detayı gör"
-            >
-              <Eye className="h-4 w-4" />
-            </button>
+            <TooltipProvider delay={200}>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <button
+                      onClick={() => setSelected(msg)}
+                      className="mt-1 cursor-pointer self-start rounded-md p-1 text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      aria-label="Detayı gör"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </button>
+                  }
+                />
+                <TooltipContent>Detayı gör</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         ))}
       </div>
@@ -134,15 +149,24 @@ export default function ContactTable({ messages }: ContactTableProps) {
                   {formatDate(msg.createdAt)}
                 </TableCell>
                 <TableCell className="text-center">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setSelected(msg)}
-                    className="cursor-pointer h-8 w-8 text-blue-400 hover:text-blue-600 hover:bg-blue-50"
-                    aria-label="Detayı gör"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
+                  <TooltipProvider delay={200}>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setSelected(msg)}
+                            className="cursor-pointer h-8 w-8 text-blue-400 hover:text-blue-600 hover:bg-blue-50"
+                            aria-label="Detayı gör"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        }
+                      />
+                      <TooltipContent>Detayı gör</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </TableCell>
               </TableRow>
             ))}

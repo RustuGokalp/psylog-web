@@ -219,29 +219,54 @@ export default function PostTable({
                   )}
                 </div>
                 <div className="flex items-center gap-1">
-                  <button
-                    onClick={() =>
-                      router.push(`/admin/posts/${post.id}/comments`)
-                    }
-                    className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-violet-400 transition-colors hover:bg-violet-50 hover:text-violet-600"
-                    aria-label="Yorumları Gör"
-                  >
-                    <MessagesSquare className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => router.push(`/admin/posts/${post.id}/edit`)}
-                    className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-amber-500 transition-colors hover:bg-amber-100 hover:text-amber-800"
-                    aria-label="Düzenle"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setDeleteTarget(post)}
-                    className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
-                    aria-label="Sil"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  <TooltipProvider delay={200}>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <button
+                            onClick={() =>
+                              router.push(`/admin/posts/${post.id}/comments`)
+                            }
+                            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-violet-400 transition-colors hover:bg-violet-50 hover:text-violet-600"
+                            aria-label="Yorumları Gör"
+                          >
+                            <MessagesSquare className="h-4 w-4" />
+                          </button>
+                        }
+                      />
+                      <TooltipContent>Yorumları Gör</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <button
+                            onClick={() =>
+                              router.push(`/admin/posts/${post.id}/edit`)
+                            }
+                            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-amber-500 transition-colors hover:bg-amber-100 hover:text-amber-800"
+                            aria-label="Düzenle"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                        }
+                      />
+                      <TooltipContent>Düzenle</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <button
+                            onClick={() => setDeleteTarget(post)}
+                            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                            aria-label="Sil"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        }
+                      />
+                      <TooltipContent>Sil</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
             </div>
@@ -411,37 +436,62 @@ export default function PostTable({
                 {/* Aksiyonlar */}
                 <TableCell>
                   <div className="flex items-center justify-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() =>
-                        router.push(`/admin/posts/${post.id}/comments`)
-                      }
-                      className="h-8 w-8 cursor-pointer text-violet-400 hover:text-violet-600 hover:bg-violet-50"
-                      aria-label="Yorumları Gör"
-                    >
-                      <MessagesSquare className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() =>
-                        router.push(`/admin/posts/${post.id}/edit`)
-                      }
-                      className="h-8 w-8 cursor-pointer text-amber-400 hover:text-amber-500 hover:bg-amber-50"
-                      aria-label="Düzenle"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setDeleteTarget(post)}
-                      className="h-8 w-8 cursor-pointer text-red-400 hover:text-red-600 hover:bg-red-50"
-                      aria-label="Sil"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <TooltipProvider delay={200}>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() =>
+                                router.push(
+                                  `/admin/posts/${post.id}/comments`,
+                                )
+                              }
+                              className="h-8 w-8 cursor-pointer text-violet-400 hover:text-violet-600 hover:bg-violet-50"
+                              aria-label="Yorumları Gör"
+                            >
+                              <MessagesSquare className="h-4 w-4" />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>Yorumları Gör</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() =>
+                                router.push(`/admin/posts/${post.id}/edit`)
+                              }
+                              className="h-8 w-8 cursor-pointer text-amber-400 hover:text-amber-500 hover:bg-amber-50"
+                              aria-label="Düzenle"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>Düzenle</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setDeleteTarget(post)}
+                              className="h-8 w-8 cursor-pointer text-red-400 hover:text-red-600 hover:bg-red-50"
+                              aria-label="Sil"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>Sil</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </TableCell>
               </TableRow>
