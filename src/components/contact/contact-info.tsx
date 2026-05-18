@@ -3,26 +3,31 @@ import EnvelopeSketch from "@/components/icons/envelope-sketch";
 import LocationSketch from "@/components/icons/location-sketch";
 import Daisy from "@/components/icons/daisy";
 import Rose from "@/components/icons/rose";
+import { ContactInfo as ContactInfoData } from "@/types/contact-info";
 
-const CONTACT_ITEMS = [
-  {
-    icon: <PhoneSketch />,
-    label: "Telefon",
-    value: "+90 5XX XXX XX XX",
-  },
-  {
-    icon: <EnvelopeSketch className="h-16 w-16" />,
-    label: "E-posta",
-    value: "info@tugcetekin.com",
-  },
-  {
-    icon: <LocationSketch className="h-16 w-16" />,
-    label: "Konum",
-    value: "İstanbul",
-  },
-];
+interface ContactInfoProps {
+  contactInfo: ContactInfoData | null;
+}
 
-export default function ContactInfo() {
+export default function ContactInfo({ contactInfo }: ContactInfoProps) {
+  const contactItems = [
+    {
+      icon: <PhoneSketch className="h-16 w-16" />,
+      label: "Telefon",
+      value: contactInfo?.phone ?? "+90 5XX XXX XX XX",
+    },
+    {
+      icon: <EnvelopeSketch className="h-16 w-16" />,
+      label: "E-posta",
+      value: contactInfo?.email ?? "info@tugcetekin.com",
+    },
+    {
+      icon: <LocationSketch className="h-16 w-16" />,
+      label: "Konum",
+      value: contactInfo?.location ?? "İstanbul",
+    },
+  ];
+
   return (
     <div className="relative flex flex-col gap-8">
       <div>
@@ -31,18 +36,20 @@ export default function ContactInfo() {
         </h2>
         <div className="mt-2 flex items-center gap-2">
           <Daisy className="h-7 w-7 text-orange-300" aria-hidden="true" />
-          <Rose  className="h-5 w-5 text-orange-400/70" aria-hidden="true" />
+          <Rose className="h-5 w-5 text-orange-400/70" aria-hidden="true" />
         </div>
         <p className="mt-3 text-base text-muted-foreground">
-          Aşağıdaki kanallardan bana ulaşabilirsiniz. En geç 24 saat
-          içinde size geri dönüş sağlayacağım.
+          Aşağıdaki kanallardan bana ulaşabilirsiniz. En geç 24 saat içinde size
+          geri dönüş sağlayacağım.
         </p>
       </div>
 
       <div className="flex flex-col gap-6">
-        {CONTACT_ITEMS.map((item) => (
+        {contactItems.map((item) => (
           <div key={item.label} className="flex items-center gap-5">
-            <div className="shrink-0 text-orange-500">{item.icon}</div>
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center text-orange-500">
+              {item.icon}
+            </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-orange-500">
                 {item.label}

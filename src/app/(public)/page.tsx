@@ -3,6 +3,7 @@ import { createMetadata } from "@/lib/metadata";
 import { getAbout } from "@/services/about.service";
 import { getSpecializations } from "@/services/specialization.service";
 import { getPosts } from "@/services/post.service";
+import { getContactInfo } from "@/services/contact-info.service";
 import HeroSection from "@/components/home/hero-section";
 import AboutPreviewSection from "@/components/home/about-preview-section";
 import SpecializationsPreviewSection from "@/components/home/specializations-preview-section";
@@ -17,10 +18,11 @@ export const metadata: Metadata = createMetadata({
 });
 
 export default async function HomePage() {
-  const [about, specializations, posts] = await Promise.all([
+  const [about, specializations, posts, contactInfo] = await Promise.all([
     getAbout(),
     getSpecializations(),
     getPosts({ page: 0, size: 3 }),
+    getContactInfo(),
   ]);
 
   return (
@@ -31,7 +33,7 @@ export default async function HomePage() {
         specializations={specializations.slice(0, 3)}
       />
       <PostsPreviewSection posts={posts.content} />
-      <ContactCtaSection />
+      <ContactCtaSection contactInfo={contactInfo} />
     </>
   );
 }

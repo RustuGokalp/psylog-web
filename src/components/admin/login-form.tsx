@@ -1,7 +1,6 @@
 "use client";
 
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { useRouter, useSearchParams } from "next/navigation";
 import { login } from "@/services/auth.service";
 import { ApiException } from "@/lib/api";
@@ -10,15 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
-
-const loginSchema = Yup.object({
-  email: Yup.string()
-    .required("E-posta zorunludur")
-    .email("Geçerli bir e-posta adresi girin"),
-  password: Yup.string()
-    .required("Şifre zorunludur")
-    .min(6, "Şifre en az 6 karakter olmalıdır"),
-});
+import { loginSchema } from "@/schemas/login.schema";
 
 export default function LoginForm() {
   const router = useRouter();

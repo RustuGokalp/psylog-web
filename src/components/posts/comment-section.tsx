@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { Comment } from "@/types/post";
 import { submitComment } from "@/services/post.service";
+import {
+  commentSchema,
+  type CommentFormValues,
+} from "@/schemas/comment.schema";
 import { ActionAlert, AlertType } from "@/components/action-alert";
 import { ApiException } from "@/lib/api";
 import { Input } from "@/components/ui/input";
@@ -21,20 +24,6 @@ interface ResultAlert {
   title: string;
   description?: string;
 }
-
-const commentSchema = Yup.object({
-  author: Yup.string().trim().required("Adınızı girin."),
-  email: Yup.string()
-    .trim()
-    .email("Geçerli bir e-posta adresi girin.")
-    .optional(),
-  content: Yup.string()
-    .trim()
-    .required("Yorum alanı boş bırakılamaz.")
-    .max(1000, "Yorum en fazla 1000 karakter olabilir."),
-});
-
-type CommentFormValues = Yup.InferType<typeof commentSchema>;
 
 function formatTurkishDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("tr-TR", {

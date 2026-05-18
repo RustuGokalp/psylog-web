@@ -2,13 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import {
   getAboutAdmin,
   createAbout,
   updateAbout,
   deleteAbout,
 } from "@/services/about.service";
+import { aboutSchema, type AboutFormValues } from "@/schemas/about.schema";
 import { About } from "@/types/about";
 import { ApiException } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -19,23 +19,6 @@ import ImageUpload from "@/components/admin/image-upload";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ActionAlert } from "@/components/action-alert";
 import { Plus, X } from "lucide-react";
-
-const aboutSchema = Yup.object({
-  message: Yup.string().trim().required("Hakkımda metni zorunludur."),
-  profileImage: Yup.string()
-    .url("Geçerli bir URL girin.")
-    .nullable()
-    .optional(),
-  education: Yup.array().of(Yup.string().defined()),
-  workingAreas: Yup.array().of(Yup.string().defined()),
-});
-
-type AboutFormValues = {
-  message: string;
-  profileImage: string;
-  education: string[];
-  workingAreas: string[];
-};
 
 type ResultAlert = {
   open: boolean;

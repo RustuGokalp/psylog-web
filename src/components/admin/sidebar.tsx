@@ -15,6 +15,7 @@ import {
   Menu,
   Brain,
   MessageSquare,
+  Phone,
   User,
   Stethoscope,
 } from "lucide-react";
@@ -35,6 +36,11 @@ const navItems: NavItem[] = [
     label: "İletişim",
     href: "/admin/contact",
     icon: <Mail className="h-4 w-4" />,
+  },
+  {
+    label: "İletişim Bilgileri",
+    href: "/admin/contact-info",
+    icon: <Phone className="h-4 w-4" />,
   },
   {
     label: "Bekleyen Yorumlar",

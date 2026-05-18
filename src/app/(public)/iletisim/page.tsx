@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { createMetadata } from "@/lib/metadata";
+import { getContactInfo } from "@/services/contact-info.service";
 import ContactInfo from "@/components/contact/contact-info";
 import ContactForm from "@/components/contact/contact-form";
 import Daisy from "@/components/icons/daisy";
@@ -15,7 +16,9 @@ export const metadata: Metadata = createMetadata({
   path: "/iletisim",
 });
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const contactInfo = await getContactInfo();
+
   return (
     <main>
       <PageHero
@@ -56,7 +59,7 @@ export default function ContactPage() {
       <section className="bg-rose-50">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
-            <ContactInfo />
+            <ContactInfo contactInfo={contactInfo} />
 
             <div className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
               <h2 className="mb-6 text-xl font-bold text-rose-800">
