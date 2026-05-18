@@ -7,26 +7,33 @@ import Balloon from "@/components/icons/balloon";
 import Star from "@/components/icons/star";
 import Wildflower from "@/components/icons/wildflower";
 import Butterfly from "@/components/icons/butterfly";
+import { ContactInfo } from "@/types/contact-info";
 
-const CONTACT_ITEMS = [
-  {
-    icon: <PhoneSketch />,
-    label: "Telefon",
-    value: "+90 5XX XXX XX XX",
-  },
-  {
-    icon: <EnvelopeSketch className="h-16 w-16" />,
-    label: "E-posta",
-    value: "info@tugcetekin.com",
-  },
-  {
-    icon: <LocationSketch className="h-16 w-16" />,
-    label: "Konum",
-    value: "İstanbul",
-  },
-];
+interface ContactCtaSectionProps {
+  contactInfo: ContactInfo | null;
+}
 
-export default function ContactCtaSection() {
+export default function ContactCtaSection({
+  contactInfo,
+}: ContactCtaSectionProps) {
+  const contactItems = [
+    {
+      icon: <PhoneSketch className="h-16 w-16" />,
+      label: "Telefon",
+      value: contactInfo?.phone ?? "+90 5XX XXX XX XX",
+    },
+    {
+      icon: <EnvelopeSketch className="h-16 w-16" />,
+      label: "E-posta",
+      value: contactInfo?.email ?? "info@tugcetekin.com",
+    },
+    {
+      icon: <LocationSketch className="h-16 w-16" />,
+      label: "Konum",
+      value: contactInfo?.location ?? "İstanbul",
+    },
+  ];
+
   return (
     <section className="relative overflow-hidden bg-rose-50">
       <Balloon
@@ -62,12 +69,14 @@ export default function ContactCtaSection() {
           </div>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-8 sm:flex-row sm:gap-12">
-            {CONTACT_ITEMS.map((item) => (
+            {contactItems.map((item) => (
               <div
                 key={item.label}
                 className="flex flex-col items-center gap-2 text-center"
               >
-                {item.icon}
+                <div className="flex h-16 w-16 items-center justify-center">
+                  {item.icon}
+                </div>
                 <span className="text-xs font-semibold uppercase tracking-widest text-rose-500">
                   {item.label}
                 </span>
