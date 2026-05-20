@@ -59,7 +59,7 @@ export default function ContactCtaSection({
       <div className="relative">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-rose-800 sm:text-4xl">
+            <h2 className="text-3xl font-medium text-rose-800 sm:text-4xl">
               Benimle İletişime Geçin
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-slate-500">

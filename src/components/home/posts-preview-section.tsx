@@ -13,6 +13,8 @@ interface PostsPreviewSectionProps {
   posts: Post[];
 }
 
+const ACCENT_COLORS = ["bg-rose-400", "bg-violet-300", "bg-sky-300"];
+
 const PLACEHOLDER_COLORS = ["bg-rose-100", "bg-violet-100", "bg-sky-100"];
 
 export default function PostsPreviewSection({
@@ -41,7 +43,7 @@ export default function PostsPreviewSection({
       <div className="relative">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <div className="mb-10 text-center">
-            <h2 className="text-3xl text-slate-800 sm:text-4xl">
+            <h2 className="text-3xl font-medium text-sky-900 sm:text-4xl">
               Son Yazılarım
             </h2>
             <p className="mt-4 text-base text-slate-500">
@@ -49,8 +51,9 @@ export default function PostsPreviewSection({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
             {posts.map((post, index) => {
+              const accentColor = ACCENT_COLORS[index % ACCENT_COLORS.length];
               const placeholderColor =
                 PLACEHOLDER_COLORS[index % PLACEHOLDER_COLORS.length];
               const truncatedSummary =
@@ -65,6 +68,11 @@ export default function PostsPreviewSection({
                   className="group block rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <Card className="flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-shadow group-hover:shadow-md">
+                    <div
+                      className={`h-2 w-full shrink-0 ${accentColor}`}
+                      aria-hidden="true"
+                    />
+
                     <div className="relative h-44 w-full shrink-0">
                       {post.coverImage ? (
                         <Image
@@ -103,7 +111,9 @@ export default function PostsPreviewSection({
                           {post.readingTime != null && (
                             <>
                               <span aria-hidden="true">|</span>
-                              <span>{formatReadingTime(post.readingTime)} okuma</span>
+                              <span>
+                                {formatReadingTime(post.readingTime)} okuma
+                              </span>
                             </>
                           )}
                         </div>

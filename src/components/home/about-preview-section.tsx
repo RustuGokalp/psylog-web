@@ -36,7 +36,7 @@ export default function AboutPreviewSection({
       <div className="relative">
         <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl text-slate-800 sm:text-4xl">Hakkımda</h2>
+            <h2 className="text-3xl font-medium text-pink-800 sm:text-4xl">Hakkımda</h2>
             <HtmlContent
               html={about.message}
               className="mt-6 line-clamp-4 text-lg leading-relaxed text-slate-500"
