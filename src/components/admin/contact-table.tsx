@@ -1,29 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { ContactMessage } from "@/types/contact";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Eye, Mail, Phone } from "lucide-react";
+import { formatTurkishDateTime } from "@/lib/format";
+import { DataTable } from "@/components/ui/DataTable";
+import { createContactColumns } from "@/components/tables/columns/contact-columns";
+import { TableAction } from "@/components/tables/table-action";
 
 interface ContactTableProps {
   messages: ContactMessage[];
@@ -32,147 +21,69 @@ interface ContactTableProps {
 export default function ContactTable({ messages }: ContactTableProps) {
   const [selected, setSelected] = useState<ContactMessage | null>(null);
 
-  function formatDate(iso: string) {
-    return new Date(iso).toLocaleString("tr-TR", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
+  const emptyState = (
+    <div className="rounded-xl border border-dashed border-slate-300 bg-white py-16 text-center">
+      <Mail className="mx-auto h-8 w-8 text-slate-300" />
+      <p className="mt-3 text-sm text-slate-500">Henüz iletişim mesajı yok.</p>
+    </div>
+  );
 
-  if (messages.length === 0) {
+  function renderMobileCard(msg: ContactMessage) {
     return (
-      <div className="rounded-xl border border-dashed border-slate-300 bg-white py-16 text-center">
-        <Mail className="mx-auto h-8 w-8 text-slate-300" />
-        <p className="mt-3 text-sm text-slate-500">
-          Henüz iletişim mesajı yok.
-        </p>
+      <div className="flex flex-col gap-2 p-4">
+        <div className="flex items-start justify-between gap-2">
+          <p className="text-sm font-medium text-slate-800">{msg.fullName}</p>
+          <span className="shrink-0 text-xs text-slate-400">
+            {formatTurkishDateTime(msg.createdAt)}
+          </span>
+        </div>
+
+        <p className="text-xs font-medium text-slate-600">{msg.subject}</p>
+
+        <div className="flex flex-wrap gap-x-3 gap-y-1">
+          <span className="flex items-center gap-1 text-xs text-slate-400">
+            <Mail className="h-3 w-3" />
+            {msg.email}
+          </span>
+          {msg.mobilePhone && (
+            <span className="flex items-center gap-1 text-xs text-slate-400">
+              <Phone className="h-3 w-3" />
+              {msg.mobilePhone}
+            </span>
+          )}
+        </div>
+
+        <p className="line-clamp-2 text-xs text-slate-500">{msg.message}</p>
+
+        <div className="mt-1 self-start">
+          <TableAction
+            tooltip="Detayı gör"
+            tone="blue"
+            icon={Eye}
+            onClick={() => setSelected(msg)}
+          />
+        </div>
       </div>
     );
   }
 
+  const columns = useMemo(
+    () =>
+      createContactColumns({
+        onView: (m) => setSelected(m),
+      }),
+    [],
+  );
+
   return (
     <>
-      {/* Mobile card list */}
-      <div className="sm:hidden flex flex-col divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
-        {messages.map((msg) => (
-          <div key={msg.id} className="flex flex-col gap-2 p-4">
-            <div className="flex items-start justify-between gap-2">
-              <p className="text-sm font-medium text-slate-800">
-                {msg.fullName}
-              </p>
-              <span className="shrink-0 text-xs text-slate-400">
-                {formatDate(msg.createdAt)}
-              </span>
-            </div>
-
-            <p className="text-xs font-medium text-slate-600">{msg.subject}</p>
-
-            <div className="flex flex-wrap gap-x-3 gap-y-1">
-              <span className="flex items-center gap-1 text-xs text-slate-400">
-                <Mail className="h-3 w-3" />
-                {msg.email}
-              </span>
-              {msg.mobilePhone && (
-                <span className="flex items-center gap-1 text-xs text-slate-400">
-                  <Phone className="h-3 w-3" />
-                  {msg.mobilePhone}
-                </span>
-              )}
-            </div>
-
-            <p className="line-clamp-2 text-xs text-slate-500">{msg.message}</p>
-
-            <TooltipProvider delay={200}>
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <button
-                      onClick={() => setSelected(msg)}
-                      className="mt-1 cursor-pointer self-start rounded-md p-1 text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                      aria-label="Detayı gör"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </button>
-                  }
-                />
-                <TooltipContent>Detayı gör</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        ))}
-      </div>
-
-      {/* Desktop table */}
-      <div className="hidden sm:block overflow-x-auto rounded-xl border border-slate-200 bg-white">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-slate-50 hover:bg-slate-50">
-              <TableHead className="font-semibold text-slate-600">
-                Ad Soyad
-              </TableHead>
-              <TableHead className="font-semibold text-slate-600">
-                E-posta
-              </TableHead>
-              <TableHead className="font-semibold text-slate-600">
-                Konu
-              </TableHead>
-              <TableHead className="hidden md:table-cell font-semibold text-slate-600">
-                Telefon
-              </TableHead>
-              <TableHead className="hidden lg:table-cell font-semibold text-slate-600">
-                Tarih
-              </TableHead>
-              <TableHead className="w-16 text-center font-semibold text-slate-600">
-                Action
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {messages.map((msg) => (
-              <TableRow key={msg.id} className="hover:bg-slate-50">
-                <TableCell className="font-medium text-slate-800 whitespace-nowrap">
-                  {msg.fullName}
-                </TableCell>
-                <TableCell className="text-sm text-slate-600">
-                  {msg.email}
-                </TableCell>
-                <TableCell className="text-sm text-slate-600 max-w-48">
-                  <p className="line-clamp-1">{msg.subject}</p>
-                </TableCell>
-                <TableCell className="hidden md:table-cell text-sm text-slate-500 whitespace-nowrap">
-                  {msg.mobilePhone ?? <span className="text-slate-300">—</span>}
-                </TableCell>
-                <TableCell className="hidden lg:table-cell text-sm text-slate-500 whitespace-nowrap">
-                  {formatDate(msg.createdAt)}
-                </TableCell>
-                <TableCell className="text-center">
-                  <TooltipProvider delay={200}>
-                    <Tooltip>
-                      <TooltipTrigger
-                        render={
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setSelected(msg)}
-                            className="cursor-pointer h-8 w-8 text-blue-400 hover:text-blue-600 hover:bg-blue-50"
-                            aria-label="Detayı gör"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        }
-                      />
-                      <TooltipContent>Detayı gör</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable<ContactMessage>
+        columns={columns}
+        data={messages}
+        getRowId={(m) => String(m.id)}
+        renderMobileCard={renderMobileCard}
+        emptyState={emptyState}
+      />
 
       {/* Message detail dialog */}
       <Dialog
@@ -211,7 +122,7 @@ export default function ContactTable({ messages }: ContactTableProps) {
                 Tarih
               </dt>
               <dd className="text-slate-700">
-                {selected && formatDate(selected.createdAt)}
+                {selected && formatTurkishDateTime(selected.createdAt)}
               </dd>
             </dl>
 

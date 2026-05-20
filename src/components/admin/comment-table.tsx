@@ -1,15 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ActionAlert, AlertType } from "@/components/action-alert";
 import { ApiException } from "@/lib/api";
@@ -26,26 +18,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Check, MessageSquare, Trash2, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-
-function StatusBadge({ status }: { status: CommentAdminResponse["status"] }) {
-  const map = {
-    APPROVED: {
-      label: "Onaylı",
-      className: "bg-green-100 text-green-700 border-green-200",
-    },
-    REJECTED: {
-      label: "Reddedildi",
-      className: "bg-red-100 text-red-600 border-red-200",
-    },
-    PENDING: {
-      label: "Bekliyor",
-      className: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    },
-  };
-  const { label, className } = map[status];
-  return <Badge className={className}>{label}</Badge>;
-}
+import { formatTurkishDateTime } from "@/lib/format";
+import { DataTable } from "@/components/ui/DataTable";
+import {
+  createCommentColumns,
+  CommentStatusBadge,
+} from "@/components/tables/columns/comment-columns";
 
 interface CommentTableProps {
   comments: CommentAdminResponse[];
@@ -94,6 +72,7 @@ export default function CommentTable({
   useEffect(() => {
     setComments(initialComments);
   }, [initialComments]);
+
   const [approveTarget, setApproveTarget] =
     useState<CommentAdminResponse | null>(null);
   const [rejectTarget, setRejectTarget] = useState<CommentAdminResponse | null>(
@@ -104,16 +83,6 @@ export default function CommentTable({
   );
   const [processingId, setProcessingId] = useState<number | null>(null);
   const [feedbackAlert, setFeedbackAlert] = useState<FeedbackAlert>(null);
-
-  function formatDate(iso: string) {
-    return new Date(iso).toLocaleString("tr-TR", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
 
   async function handleApprove() {
     if (!approveTarget) return;
@@ -194,237 +163,119 @@ export default function CommentTable({
     }
   }
 
-  if (comments.length === 0) {
+  const emptyState = (
+    <div className="rounded-xl border border-dashed border-slate-300 bg-white py-16 text-center">
+      <MessageSquare className="mx-auto h-8 w-8 text-slate-300" />
+      <p className="mt-3 text-sm text-slate-500">{emptyMessage}</p>
+    </div>
+  );
+
+  function renderMobileCard(comment: CommentAdminResponse) {
     return (
-      <div className="rounded-xl border border-dashed border-slate-300 bg-white py-16 text-center">
-        <MessageSquare className="mx-auto h-8 w-8 text-slate-300" />
-        <p className="mt-3 text-sm text-slate-500">{emptyMessage}</p>
+      <div className="flex flex-col gap-2 p-4">
+        <div className="flex items-start justify-between gap-2">
+          <p className="text-sm font-medium text-slate-800">{comment.author}</p>
+          <span className="shrink-0 text-xs text-slate-400">
+            {formatTurkishDateTime(comment.createdAt)}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between gap-2">
+          <Link
+            href={`/yazilarim/${comment.postSlug}`}
+            target="_blank"
+            className="text-xs font-medium text-violet-600 hover:underline line-clamp-1"
+          >
+            {comment.postTitle}
+          </Link>
+          <CommentStatusBadge status={comment.status} />
+        </div>
+
+        <p className="line-clamp-2 text-xs text-slate-500">{comment.content}</p>
+
+        <div className="flex items-center gap-2 border-t border-slate-100 pt-2.5">
+          <TooltipProvider delay={200}>
+            {comment.status !== "APPROVED" && (
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={processingId === comment.id}
+                      onClick={() => setApproveTarget(comment)}
+                      className="h-8 flex-1 cursor-pointer gap-1.5 text-xs text-green-600 hover:text-green-700 hover:bg-green-50"
+                    >
+                      <Check className="h-3.5 w-3.5" />
+                      Onayla
+                    </Button>
+                  }
+                />
+                <TooltipContent>Onayla</TooltipContent>
+              </Tooltip>
+            )}
+            {comment.status !== "REJECTED" && (
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={processingId === comment.id}
+                      onClick={() => setRejectTarget(comment)}
+                      className="h-8 flex-1 cursor-pointer gap-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                      Reddet
+                    </Button>
+                  }
+                />
+                <TooltipContent>Reddet</TooltipContent>
+              </Tooltip>
+            )}
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={processingId === comment.id}
+                    onClick={() => setDeleteTarget(comment)}
+                    className="h-8 w-8 cursor-pointer p-0 text-red-400 hover:text-red-600 hover:bg-red-50"
+                    aria-label="Sil"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                }
+              />
+              <TooltipContent>Sil</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
     );
   }
 
+  const columns = useMemo(
+    () =>
+      createCommentColumns({
+        onApprove: (c) => setApproveTarget(c),
+        onReject: (c) => setRejectTarget(c),
+        onDelete: (c) => setDeleteTarget(c),
+        processingId,
+      }),
+    [processingId],
+  );
+
   return (
     <>
-      {/* Mobile card list */}
-      <div className="sm:hidden flex flex-col divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
-        {comments.map((comment) => (
-          <div key={comment.id} className="flex flex-col gap-2 p-4">
-            <div className="flex items-start justify-between gap-2">
-              <p className="text-sm font-medium text-slate-800">
-                {comment.author}
-              </p>
-              <span className="shrink-0 text-xs text-slate-400">
-                {formatDate(comment.createdAt)}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between gap-2">
-              <Link
-                href={`/yazilarim/${comment.postSlug}`}
-                target="_blank"
-                className="text-xs font-medium text-violet-600 hover:underline line-clamp-1"
-              >
-                {comment.postTitle}
-              </Link>
-              <StatusBadge status={comment.status} />
-            </div>
-
-            <p className="line-clamp-2 text-xs text-slate-500">
-              {comment.content}
-            </p>
-
-            <div className="flex items-center gap-2 border-t border-slate-100 pt-2.5">
-              <TooltipProvider delay={200}>
-                {comment.status !== "APPROVED" && (
-                  <Tooltip>
-                    <TooltipTrigger
-                      render={
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          disabled={processingId === comment.id}
-                          onClick={() => setApproveTarget(comment)}
-                          className="h-8 flex-1 cursor-pointer gap-1.5 text-xs text-green-600 hover:text-green-700 hover:bg-green-50"
-                        >
-                          <Check className="h-3.5 w-3.5" />
-                          Onayla
-                        </Button>
-                      }
-                    />
-                    <TooltipContent>Onayla</TooltipContent>
-                  </Tooltip>
-                )}
-                {comment.status !== "REJECTED" && (
-                  <Tooltip>
-                    <TooltipTrigger
-                      render={
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          disabled={processingId === comment.id}
-                          onClick={() => setRejectTarget(comment)}
-                          className="h-8 flex-1 cursor-pointer gap-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50"
-                        >
-                          <X className="h-3.5 w-3.5" />
-                          Reddet
-                        </Button>
-                      }
-                    />
-                    <TooltipContent>Reddet</TooltipContent>
-                  </Tooltip>
-                )}
-                <Tooltip>
-                  <TooltipTrigger
-                    render={
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={processingId === comment.id}
-                        onClick={() => setDeleteTarget(comment)}
-                        className="h-8 w-8 cursor-pointer p-0 text-red-400 hover:text-red-600 hover:bg-red-50"
-                        aria-label="Sil"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    }
-                  />
-                  <TooltipContent>Sil</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Desktop table */}
-      <div className="hidden sm:block overflow-x-auto rounded-xl border border-slate-200 bg-white">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-slate-50 hover:bg-slate-50">
-              <TableHead className="font-semibold text-slate-600">
-                Yazı
-              </TableHead>
-              <TableHead className="font-semibold text-slate-600">
-                Yazar
-              </TableHead>
-              <TableHead className="hidden md:table-cell font-semibold text-slate-600">
-                E-posta
-              </TableHead>
-              <TableHead className="font-semibold text-slate-600">
-                İçerik
-              </TableHead>
-              <TableHead className="font-semibold text-slate-600">
-                Durum
-              </TableHead>
-              <TableHead className="hidden lg:table-cell font-semibold text-slate-600">
-                Tarih
-              </TableHead>
-              <TableHead className="w-24 text-center font-semibold text-slate-600">
-                Action
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {comments.map((comment) => (
-              <TableRow key={comment.id} className="hover:bg-slate-50">
-                <TableCell className="max-w-40">
-                  <Link
-                    href={`/yazilarim/${comment.postSlug}`}
-                    target="_blank"
-                    className="line-clamp-1 text-sm font-medium text-violet-600 hover:underline"
-                  >
-                    {comment.postTitle}
-                  </Link>
-                </TableCell>
-
-                <TableCell className="whitespace-nowrap text-sm font-medium text-slate-800">
-                  {comment.author}
-                </TableCell>
-
-                <TableCell className="hidden md:table-cell text-sm text-slate-500">
-                  {comment.email ?? <span className="text-slate-300">—</span>}
-                </TableCell>
-
-                <TableCell className="max-w-64">
-                  <p className="line-clamp-2 text-sm text-slate-600">
-                    {comment.content}
-                  </p>
-                </TableCell>
-
-                <TableCell>
-                  <StatusBadge status={comment.status} />
-                </TableCell>
-
-                <TableCell className="hidden lg:table-cell whitespace-nowrap text-sm text-slate-500">
-                  {formatDate(comment.createdAt)}
-                </TableCell>
-
-                <TableCell>
-                  <div className="flex items-center justify-center gap-1">
-                    <TooltipProvider delay={200}>
-                      {comment.status !== "APPROVED" && (
-                        <Tooltip>
-                          <TooltipTrigger
-                            render={
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                disabled={processingId === comment.id}
-                                onClick={() => setApproveTarget(comment)}
-                                className="h-8 w-8 cursor-pointer text-green-500 hover:text-green-700 hover:bg-green-50"
-                                aria-label="Onayla"
-                              >
-                                <Check className="h-4 w-4" />
-                              </Button>
-                            }
-                          />
-                          <TooltipContent>Onayla</TooltipContent>
-                        </Tooltip>
-                      )}
-                      {comment.status !== "REJECTED" && (
-                        <Tooltip>
-                          <TooltipTrigger
-                            render={
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                disabled={processingId === comment.id}
-                                onClick={() => setRejectTarget(comment)}
-                                className="h-8 w-8 cursor-pointer text-red-400 hover:text-red-600 hover:bg-red-50"
-                                aria-label="Reddet"
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            }
-                          />
-                          <TooltipContent>Reddet</TooltipContent>
-                        </Tooltip>
-                      )}
-                      <Tooltip>
-                        <TooltipTrigger
-                          render={
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              disabled={processingId === comment.id}
-                              onClick={() => setDeleteTarget(comment)}
-                              className="h-8 w-8 cursor-pointer text-red-400 hover:text-red-600 hover:bg-red-50"
-                              aria-label="Sil"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          }
-                        />
-                        <TooltipContent>Sil</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable<CommentAdminResponse>
+        columns={columns}
+        data={comments}
+        getRowId={(c) => String(c.id)}
+        renderMobileCard={renderMobileCard}
+        emptyState={emptyState}
+      />
 
       {/* Approve confirmation */}
       <ActionAlert
