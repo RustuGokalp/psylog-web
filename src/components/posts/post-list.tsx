@@ -67,7 +67,7 @@ export default function PostList({
     return () => {
       if (sentinel) observer.unobserve(sentinel);
     };
-  }, [isLast, isLoading, page]);
+  }, [isLast, isLoading, page, keyword, tag]);
 
   if (posts.length === 0 && !isLoading) {
     return null;
