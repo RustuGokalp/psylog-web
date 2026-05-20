@@ -42,7 +42,7 @@ export default function SpecializationsPreviewSection({
       <div className="relative">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <div className="mb-10 text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-violet-800 sm:text-4xl">
+            <h2 className="text-3xl font-medium text-violet-700 sm:text-4xl">
               Çalışma Alanlarım
             </h2>
             <p className="mt-4 text-base text-slate-500">
@@ -51,7 +51,7 @@ export default function SpecializationsPreviewSection({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
             {specializations.map((item, index) => {
               const accentColor = ACCENT_COLORS[index % ACCENT_COLORS.length];
               const placeholderColor =
