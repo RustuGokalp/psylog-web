@@ -1,26 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { ActionAlert, AlertType } from "@/components/action-alert";
 import { ApiException } from "@/lib/api";
 import {
@@ -31,6 +16,9 @@ import {
 import { AdminPost } from "@/types/post";
 import { MessageSquare, MessagesSquare, Pencil, Trash2 } from "lucide-react";
 import { formatReadingTime, formatTurkishDate } from "@/lib/format";
+import { DataTable } from "@/components/ui/DataTable";
+import { createPostColumns } from "@/components/tables/columns/post-columns";
+import { TableAction } from "@/components/tables/table-action";
 
 interface PostTableProps {
   posts: AdminPost[];
@@ -53,6 +41,7 @@ export default function PostTable({
   useEffect(() => {
     setPosts(initialPosts);
   }, [initialPosts]);
+
   const [togglingId, setTogglingId] = useState<number | null>(null);
   const [draftTarget, setDraftTarget] = useState<AdminPost | null>(null);
   const [toggleTarget, setToggleTarget] = useState<AdminPost | null>(null);
@@ -130,14 +119,6 @@ export default function PostTable({
     }
   }
 
-  function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString("tr-TR", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  }
-
   const emptyState = (
     <div className="rounded-xl border border-dashed border-slate-300 bg-white py-16 text-center">
       <p className="text-sm text-slate-500">Henüz yazı yok.</p>
@@ -149,8 +130,6 @@ export default function PostTable({
       </Link>
     </div>
   );
-
-  if (posts.length === 0) return emptyState;
 
   function renderStatusBadge(post: AdminPost) {
     if (post.published)
@@ -172,333 +151,94 @@ export default function PostTable({
     );
   }
 
+  function renderMobileCard(post: AdminPost) {
+    const pendingCount =
+      post.comments?.filter((c) => c.status === "PENDING").length ?? 0;
+    return (
+      <div className="flex flex-col gap-2.5 p-4">
+        <div className="flex items-start justify-between gap-2">
+          <p className="flex-1 text-sm font-medium leading-snug text-slate-800 line-clamp-2">
+            {post.title}
+          </p>
+          {renderStatusBadge(post)}
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-slate-400">
+            {formatTurkishDate(post.createdAt)}
+            {post.readingTime != null &&
+              ` · ${formatReadingTime(post.readingTime)}`}
+          </span>
+          {pendingCount > 0 && (
+            <Link
+              href={`/admin/posts/${post.id}/comments`}
+              className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-700 hover:bg-violet-200 transition-colors"
+            >
+              <MessageSquare className="h-3 w-3" />
+              {pendingCount} bekliyor
+            </Link>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between border-t border-slate-100 pt-2.5">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-500">Yayınla</span>
+            {togglingId === post.id ? (
+              <Skeleton className="h-5 w-9 rounded-full" />
+            ) : (
+              <Switch
+                checked={post.published}
+                onCheckedChange={() => handleTogglePublish(post)}
+                aria-label={post.published ? "Taslağa al" : "Yayınla"}
+              />
+            )}
+          </div>
+          <div className="flex items-center gap-1">
+            <TableAction
+              tooltip="Yorumları Gör"
+              tone="violet"
+              icon={MessagesSquare}
+              onClick={() => router.push(`/admin/posts/${post.id}/comments`)}
+            />
+            <TableAction
+              tooltip="Düzenle"
+              tone="amber"
+              icon={Pencil}
+              onClick={() => router.push(`/admin/posts/${post.id}/edit`)}
+            />
+            <TableAction
+              tooltip="Sil"
+              tone="red"
+              icon={Trash2}
+              onClick={() => setDeleteTarget(post)}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const columns = useMemo(
+    () =>
+      createPostColumns({
+        onViewComments: (id) => router.push(`/admin/posts/${id}/comments`),
+        onEdit: (id) => router.push(`/admin/posts/${id}/edit`),
+        onDelete: (post) => setDeleteTarget(post),
+        onTogglePublish: handleTogglePublish,
+        togglingId,
+      }),
+    [router, togglingId],
+  );
+
   return (
     <>
-      {/* Mobile card list — hidden on sm+ */}
-      <div className="sm:hidden flex flex-col divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
-        {posts.map((post) => {
-          const pendingCount =
-            post.comments?.filter((c) => c.status === "PENDING").length ?? 0;
-          return (
-            <div key={post.id} className="flex flex-col gap-2.5 p-4">
-              <div className="flex items-start justify-between gap-2">
-                <p className="flex-1 text-sm font-medium leading-snug text-slate-800 line-clamp-2">
-                  {post.title}
-                </p>
-                {renderStatusBadge(post)}
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400">
-                  {formatTurkishDate(post.createdAt)}
-                  {post.readingTime != null &&
-                    ` · ${formatReadingTime(post.readingTime)}`}
-                </span>
-                {pendingCount > 0 && (
-                  <Link
-                    href={`/admin/posts/${post.id}/comments`}
-                    className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-700 hover:bg-violet-200 transition-colors"
-                  >
-                    <MessageSquare className="h-3 w-3" />
-                    {pendingCount} bekliyor
-                  </Link>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between border-t border-slate-100 pt-2.5">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-500">Yayınla</span>
-                  {togglingId === post.id ? (
-                    <Skeleton className="h-5 w-9 rounded-full" />
-                  ) : (
-                    <Switch
-                      checked={post.published}
-                      onCheckedChange={() => handleTogglePublish(post)}
-                      aria-label={post.published ? "Taslağa al" : "Yayınla"}
-                    />
-                  )}
-                </div>
-                <div className="flex items-center gap-1">
-                  <TooltipProvider delay={200}>
-                    <Tooltip>
-                      <TooltipTrigger
-                        render={
-                          <button
-                            onClick={() =>
-                              router.push(`/admin/posts/${post.id}/comments`)
-                            }
-                            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-violet-400 transition-colors hover:bg-violet-50 hover:text-violet-600"
-                            aria-label="Yorumları Gör"
-                          >
-                            <MessagesSquare className="h-4 w-4" />
-                          </button>
-                        }
-                      />
-                      <TooltipContent>Yorumları Gör</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger
-                        render={
-                          <button
-                            onClick={() =>
-                              router.push(`/admin/posts/${post.id}/edit`)
-                            }
-                            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-amber-500 transition-colors hover:bg-amber-100 hover:text-amber-800"
-                            aria-label="Düzenle"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </button>
-                        }
-                      />
-                      <TooltipContent>Düzenle</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger
-                        render={
-                          <button
-                            onClick={() => setDeleteTarget(post)}
-                            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
-                            aria-label="Sil"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        }
-                      />
-                      <TooltipContent>Sil</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Desktop table — hidden on mobile */}
-      <div className="hidden sm:block overflow-x-auto rounded-xl border border-slate-200 bg-white">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-slate-50 hover:bg-slate-50">
-              <TableHead className="min-w-50 font-semibold text-slate-600">
-                Başlık
-              </TableHead>
-              <TableHead className="font-semibold text-slate-600">
-                Durum
-              </TableHead>
-              <TableHead className="hidden md:table-cell font-semibold text-slate-600">
-                Etiketler
-              </TableHead>
-              <TableHead className="hidden lg:table-cell font-semibold text-slate-600">
-                Oluşturulma
-              </TableHead>
-              <TableHead className="hidden lg:table-cell font-semibold text-slate-600">
-                Güncelleme
-              </TableHead>
-              <TableHead className="hidden xl:table-cell font-semibold text-slate-600 text-center">
-                Okuma
-              </TableHead>
-              <TableHead className="hidden lg:table-cell font-semibold text-slate-600 text-center">
-                Yorumlar
-              </TableHead>
-              <TableHead className="w-20 text-center font-semibold text-slate-600">
-                Yayınla
-              </TableHead>
-              <TableHead className="w-20 text-center font-semibold text-slate-600">
-                Action
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {posts.map((post) => (
-              <TableRow key={post.id} className="hover:bg-slate-50">
-                {/* Başlık */}
-                <TableCell>
-                  <p className="font-medium text-slate-800 line-clamp-1">
-                    {post.title}
-                  </p>
-                </TableCell>
-
-                {/* Durum */}
-                <TableCell>
-                  {post.published ? (
-                    <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-                      Yayında
-                    </Badge>
-                  ) : post.publishAt ? (
-                    <div className="flex flex-col gap-0.5">
-                      <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 w-fit">
-                        Zamanlandı
-                      </Badge>
-                      <span className="text-xs text-slate-400">
-                        {formatDate(post.publishAt)}
-                      </span>
-                    </div>
-                  ) : (
-                    <Badge className="bg-slate-100 text-slate-600 hover:bg-slate-100">
-                      Taslak
-                    </Badge>
-                  )}
-                </TableCell>
-
-                {/* Etiketler */}
-                <TableCell className="hidden md:table-cell">
-                  {post.tags.length === 0 ? (
-                    <span className="text-xs text-slate-300">—</span>
-                  ) : (
-                    <div className="flex flex-wrap gap-1">
-                      {post.tags.slice(0, 3).map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="outline"
-                          className="text-xs font-normal"
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                      {post.tags.length > 3 && (
-                        <TooltipProvider delay={200}>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Badge
-                                variant="outline"
-                                className="text-xs font-normal text-slate-400 cursor-default"
-                              >
-                                +{post.tags.length - 3}
-                              </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent
-                              side="top"
-                              className="flex flex-col gap-0.5"
-                            >
-                              {post.tags.slice(3).map((tag) => (
-                                <span key={tag}>{tag}</span>
-                              ))}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
-                    </div>
-                  )}
-                </TableCell>
-
-                {/* Oluşturulma */}
-                <TableCell className="hidden lg:table-cell text-sm text-slate-500 whitespace-nowrap">
-                  {formatTurkishDate(post.createdAt)}
-                </TableCell>
-
-                {/* Güncelleme */}
-                <TableCell className="hidden lg:table-cell text-sm text-slate-500 whitespace-nowrap">
-                  {post.updatedAt ? formatTurkishDate(post.updatedAt) : "—"}
-                </TableCell>
-
-                {/* Okuma süresi */}
-                <TableCell className="hidden xl:table-cell text-center text-sm text-slate-500">
-                  {post.readingTime != null
-                    ? formatReadingTime(post.readingTime)
-                    : "—"}
-                </TableCell>
-
-                {/* Yorumlar */}
-                <TableCell className="hidden lg:table-cell text-center">
-                  {(() => {
-                    const pendingCount =
-                      post.comments?.filter((c) => c.status === "PENDING")
-                        .length ?? 0;
-                    return pendingCount > 0 ? (
-                      <Link
-                        href={`/admin/posts/${post.id}/comments`}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-medium text-violet-700 hover:bg-violet-200 transition-colors"
-                      >
-                        <MessageSquare className="h-3 w-3" />
-                        {pendingCount} bekliyor
-                      </Link>
-                    ) : (
-                      <span className="text-xs text-slate-300">—</span>
-                    );
-                  })()}
-                </TableCell>
-
-                {/* Yayınla toggle */}
-                <TableCell className="text-center">
-                  {togglingId === post.id ? (
-                    <div className="flex justify-center">
-                      <Skeleton className="h-5 w-9 rounded-full" />
-                    </div>
-                  ) : (
-                    <Switch
-                      checked={post.published}
-                      onCheckedChange={() => handleTogglePublish(post)}
-                      aria-label={post.published ? "Taslağa al" : "Yayınla"}
-                    />
-                  )}
-                </TableCell>
-
-                {/* Aksiyonlar */}
-                <TableCell>
-                  <div className="flex items-center justify-center gap-1">
-                    <TooltipProvider delay={200}>
-                      <Tooltip>
-                        <TooltipTrigger
-                          render={
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() =>
-                                router.push(
-                                  `/admin/posts/${post.id}/comments`,
-                                )
-                              }
-                              className="h-8 w-8 cursor-pointer text-violet-400 hover:text-violet-600 hover:bg-violet-50"
-                              aria-label="Yorumları Gör"
-                            >
-                              <MessagesSquare className="h-4 w-4" />
-                            </Button>
-                          }
-                        />
-                        <TooltipContent>Yorumları Gör</TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger
-                          render={
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() =>
-                                router.push(`/admin/posts/${post.id}/edit`)
-                              }
-                              className="h-8 w-8 cursor-pointer text-amber-400 hover:text-amber-500 hover:bg-amber-50"
-                              aria-label="Düzenle"
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                          }
-                        />
-                        <TooltipContent>Düzenle</TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger
-                          render={
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => setDeleteTarget(post)}
-                              className="h-8 w-8 cursor-pointer text-red-400 hover:text-red-600 hover:bg-red-50"
-                              aria-label="Sil"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          }
-                        />
-                        <TooltipContent>Sil</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable<AdminPost>
+        columns={columns}
+        data={posts}
+        getRowId={(p) => String(p.id)}
+        renderMobileCard={renderMobileCard}
+        emptyState={emptyState}
+      />
 
       {/* Draft edit prompt */}
       <ActionAlert

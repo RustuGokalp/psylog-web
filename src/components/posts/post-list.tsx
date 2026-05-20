@@ -12,7 +12,12 @@ interface PostListProps {
   tag?: string;
 }
 
-export default function PostList({ initialPosts, initialLast, keyword, tag }: PostListProps) {
+export default function PostList({
+  initialPosts,
+  initialLast,
+  keyword,
+  tag,
+}: PostListProps) {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [page, setPage] = useState(0);
   const [isLast, setIsLast] = useState(initialLast);
@@ -32,7 +37,12 @@ export default function PostList({ initialPosts, initialLast, keyword, tag }: Po
       setIsLoading(true);
       try {
         const nextPage = page + 1;
-        const data = await fetchPublicPosts({ page: nextPage, size: 10, keyword, tag });
+        const data = await fetchPublicPosts({
+          page: nextPage,
+          size: 10,
+          keyword,
+          tag,
+        });
         setPosts((prev) => [...prev, ...data.content]);
         setPage(nextPage);
         setIsLast(data.last);
