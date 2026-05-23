@@ -63,7 +63,6 @@ export default function NotFound() {
         />
       </div>
 
-      {/* ── Main content ── */}
       <main className="flex flex-1 flex-col items-center justify-center text-center px-4 py-24">
         <div className="mx-auto max-w-xl flex flex-col items-center">
           <div className="animate-float-balloon w-40 sm:w-52 mx-auto relative">
@@ -106,7 +105,6 @@ export default function NotFound() {
         </div>
       </main>
 
-      {/* ── Footer link row ── */}
       <footer className="nf-footer-row relative z-10 mt-auto py-6 px-4">
         <div className="mx-auto max-w-5xl flex flex-wrap items-center gap-x-4 gap-y-2 justify-center">
           <span className="nf-eyebrow text-xs font-medium uppercase tracking-widest">
