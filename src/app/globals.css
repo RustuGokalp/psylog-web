@@ -215,6 +215,11 @@
   opacity: 0.45;
 }
 
+.nf-script-lavender {
+  font-family: var(--font-handwriting);
+  color: var(--nf-lavender);
+}
+
 @keyframes float-balloon {
   0%,
   100% {
