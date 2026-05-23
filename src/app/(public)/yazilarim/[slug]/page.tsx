@@ -78,7 +78,7 @@ export default async function PostDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: safeJsonLd(buildJsonLd(post)) }}
       />
 
-      <section className="relative overflow-hidden bg-[#fdf4f5]">
+      <section className="relative overflow-hidden bg-rose-tint">
         <Blob
           className="pointer-events-none absolute -right-16 -top-12 h-72 w-72 text-rose-200/40"
           aria-hidden="true"
@@ -249,7 +249,7 @@ export default async function PostDetailPage({ params }: Props) {
 
       <PageCta
         description="Sorularınız için benimle iletişime geçebilirsiniz."
-        className="bg-[#fdf4f5]"
+        className="bg-rose-tint"
       />
     </>
   );
