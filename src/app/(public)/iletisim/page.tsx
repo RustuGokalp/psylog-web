@@ -22,7 +22,7 @@ export default async function ContactPage() {
   return (
     <main>
       <PageHero
-        className="bg-[#FAEEF5]"
+        className="bg-rose-tint"
         label="Randevu ve Bilgi"
         labelClassName="text-rose-500"
         lineClassName="bg-rose-400"

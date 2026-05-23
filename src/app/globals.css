@@ -7,8 +7,11 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-rose-tint: #faeef5;
+  --color-cream-tint: #fdf8f6;
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display), ui-serif, Georgia, serif;
+  --font-handwriting: var(--font-handwriting), ui-serif, cursive;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -127,6 +130,123 @@
   main h1,
   main h2 {
     font-family: var(--font-display);
+  }
+}
+
+/* 404 page — palette root */
+.nf-scene {
+  --nf-rose: #c2415a;
+  --nf-rose-dark: #be3455;
+  --nf-lavender: #8b7eb8;
+  --nf-cream: #fdf8f6;
+  --nf-rose-mid: #eecdd6;
+  --nf-lavender-soft: #d4ccf0;
+  --nf-ink: #1e1318;
+  --nf-ink-mid: #5a4750;
+  --nf-ink-soft: #9a8892;
+  --nf-border: #e8dde2;
+  background-color: var(--nf-cream);
+}
+
+/* 404 page button styles — avoids inline event handlers in Server Component */
+.nf-btn-primary {
+  background-color: var(--nf-rose);
+  color: white;
+}
+.nf-btn-primary:hover {
+  background-color: var(--nf-rose-dark);
+}
+
+.nf-btn-ghost {
+  border: 1px solid var(--nf-border);
+  color: var(--nf-ink);
+  background-color: transparent;
+}
+.nf-btn-ghost:hover {
+  background-color: #f7e8ec;
+}
+
+/* 404 page scoped utility classes */
+.nf-dot-grid {
+  background-image: radial-gradient(
+    circle,
+    var(--nf-lavender-soft) 1px,
+    transparent 1px
+  );
+  background-size: 32px 32px;
+  opacity: 0.45;
+}
+
+.nf-404 {
+  font-family: var(--font-handwriting);
+  color: var(--nf-rose);
+}
+
+.nf-title {
+  color: var(--nf-ink);
+}
+
+.nf-text {
+  color: var(--nf-ink-mid);
+}
+
+.nf-eyebrow {
+  color: var(--nf-ink-soft);
+}
+
+.nf-footer-row {
+  border-top: 1px solid var(--nf-border);
+}
+
+.nf-footer-link {
+  color: var(--nf-rose);
+}
+.nf-footer-link:hover {
+  opacity: 0.8;
+}
+
+.nf-sep {
+  color: var(--nf-border);
+}
+
+.nf-qmark {
+  font-family: var(--font-handwriting);
+  color: var(--nf-lavender);
+  opacity: 0.45;
+}
+
+@keyframes float-balloon {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateX(8px);
+  }
+}
+
+.animate-float-balloon {
+  animation: float-balloon 6s ease-in-out infinite;
+}
+
+.animate-drift {
+  animation: drift 8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-balloon,
+  .animate-drift {
+    animation: none;
   }
 }
 

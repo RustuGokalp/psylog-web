@@ -55,7 +55,9 @@ interface YazilarimPageProps {
   searchParams: Promise<{ keyword?: string; tag?: string }>;
 }
 
-export default async function YazilarimPage({ searchParams }: YazilarimPageProps) {
+export default async function YazilarimPage({
+  searchParams,
+}: YazilarimPageProps) {
   const { keyword, tag } = await searchParams;
   const initialData = await getPosts({ page: 0, size: 10, keyword, tag });
   const posts = initialData.content;
@@ -67,7 +69,7 @@ export default async function YazilarimPage({ searchParams }: YazilarimPageProps
         dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(posts)) }}
       />
 
-      <section className="relative overflow-hidden bg-[#FAEEF5]">
+      <section className="relative overflow-hidden bg-rose-tint">
         <Blob
           className="pointer-events-none absolute -top-8 -left-8 h-48 w-48 text-rose-200/30"
           aria-hidden="true"
@@ -109,7 +111,7 @@ export default async function YazilarimPage({ searchParams }: YazilarimPageProps
         </div>
       </section>
 
-      <section className="bg-[#FDF8F6]">
+      <section className="bg-cream-tint">
         <div className="mx-auto max-w-6xl px-4 pt-8 pb-16 sm:px-6 sm:pt-10 sm:pb-20 lg:px-8">
           <PostSearchFilter initialKeyword={keyword} initialTag={tag} />
           {posts.length === 0 ? (
