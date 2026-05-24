@@ -15,7 +15,7 @@ import { MessageSquare, MessagesSquare, Pencil, Trash2 } from "lucide-react";
 import {
   formatTurkishDate,
   formatReadingTime,
-  formatPublishDate,
+  formatTurkishDateTime,
 } from "@/lib/format";
 import { AdminPost } from "@/types/post";
 import { TableAction } from "@/components/tables/table-action";
@@ -70,7 +70,7 @@ export function createPostColumns(
                 Zamanlandı
               </Badge>
               <span className="text-xs text-slate-400">
-                {formatPublishDate(post.publishAt)}
+                {formatTurkishDateTime(post.publishAt)}
               </span>
             </div>
           );

@@ -19,7 +19,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import RichTextEditor from "@/components/admin/rich-text-editor";
 import ImageUpload from "@/components/admin/image-upload";
-import { Loader2 } from "lucide-react";
+import { Eye, Loader2 } from "lucide-react";
+import SpecializationPreview from "@/components/admin/specialization-preview";
 
 interface SpecializationFormProps {
   mode: "create" | "edit";
@@ -76,12 +77,12 @@ export default function SpecializationForm({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [resultAlert, setResultAlert] = useState<ResultAlert>(null);
   const [resultAlertOpen, setResultAlertOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const isEdit = mode === "edit";
 
   const stableInitialValues = useMemo(
     () => ({ ...defaultValues, ...initialValues }),
-    // Deps are the primitive field values — stable across re-renders when data hasn't changed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       initialValues?.title,
@@ -170,6 +171,11 @@ export default function SpecializationForm({
       formik.setSubmitting(false);
     }
   }
+
+  const canPreview =
+    formik.values.title.trim().length >= 1 &&
+    formik.values.summary.replace(/<[^>]*>/g, "").trim().length >= 1 &&
+    formik.values.content.replace(/<[^>]*>/g, "").trim().length >= 1;
 
   return (
     <>
@@ -333,6 +339,16 @@ export default function SpecializationForm({
         )}
 
         <div className="flex items-center justify-end gap-3 pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!canPreview}
+            onClick={() => setPreviewOpen(true)}
+            className="flex items-center gap-2 mr-auto"
+          >
+            <Eye className="h-4 w-4" />
+            Önizle
+          </Button>
           {isEdit ? (
             <Button
               type="button"
@@ -407,6 +423,12 @@ export default function SpecializationForm({
             router.refresh();
           }
         }}
+      />
+
+      <SpecializationPreview
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        values={formik.values}
       />
     </>
   );

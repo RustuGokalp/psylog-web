@@ -15,7 +15,11 @@ import {
 } from "@/services/post.service";
 import { AdminPost } from "@/types/post";
 import { MessageSquare, MessagesSquare, Pencil, Trash2 } from "lucide-react";
-import { formatReadingTime, formatTurkishDate } from "@/lib/format";
+import {
+  formatReadingTime,
+  formatTurkishDate,
+  formatTurkishDateTime,
+} from "@/lib/format";
 import { DataTable } from "@/components/ui/DataTable";
 import { createPostColumns } from "@/components/tables/columns/post-columns";
 import { TableAction } from "@/components/tables/table-action";
@@ -140,9 +144,14 @@ export default function PostTable({
       );
     if (post.publishAt)
       return (
-        <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 shrink-0">
-          Zamanlandı
-        </Badge>
+        <div className="flex flex-col items-end gap-0.5 shrink-0">
+          <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">
+            Zamanlandı
+          </Badge>
+          <span className="text-xs text-slate-400">
+            {formatTurkishDateTime(post.publishAt)}
+          </span>
+        </div>
       );
     return (
       <Badge className="bg-slate-100 text-slate-600 hover:bg-slate-100 shrink-0">
