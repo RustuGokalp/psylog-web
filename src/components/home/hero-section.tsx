@@ -13,7 +13,7 @@ interface HeroSectionProps {
 
 export default function HeroSection({ about }: HeroSectionProps) {
   return (
-    <div className="min-[2560px]:bg-[linear-gradient(to_right,#ffffff_50%,#fff1f2_50%)]">
+    <div className="min-[2560px]:bg-rose-50">
       <section className="mx-auto flex min-h-140 flex-col md:flex-row min-[2560px]:max-w-400">
         {/* Left: photo */}
         <div className="relative h-72 w-full md:min-h-140 md:w-1/2">
