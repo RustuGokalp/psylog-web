@@ -24,14 +24,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return createMetadata({
       title: "Sayfa Bulunamadı",
       description: "",
-      path: `/calisma-alanlari/${slug}`,
+      path: `/calisma-alanlarim/${slug}`,
     });
   }
 
   return createMetadata({
     title: item.title,
     description: item.summary.replace(/<[^>]*>/g, "").slice(0, 160),
-    path: `/calisma-alanlari/${item.slug}`,
+    path: `/calisma-alanlarim/${item.slug}`,
   });
 }
 

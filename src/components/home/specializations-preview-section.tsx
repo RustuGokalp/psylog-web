@@ -60,7 +60,7 @@ export default function SpecializationsPreviewSection({
               return (
                 <Link
                   key={item.id}
-                  href={`/calisma-alanlari/${item.slug}`}
+                  href={`/calisma-alanlarim/${item.slug}`}
                   className="group block rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <Card className="h-full overflow-hidden rounded-2xl shadow-sm transition-shadow group-hover:shadow-md">
@@ -108,7 +108,7 @@ export default function SpecializationsPreviewSection({
 
           <div className="mt-10 text-center">
             <Link
-              href="/calisma-alanlari"
+              href="/calisma-alanlarim"
               className="font-semibold text-violet-600 hover:text-violet-800 hover:underline"
             >
               Tüm Alanlar →
