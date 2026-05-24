@@ -5,6 +5,7 @@ import { Eye } from "lucide-react";
 import { ContactMessage } from "@/types/contact";
 import { formatTurkishDateTime } from "@/lib/format";
 import { TableAction } from "@/components/tables/table-action";
+import { OverflowTooltip } from "@/components/ui/tooltip";
 
 export interface ContactColumnHandlers {
   onView: (m: ContactMessage) => void;
@@ -17,37 +18,42 @@ export function createContactColumns(
     {
       id: "fullName",
       header: "Ad Soyad",
+      maxSize: 160,
       meta: {
         headerClassName: "font-semibold text-slate-600",
-        cellClassName: "font-medium text-slate-800 whitespace-nowrap",
+        cellClassName: "font-medium text-slate-800",
       },
       cell: ({ row }) => {
         const m = row.original;
-        return <>{m.fullName}</>;
+        return (
+          <OverflowTooltip as="p" text={m.fullName} className="truncate" />
+        );
       },
     },
     {
       id: "email",
       header: "E-posta",
+      maxSize: 192,
       meta: {
         headerClassName: "font-semibold text-slate-600",
         cellClassName: "text-sm text-slate-600",
       },
       cell: ({ row }) => {
         const m = row.original;
-        return <>{m.email}</>;
+        return <OverflowTooltip as="p" text={m.email} className="truncate" />;
       },
     },
     {
       id: "subject",
       header: "Konu",
+      maxSize: 192,
       meta: {
         headerClassName: "font-semibold text-slate-600",
-        cellClassName: "text-sm text-slate-600 max-w-48",
+        cellClassName: "text-sm text-slate-600",
       },
       cell: ({ row }) => {
         const m = row.original;
-        return <p className="line-clamp-1">{m.subject}</p>;
+        return <OverflowTooltip as="p" text={m.subject} className="truncate" />;
       },
     },
     {
@@ -58,6 +64,7 @@ export function createContactColumns(
         cellClassName:
           "hidden md:table-cell text-sm text-slate-500 whitespace-nowrap",
       },
+      maxSize: 130,
       cell: ({ row }) => {
         const m = row.original;
         return (
@@ -68,6 +75,7 @@ export function createContactColumns(
     {
       id: "date",
       header: "Tarih",
+      maxSize: 135,
       meta: {
         headerClassName: "hidden lg:table-cell font-semibold text-slate-600",
         cellClassName:
@@ -81,6 +89,7 @@ export function createContactColumns(
     {
       id: "actions",
       header: "Action",
+      maxSize: 80,
       meta: {
         headerClassName: "w-16 text-center font-semibold text-slate-600",
         cellClassName: "text-center",

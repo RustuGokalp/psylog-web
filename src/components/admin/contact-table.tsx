@@ -1,18 +1,13 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { ContactMessage } from "@/types/contact";
 import { Eye, Mail, Phone } from "lucide-react";
 import { formatTurkishDateTime } from "@/lib/format";
 import { DataTable } from "@/components/ui/DataTable";
 import { createContactColumns } from "@/components/tables/columns/contact-columns";
 import { TableAction } from "@/components/tables/table-action";
+import ContactDetailModal from "@/components/admin/modals/contact-detail-modal";
 
 interface ContactTableProps {
   messages: ContactMessage[];
@@ -85,60 +80,10 @@ export default function ContactTable({ messages }: ContactTableProps) {
         emptyState={emptyState}
       />
 
-      {/* Message detail dialog */}
-      <Dialog
-        open={!!selected}
-        onOpenChange={(open) => !open && setSelected(null)}
-      >
-        <DialogContent className="max-w-md p-0 overflow-hidden">
-          <DialogHeader className="px-5 pt-5 pb-3 border-b border-slate-100">
-            <DialogTitle className="text-sm font-semibold text-slate-800 leading-snug">
-              {selected?.subject}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="px-5 py-4 flex flex-col gap-3">
-            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-              <dt className="text-slate-400 font-medium whitespace-nowrap">
-                Ad Soyad
-              </dt>
-              <dd className="text-slate-700">{selected?.fullName}</dd>
-
-              <dt className="text-slate-400 font-medium whitespace-nowrap">
-                E-posta
-              </dt>
-              <dd className="text-slate-700 break-all">{selected?.email}</dd>
-
-              {selected?.mobilePhone && (
-                <>
-                  <dt className="text-slate-400 font-medium whitespace-nowrap">
-                    Telefon
-                  </dt>
-                  <dd className="text-slate-700">{selected.mobilePhone}</dd>
-                </>
-              )}
-
-              <dt className="text-slate-400 font-medium whitespace-nowrap">
-                Tarih
-              </dt>
-              <dd className="text-slate-700">
-                {selected && formatTurkishDateTime(selected.createdAt)}
-              </dd>
-            </dl>
-
-            <div className="border-t border-slate-100" />
-
-            <div>
-              <p className="mb-1.5 text-xs font-medium text-slate-400 uppercase tracking-wide">
-                Mesaj
-              </p>
-              <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">
-                {selected?.message}
-              </p>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ContactDetailModal
+        message={selected}
+        onClose={() => setSelected(null)}
+      />
     </>
   );
 }

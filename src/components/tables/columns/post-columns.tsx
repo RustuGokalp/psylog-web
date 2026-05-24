@@ -10,6 +10,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  OverflowTooltip,
 } from "@/components/ui/tooltip";
 import { MessageSquare, MessagesSquare, Pencil, Trash2 } from "lucide-react";
 import {
@@ -36,21 +37,26 @@ export function createPostColumns(
       id: "title",
       accessorKey: "title",
       header: "Başlık",
+      minSize: 200,
+      maxSize: 384,
       meta: {
-        headerClassName: "min-w-50 font-semibold text-slate-600",
+        headerClassName: "font-semibold text-slate-600",
       },
       cell: ({ row }) => {
         const post = row.original;
         return (
-          <p className="font-medium text-slate-800 line-clamp-1">
-            {post.title}
-          </p>
+          <OverflowTooltip
+            as="p"
+            text={post.title}
+            className="truncate font-medium text-slate-800"
+          />
         );
       },
     },
     {
       id: "status",
       header: "Durum",
+      minSize: 150,
       meta: {
         headerClassName: "font-semibold text-slate-600",
       },
@@ -65,11 +71,11 @@ export function createPostColumns(
         }
         if (post.publishAt) {
           return (
-            <div className="flex flex-col gap-0.5 text-center">
+            <div className="flex flex-col items-start gap-0.5">
               <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 w-fit">
                 Zamanlandı
               </Badge>
-              <span className="text-xs text-slate-400">
+              <span className="text-xs whitespace-nowrap text-slate-400">
                 {formatTurkishDateTime(post.publishAt)}
               </span>
             </div>

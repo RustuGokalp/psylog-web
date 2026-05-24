@@ -18,6 +18,23 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
+// TanStack's size/minSize/maxSize are plain numbers that aren't applied to the
+// DOM by default. We surface them as inline styles so a column can declare its
+// width directly (e.g. `maxSize: 192`). maxWidth must sit on a block element
+// inside the cell — applied to the <td> it is ignored for nowrap content in an
+// auto-layout table, so the truncation/ellipsis never triggers.
+function getSizingStyle(columnDef: {
+  size?: number;
+  minSize?: number;
+  maxSize?: number;
+}): React.CSSProperties | undefined {
+  const style: React.CSSProperties = {};
+  if (columnDef.size != null) style.width = columnDef.size;
+  if (columnDef.minSize != null) style.minWidth = columnDef.minSize;
+  if (columnDef.maxSize != null) style.maxWidth = columnDef.maxSize;
+  return Object.keys(style).length > 0 ? style : undefined;
+}
+
 declare module "@tanstack/react-table" {
   // Type params must exactly match TanStack's ColumnMeta signature for
   // declaration merging (interface merging requires identical type-parameter
@@ -83,35 +100,60 @@ export function DataTable<TData, TValue = unknown>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className={headerRowClassName}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    className={cn(
-                      header.column.columnDef.meta?.headerClassName,
-                    )}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
+                {headerGroup.headers.map((header) => {
+                  const sizingStyle = getSizingStyle(header.column.columnDef);
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={cn(
+                        header.column.columnDef.meta?.headerClassName,
+                      )}
+                    >
+                      {header.isPlaceholder ? null : sizingStyle ? (
+                        <div className="min-w-0 overflow-hidden" style={sizingStyle}>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                        </div>
+                      ) : (
+                        flexRender(
                           header.column.columnDef.header,
                           header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
+                        )
+                      )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows.map((row) => (
               <TableRow key={row.id} className={bodyRowClassName}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    className={cn(cell.column.columnDef.meta?.cellClassName)}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+                {row.getVisibleCells().map((cell) => {
+                  const sizingStyle = getSizingStyle(cell.column.columnDef);
+                  return (
+                    <TableCell
+                      key={cell.id}
+                      className={cn(cell.column.columnDef.meta?.cellClassName)}
+                    >
+                      {sizingStyle ? (
+                        <div className="min-w-0 overflow-hidden" style={sizingStyle}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </div>
+                      ) : (
+                        flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )
+                      )}
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             ))}
           </TableBody>
