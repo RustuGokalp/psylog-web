@@ -16,7 +16,7 @@ export const metadata: Metadata = createMetadata({
   title: "Çalışma Alanlarım",
   description:
     "Klinik Psikolog Tuğçe Tekin'in çocuk ve ergen alanındaki uzmanlık ve çalışma alanları hakkında bilgi edinin.",
-  path: "/calisma-alanlari",
+  path: "/calisma-alanlarim",
 });
 
 const PLACEHOLDER_COLORS = [
@@ -100,7 +100,7 @@ export default async function CalismaAlanlariPage() {
                   >
                     {/* Image */}
                     <Link
-                      href={`/calisma-alanlari/${item.slug}`}
+                      href={`/calisma-alanlarim/${item.slug}`}
                       className="group relative block h-60 w-full shrink-0 overflow-hidden rounded-2xl shadow-sm md:h-72 md:w-2/5"
                       tabIndex={-1}
                       aria-hidden="true"
@@ -139,7 +139,7 @@ export default async function CalismaAlanlariPage() {
                         className="text-base leading-relaxed text-slate-600"
                       />
                       <Link
-                        href={`/calisma-alanlari/${item.slug}`}
+                        href={`/calisma-alanlarim/${item.slug}`}
                         className="mt-4 inline-flex w-fit items-center gap-1 text-sm font-semibold text-violet-600 hover:text-violet-800 hover:underline"
                       >
                         Daha Fazlası →

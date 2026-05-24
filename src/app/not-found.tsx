@@ -123,7 +123,7 @@ export default function NotFound() {
             ·
           </span>
           <Link
-            href="/calisma-alanlari"
+            href="/calisma-alanlarim"
             className="nf-footer-link text-sm transition-colors"
           >
             Çalışma Alanlarım

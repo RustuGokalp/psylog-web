@@ -47,7 +47,7 @@ export default function SpecializationDetail({ item }: Props) {
         }
       >
         <Link
-          href="/calisma-alanlari"
+          href="/calisma-alanlarim"
           className="mb-6 flex w-full items-center gap-1 text-sm font-medium text-purple-600 hover:text-purple-800 hover:underline"
         >
           ← Çalışma Alanlarım
@@ -85,7 +85,7 @@ export default function SpecializationDetail({ item }: Props) {
       <PageCta
         description="Bu alanda destek almak ister misiniz?"
         className="bg-violet-50"
-        secondaryButton={{ label: "Diğer Alanlar", href: "/calisma-alanlari" }}
+        secondaryButton={{ label: "Diğer Alanlar", href: "/calisma-alanlarim" }}
       />
     </main>
   );

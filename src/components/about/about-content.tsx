@@ -149,7 +149,7 @@ export default function AboutContent({ about }: AboutContentProps) {
                     aria-hidden="true"
                   />
                   <Link
-                    href="/calisma-alanlari"
+                    href="/calisma-alanlarim"
                     className="mt-5 inline-flex items-center gap-1 rounded-full border border-violet-300 px-5 py-2 text-sm font-semibold text-violet-700 transition-colors hover:bg-violet-100"
                   >
                     Çalışma Alanlarım →
