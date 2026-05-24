@@ -7,6 +7,7 @@ import { Check, Trash2, X } from "lucide-react";
 import { CommentAdminResponse } from "@/types/post";
 import { formatTurkishDateTime } from "@/lib/format";
 import { TableAction } from "@/components/tables/table-action";
+import { OverflowTooltip } from "@/components/ui/tooltip";
 
 function StatusBadge({ status }: { status: CommentAdminResponse["status"] }) {
   const map = {
@@ -43,58 +44,68 @@ export function createCommentColumns(
     {
       id: "post",
       header: "Yazı",
+      maxSize: 160,
       meta: {
         headerClassName: "font-semibold text-slate-600",
-        cellClassName: "max-w-40",
       },
       cell: ({ row }) => {
         const c = row.original;
         return (
-          <Link
+          <OverflowTooltip
+            as={Link}
             href={`/yazilarim/${c.postSlug}`}
             target="_blank"
-            className="line-clamp-1 text-sm font-medium text-violet-600 hover:underline"
-          >
-            {c.postTitle}
-          </Link>
+            text={c.postTitle}
+            className="block truncate text-sm font-medium text-violet-600 hover:underline"
+          />
         );
       },
     },
     {
       id: "author",
       header: "Yazar",
+      maxSize: 160,
       meta: {
         headerClassName: "font-semibold text-slate-600",
-        cellClassName: "whitespace-nowrap text-sm font-medium text-slate-800",
+        cellClassName: "text-sm font-medium text-slate-800",
       },
       cell: ({ row }) => {
         const c = row.original;
-        return <>{c.author}</>;
+        return <OverflowTooltip as="p" text={c.author} className="truncate" />;
       },
     },
     {
       id: "email",
       header: "E-posta",
+      maxSize: 192,
       meta: {
         headerClassName: "hidden md:table-cell font-semibold text-slate-600",
         cellClassName: "hidden md:table-cell text-sm text-slate-500",
       },
       cell: ({ row }) => {
         const c = row.original;
-        return <>{c.email ?? <span className="text-slate-300">—</span>}</>;
+        return c.email ? (
+          <OverflowTooltip as="p" text={c.email} className="truncate" />
+        ) : (
+          <span className="text-slate-300">—</span>
+        );
       },
     },
     {
       id: "content",
       header: "İçerik",
+      maxSize: 256,
       meta: {
         headerClassName: "font-semibold text-slate-600",
-        cellClassName: "max-w-64",
       },
       cell: ({ row }) => {
         const c = row.original;
         return (
-          <p className="line-clamp-2 text-sm text-slate-600">{c.content}</p>
+          <OverflowTooltip
+            as="p"
+            text={c.content}
+            className="truncate text-sm text-slate-600"
+          />
         );
       },
     },
