@@ -126,7 +126,7 @@ export default function NotFound() {
             href="/calisma-alanlari"
             className="nf-footer-link text-sm transition-colors"
           >
-            Çalışma Alanları
+            Çalışma Alanlarım
           </Link>
           <span className="nf-sep" aria-hidden="true">
             ·
