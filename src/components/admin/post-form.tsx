@@ -23,8 +23,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, Loader2, X } from "lucide-react";
+import { CalendarIcon, Eye, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import PostPreview from "@/components/admin/post-preview";
 
 interface PostFormProps {
   mode: "create" | "edit";
@@ -153,6 +154,7 @@ export default function PostForm({
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [resultAlert, setResultAlert] = useState<ResultAlert>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const isEdit = mode === "edit";
 
@@ -266,6 +268,11 @@ export default function PostForm({
     updated.setHours(Number(h), Number(m), 0, 0);
     formik.setFieldValue("publishAt", format(updated, "yyyy-MM-dd'T'HH:mm:ss"));
   }
+
+  const canPreview =
+    formik.values.title.trim().length >= 3 &&
+    formik.values.summary.trim().length >= 10 &&
+    formik.values.content.replace(/<[^>]*>/g, "").trim().length >= 20;
 
   return (
     <>
@@ -631,6 +638,16 @@ export default function PostForm({
           )}
           <Button
             type="button"
+            variant="outline"
+            disabled={!canPreview}
+            onClick={() => setPreviewOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <Eye className="h-4 w-4" />
+            Önizle
+          </Button>
+          <Button
+            type="button"
             variant="ghost"
             disabled={formik.isSubmitting}
             onClick={() => router.push("/admin/posts")}
@@ -670,6 +687,13 @@ export default function PostForm({
           }}
         />
       )}
+
+      <PostPreview
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        values={formik.values}
+        about={null}
+      />
     </>
   );
 }

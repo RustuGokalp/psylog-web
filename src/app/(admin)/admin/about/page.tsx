@@ -18,7 +18,8 @@ import RichTextEditor from "@/components/admin/rich-text-editor";
 import ImageUpload from "@/components/admin/image-upload";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ActionAlert } from "@/components/action-alert";
-import { Plus, X } from "lucide-react";
+import { Eye, Plus, X } from "lucide-react";
+import AboutPreview from "@/components/admin/about-preview";
 
 type ResultAlert = {
   open: boolean;
@@ -47,6 +48,7 @@ export default function AdminAboutPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [eduInput, setEduInput] = useState("");
   const [workInput, setWorkInput] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [resultAlert, setResultAlert] = useState<ResultAlert>({
     open: false,
     type: "success",
@@ -350,13 +352,25 @@ export default function AdminAboutPage() {
             </div>
           </div>
 
-          <Button
-            type="submit"
-            disabled={formik.isSubmitting || isLoading || !formik.dirty}
-            className="self-end bg-violet-600 hover:bg-violet-700 text-white"
-          >
-            {isUpdate ? "Güncelle" : "Kaydet"}
-          </Button>
+          <div className="flex items-center justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!formik.values.message.replace(/<[^>]*>/g, "").trim()}
+              onClick={() => setPreviewOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Eye className="h-4 w-4" />
+              Önizle
+            </Button>
+            <Button
+              type="submit"
+              disabled={formik.isSubmitting || isLoading || !formik.dirty}
+              className="bg-violet-600 hover:bg-violet-700 text-white"
+            >
+              {isUpdate ? "Güncelle" : "Kaydet"}
+            </Button>
+          </div>
 
           {/* Danger zone — only when record exists */}
           {isUpdate && (
@@ -419,6 +433,12 @@ export default function AdminAboutPage() {
         title={resultAlert.title}
         description={resultAlert.description}
         onClose={() => setResultAlert((prev) => ({ ...prev, open: false }))}
+      />
+
+      <AboutPreview
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        values={formik.values}
       />
     </div>
   );
