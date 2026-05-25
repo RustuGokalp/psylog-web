@@ -21,7 +21,18 @@ export default function NavBar() {
 
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const SHRINK_AT = 60;
+    const GROW_AT = 20;
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled((prev) => {
+        if (!prev && y > SHRINK_AT) return true;
+        if (prev && y < GROW_AT) return false;
+        return prev;
+      });
+    };
+
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
