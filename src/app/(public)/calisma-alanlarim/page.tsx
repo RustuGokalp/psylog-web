@@ -77,7 +77,9 @@ export default async function CalismaAlanlariPage() {
 
       <PageCta
         description="Danışanlarımla terapötik bir süreç başlatmak için benimle iletişime geçebilirsiniz."
-        className="bg-violet-50"
+        className="bg-purple-100"
+        secondaryButton={{ label: "Yazılarım", href: "/yazilarim" }}
+        secondaryButtonClassName="border-purple-300 text-purple-700 hover:bg-purple-200"
       />
     </main>
   );

@@ -10,6 +10,7 @@ import Star from "@/components/icons/star";
 import HtmlContent from "@/components/html-content";
 import Wildflower from "@/components/icons/wildflower";
 import PageHero from "@/components/page-hero";
+import PageCta from "@/components/page-cta";
 
 interface AboutContentProps {
   about: About | null;
@@ -160,6 +161,16 @@ export default function AboutContent({ about }: AboutContentProps) {
           </div>
         </div>
       </section>
+
+      <PageCta
+        description="Çocuğunuzun gelişim yolculuğunda yanınızda olmak için buradayım. Bir görüşme planlamak için benimle iletişime geçebilirsiniz."
+        className="bg-violet-100"
+        secondaryButton={{
+          label: "Çalışma Alanlarım",
+          href: "/calisma-alanlarim",
+        }}
+        secondaryButtonClassName="border-violet-300 text-violet-700 hover:bg-violet-200"
+      />
     </>
   );
 }
