@@ -45,18 +45,18 @@ export default function SpecializationDetail({ item }: Props) {
             />
           </>
         }
-      >
-        <Link
-          href="/calisma-alanlarim"
-          className="mb-6 flex w-full items-center gap-1 text-sm font-medium text-purple-600 hover:text-purple-800 hover:underline"
-        >
-          ← Çalışma Alanlarım
-        </Link>
-      </PageHero>
+      />
 
       {/* Content */}
       <section className="bg-violet-50">
         <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <Link
+            href="/calisma-alanlarim"
+            className="mb-8 inline-flex items-center gap-1 text-sm font-medium text-purple-600 transition-colors hover:text-purple-800"
+          >
+            <span aria-hidden="true">←</span> Çalışma Alanlarım
+          </Link>
+
           {item.image && (
             <div className="relative mb-10 mx-auto h-72 w-full max-w-2xl overflow-hidden rounded-2xl shadow-sm sm:h-96">
               <Image
@@ -84,7 +84,7 @@ export default function SpecializationDetail({ item }: Props) {
 
       <PageCta
         description="Bu alanda destek almak ister misiniz?"
-        className="bg-violet-50"
+        className="bg-purple-100"
         secondaryButton={{ label: "Diğer Alanlar", href: "/calisma-alanlarim" }}
       />
     </main>

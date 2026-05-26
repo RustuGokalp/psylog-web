@@ -10,6 +10,7 @@ interface PageHeroProps {
   descriptionClassName?: string;
   className?: string;
   icons?: React.ReactNode;
+  backLink?: React.ReactNode;
   children?: React.ReactNode;
 }
 
@@ -23,11 +24,17 @@ export default function PageHero({
   descriptionClassName,
   className,
   icons,
+  backLink,
   children,
 }: PageHeroProps) {
   return (
     <section className={cn("relative overflow-hidden", className)}>
       {icons}
+      {backLink && (
+        <div className="absolute top-4 left-4 z-10 sm:top-5 sm:left-6 lg:left-8">
+          {backLink}
+        </div>
+      )}
       <div className="relative">
         <div className="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-20 lg:px-8">
           {children}

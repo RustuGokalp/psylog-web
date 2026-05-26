@@ -10,12 +10,14 @@ interface PageCtaProps {
   description?: string;
   className?: string;
   secondaryButton?: SecondaryButton;
+  secondaryButtonClassName?: string;
 }
 
 export default function PageCta({
   description,
   className,
   secondaryButton,
+  secondaryButtonClassName,
 }: PageCtaProps) {
   return (
     <section className={cn("bg-rose-50", className)}>
@@ -38,7 +40,10 @@ export default function PageCta({
           {secondaryButton && (
             <Link
               href={secondaryButton.href}
-              className="inline-flex items-center justify-center rounded-full border border-rose-300 px-8 py-3 text-sm font-semibold text-rose-700 transition-colors hover:bg-rose-100"
+              className={cn(
+                "inline-flex items-center justify-center rounded-full border border-rose-300 px-8 py-3 text-sm font-semibold text-rose-700 transition-colors hover:bg-rose-200",
+                secondaryButtonClassName,
+              )}
             >
               {secondaryButton.label}
             </Link>

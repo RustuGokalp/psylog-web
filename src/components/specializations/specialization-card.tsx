@@ -35,15 +35,15 @@ export default function SpecializationCard({
     PLACEHOLDER_COLORS[index % PLACEHOLDER_COLORS.length];
   const accentColor = ACCENT_COLORS[index % ACCENT_COLORS.length];
 
+  const detailHref = `/calisma-alanlarim/${item.slug}`;
   const imageHref = interactive ? `/calisma-alanlarim/${item.slug}` : "#";
-  const detailHref = interactive ? `/calisma-alanlarim/${item.slug}` : "#";
 
   const imageBlock = interactive ? (
     <Link
       href={imageHref}
-      className="group relative block h-60 w-full shrink-0 overflow-hidden rounded-2xl shadow-sm md:h-72 md:w-2/5"
       tabIndex={-1}
       aria-hidden="true"
+      className="group relative block h-60 w-full shrink-0 overflow-hidden rounded-2xl shadow-sm md:h-72 md:w-2/5"
     >
       {item.image !== null ? (
         <Image
@@ -62,7 +62,7 @@ export default function SpecializationCard({
     </Link>
   ) : (
     <div
-      className="relative block h-60 w-full shrink-0 overflow-hidden rounded-2xl shadow-sm md:h-72 md:w-2/5"
+      className="group relative block h-60 w-full shrink-0 overflow-hidden rounded-2xl shadow-sm md:h-72 md:w-2/5"
       aria-hidden="true"
     >
       {item.image !== null ? (
@@ -70,7 +70,7 @@ export default function SpecializationCard({
           src={item.image}
           alt={item.title}
           fill
-          className="object-cover"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
           sizes="(max-width: 768px) 100vw, 40vw"
         />
       ) : (
@@ -85,12 +85,12 @@ export default function SpecializationCard({
   const detailLink = interactive ? (
     <Link
       href={detailHref}
-      className="mt-4 inline-flex w-fit items-center gap-1 text-sm font-semibold text-violet-600 hover:text-violet-800 hover:underline"
+      className="relative z-10 mt-4 inline-flex w-fit items-center gap-1 text-sm font-semibold text-violet-600 hover:text-violet-800 hover:underline"
     >
       Daha Fazlası →
     </Link>
   ) : (
-    <span className="mt-4 inline-flex w-fit cursor-default items-center gap-1 text-sm font-semibold text-violet-600">
+    <span className="mt-4 inline-flex w-fit cursor-default items-center gap-1 text-sm font-semibold text-violet-600 hover:text-violet-800 hover:underline">
       Daha Fazlası →
     </span>
   );
@@ -103,7 +103,7 @@ export default function SpecializationCard({
     >
       {imageBlock}
 
-      <div className="flex flex-1 flex-col">
+      <div className="relative flex flex-1 flex-col">
         <div className="mb-3 flex items-center gap-3">
           <span
             className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${accentColor} text-xs font-bold text-white`}
@@ -120,6 +120,14 @@ export default function SpecializationCard({
           className="text-base leading-relaxed text-slate-600"
         />
         {detailLink}
+        {interactive && (
+          <Link
+            href={detailHref}
+            aria-hidden="true"
+            tabIndex={-1}
+            className="absolute inset-0"
+          />
+        )}
       </div>
     </article>
   );

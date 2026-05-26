@@ -129,7 +129,7 @@ export default async function YazilarimPage({
 
       <PageCta
         description="Sorularınız veya randevu talepleriniz için benimle iletişime geçebilirsiniz."
-        className="bg-violet-50"
+        className="bg-rose-tint"
       />
     </>
   );
