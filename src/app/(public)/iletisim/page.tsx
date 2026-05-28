@@ -58,7 +58,7 @@ export default async function ContactPage() {
 
       <section className="bg-rose-50">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-          <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
+          <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-2 md:gap-16">
             <ContactInfo contactInfo={contactInfo} />
 
             <div className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
