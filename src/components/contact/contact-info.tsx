@@ -4,6 +4,7 @@ import LocationSketch from "@/components/icons/location-sketch";
 import Daisy from "@/components/icons/daisy";
 import Rose from "@/components/icons/rose";
 import { ContactInfo as ContactInfoData } from "@/types/contact-info";
+import WorkingHoursClient from "@/components/contact/working-hours-client";
 
 interface ContactInfoProps {
   contactInfo: ContactInfoData | null;
@@ -64,14 +65,9 @@ export default function ContactInfo({ contactInfo }: ContactInfoProps) {
 
       <div className="rounded-2xl bg-orange-100 p-6">
         <h3 className="text-base font-semibold text-orange-800">
-          Seans Saatleri
+          Çalışma Saatleri
         </h3>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Pazartesi – Cuma: 09:00 – 18:00
-        </p>
-        <p className="text-sm text-muted-foreground">
-          Cumartesi: Randevuya göre
-        </p>
+        <WorkingHoursClient workingHours={contactInfo?.workingHours} />
       </div>
     </div>
   );

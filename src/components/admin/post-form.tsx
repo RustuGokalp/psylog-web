@@ -17,13 +17,8 @@ import RichTextEditor from "@/components/admin/rich-text-editor";
 import ImageUpload from "@/components/admin/image-upload";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { CalendarIcon, Eye, Loader2, X } from "lucide-react";
+import { DatePicker, TimePicker } from "@/components/ui/date-picker";
+import { Eye, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PostPreview from "@/components/admin/post-preview";
 
@@ -151,7 +146,6 @@ export default function PostForm({
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState("");
-  const [calendarOpen, setCalendarOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [resultAlert, setResultAlert] = useState<ResultAlert>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -258,12 +252,11 @@ export default function PostForm({
     const [h, m] = existingTime.split(":");
     day.setHours(Number(h), Number(m), 0, 0);
     formik.setFieldValue("publishAt", format(day, "yyyy-MM-dd'T'HH:mm:ss"));
-    setCalendarOpen(false);
   }
 
-  function handleTimeChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleTimeChange(value: string) {
     const base = validSelectedDate ?? new Date();
-    const [h, m] = e.target.value.split(":");
+    const [h, m] = value.split(":");
     const updated = new Date(base);
     updated.setHours(Number(h), Number(m), 0, 0);
     formik.setFieldValue("publishAt", format(updated, "yyyy-MM-dd'T'HH:mm:ss"));
@@ -492,48 +485,27 @@ export default function PostForm({
                 yayınlanacak.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
-                <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-                  <PopoverTrigger
-                    disabled={formik.isSubmitting}
-                    className={cn(
-                      "flex h-9 flex-1 items-center gap-2 rounded-md border bg-white px-3 text-sm transition-colors hover:bg-slate-50 disabled:opacity-50",
-                      formik.touched.publishAt && formik.errors.publishAt
-                        ? "border-red-400"
-                        : "border-slate-200",
-                    )}
-                  >
-                    <CalendarIcon className="h-4 w-4 text-slate-400 shrink-0" />
-                    <span
-                      className={
-                        validSelectedDate ? "text-slate-800" : "text-slate-400"
-                      }
-                    >
-                      {validSelectedDate
-                        ? format(validSelectedDate, "d MMMM yyyy", {
-                            locale: tr,
-                          })
-                        : "Tarih seçin"}
-                    </span>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={validSelectedDate}
-                      onSelect={handleCalendarSelect}
-                      disabled={(date) =>
-                        date < new Date(new Date().setHours(0, 0, 0, 0))
-                      }
-                      locale={tr}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker
+                  value={validSelectedDate}
+                  onChange={handleCalendarSelect}
+                  disabled={formik.isSubmitting}
+                  disabledDate={(date) =>
+                    date < new Date(new Date().setHours(0, 0, 0, 0))
+                  }
+                  className={cn(
+                    "flex-1",
+                    formik.touched.publishAt && formik.errors.publishAt
+                      ? "border-red-400"
+                      : "border-slate-200",
+                  )}
+                />
 
                 <div className="flex items-center gap-2">
-                  <Input
-                    type="time"
+                  <TimePicker
                     value={timeValue}
                     onChange={handleTimeChange}
                     disabled={formik.isSubmitting || !validSelectedDate}
+                    aria-label="Yayın saati"
                     className="w-32 bg-white"
                   />
                   {validSelectedDate && (
