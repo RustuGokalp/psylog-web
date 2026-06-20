@@ -72,13 +72,14 @@ function buildInitialValues(data: ContactInfo | null): ContactInfoFormValues {
         });
 
   if (!data) {
-    return { phone: "", email: "", location: "", workingHours };
+    return { phone: "", email: "", location: "", instagram: "", workingHours };
   }
 
   return {
     phone: data.phone,
     email: data.email,
     location: data.location,
+    instagram: data.instagram ?? "",
     workingHours,
   };
 }
@@ -117,6 +118,7 @@ export default function AdminContactInfoPage() {
     formik.values.phone.trim() !== (existing?.phone ?? "") ||
     formik.values.email.trim() !== (existing?.email ?? "") ||
     formik.values.location.trim() !== (existing?.location ?? "") ||
+    (formik.values.instagram?.trim() ?? "") !== (existing?.instagram ?? "") ||
     JSON.stringify(formik.values.workingHours) !==
       JSON.stringify(existingFormWorkingHours);
 
@@ -159,6 +161,7 @@ export default function AdminContactInfoPage() {
       phone: values.phone.trim(),
       email: values.email.trim(),
       location: values.location.trim(),
+      instagram: values.instagram?.trim().replace(/^@/, "") || undefined,
       workingHours,
     };
 
@@ -339,6 +342,40 @@ export default function AdminContactInfoPage() {
                   className="text-xs text-destructive"
                 >
                   {formik.errors.location}
+                </p>
+              )}
+            </div>
+
+            {/* instagram */}
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="instagram" className="text-slate-700 font-medium">
+                Instagram
+              </Label>
+              <p className="text-xs text-slate-400">
+                Kullanıcı adı, başında @ olmadan. Boş bırakılabilir.
+              </p>
+              <Input
+                id="instagram"
+                name="instagram"
+                type="text"
+                placeholder="Ör: drpsikolog"
+                value={formik.values.instagram}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                disabled={isLoading}
+                aria-describedby={
+                  formik.touched.instagram && formik.errors.instagram
+                    ? "instagram-error"
+                    : undefined
+                }
+              />
+              {formik.touched.instagram && formik.errors.instagram && (
+                <p
+                  id="instagram-error"
+                  role="alert"
+                  className="text-xs text-destructive"
+                >
+                  {formik.errors.instagram}
                 </p>
               )}
             </div>

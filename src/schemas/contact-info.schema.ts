@@ -76,6 +76,11 @@ export const contactInfoSchema = Yup.object({
     .trim()
     .required("Konum zorunludur.")
     .max(200, "Konum en fazla 200 karakter olabilir."),
+  instagram: Yup.string()
+    .trim()
+    .max(31, "Instagram kullanıcı adı çok uzun.")
+    .matches(/^@?[A-Za-z0-9._]*$/, "Geçersiz Instagram kullanıcı adı.")
+    .optional(),
   workingHours: Yup.array()
     .of(workingHourSchema)
     .length(7, "7 gün de gereklidir.")
