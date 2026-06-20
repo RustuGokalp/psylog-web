@@ -16,6 +16,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export type AlertType = "success" | "error" | "warning" | "info";
 
@@ -80,7 +81,10 @@ export function ActionAlert({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent showCloseButton={false} className="max-w-sm">
+      <DialogContent
+        showCloseButton={false}
+        className="max-w-sm rounded-lg py-6 sm:rounded-xl sm:py-4"
+      >
         <DialogHeader className="items-center text-center">
           <Icon className={`size-18 ${iconClass} mb-1`} />
           <DialogTitle>{title}</DialogTitle>
@@ -91,8 +95,14 @@ export function ActionAlert({
             {content}
           </div>
         )}
-        <DialogFooter className="justify-center">
-          <Button variant="outline" onClick={onClose} disabled={loading}>
+        <DialogFooter className="-mb-6 justify-center rounded-b-lg p-5 sm:-mb-4 sm:rounded-b-xl sm:p-4">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={loading}
+            className="flex-1 max-sm:py-1"
+            size="lg"
+          >
             {closeLabel}
           </Button>
           {onConfirm && (
@@ -100,7 +110,8 @@ export function ActionAlert({
               variant={confirmVariant}
               onClick={onConfirm}
               disabled={loading}
-              className={confirmClassName}
+              className={cn("flex-1 max-sm:py-1", confirmClassName)}
+              size="lg"
             >
               {loading ? (
                 <span className="flex items-center gap-2">

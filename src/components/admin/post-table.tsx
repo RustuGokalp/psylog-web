@@ -27,6 +27,7 @@ import { TableAction } from "@/components/tables/table-action";
 interface PostTableProps {
   posts: AdminPost[];
   onDeleteSuccess?: () => void;
+  fillHeight?: boolean;
 }
 
 type FeedbackAlert = {
@@ -38,6 +39,7 @@ type FeedbackAlert = {
 export default function PostTable({
   posts: initialPosts,
   onDeleteSuccess,
+  fillHeight,
 }: PostTableProps) {
   const router = useRouter();
   const [posts, setPosts] = useState<AdminPost[]>(initialPosts);
@@ -247,6 +249,7 @@ export default function PostTable({
         getRowId={(p) => String(p.id)}
         renderMobileCard={renderMobileCard}
         emptyState={emptyState}
+        fillHeight={fillHeight}
       />
 
       {/* Draft edit prompt */}

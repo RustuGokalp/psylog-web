@@ -9,7 +9,7 @@ import AdminPagination from "@/components/admin/admin-pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ActionAlert } from "@/components/action-alert";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 export default function AdminContactPage() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
@@ -40,7 +40,7 @@ export default function AdminContactPage() {
   }, [fetchMessages, page]);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 sm:h-[calc(100dvh-6.5rem)] lg:h-[calc(100dvh-4rem)]">
       <div>
         <h1 className="text-2xl font-bold text-slate-800">İletişim</h1>
         <p className="mt-0.5 text-sm text-slate-500">
@@ -51,13 +51,13 @@ export default function AdminContactPage() {
       </div>
 
       {loading ? (
-        <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4">
+        <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-1 sm:min-h-0 overflow-hidden">
           {Array.from({ length: PAGE_SIZE }).map((_, i) => (
             <Skeleton key={i} className="h-10 w-full rounded-md" />
           ))}
         </div>
       ) : (
-        <ContactTable messages={messages} />
+        <ContactTable messages={messages} fillHeight />
       )}
 
       {!loading && (

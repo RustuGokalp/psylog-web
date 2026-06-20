@@ -9,7 +9,7 @@ export async function sendContact(body: ContactRequest): Promise<ApiSuccess> {
 
 export async function getAdminContacts(
   page = 0,
-  size = 10,
+  size = 20,
 ): Promise<PagedResponse<ContactMessage>> {
   const response = await apiClient.get<PagedResponse<ContactMessage>>(
     `/api/admin/contact?page=${page}&size=${size}`,
