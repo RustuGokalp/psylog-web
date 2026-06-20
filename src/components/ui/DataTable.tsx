@@ -52,6 +52,7 @@ interface DataTableProps<TData, TValue = unknown> {
   renderMobileCard?: (row: TData) => React.ReactNode;
   emptyState?: React.ReactNode;
   getRowId?: (row: TData) => string;
+  fillHeight?: boolean;
   desktopContainerClassName?: string;
   mobileContainerClassName?: string;
   headerRowClassName?: string;
@@ -64,9 +65,14 @@ export function DataTable<TData, TValue = unknown>({
   renderMobileCard,
   emptyState,
   getRowId,
-  desktopContainerClassName = "hidden sm:block overflow-x-auto rounded-xl border border-slate-200 bg-white",
+  fillHeight = false,
+  desktopContainerClassName = fillHeight
+    ? "hidden sm:flex sm:flex-col flex-1 min-h-0 overflow-hidden rounded-xl border border-slate-200 bg-white"
+    : "hidden sm:block overflow-x-auto rounded-xl border border-slate-200 bg-white",
   mobileContainerClassName = "sm:hidden flex flex-col divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white",
-  headerRowClassName = "bg-slate-50 hover:bg-slate-50",
+  headerRowClassName = fillHeight
+    ? "bg-slate-50 hover:bg-slate-50 sticky top-0 z-10"
+    : "bg-slate-50 hover:bg-slate-50",
   bodyRowClassName = "hover:bg-slate-50",
 }: DataTableProps<TData, TValue>) {
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -96,7 +102,11 @@ export function DataTable<TData, TValue = unknown>({
 
       {/* Desktop table */}
       <div className={desktopContainerClassName}>
-        <Table>
+        <Table
+          containerClassName={
+            fillHeight ? "flex-1 min-h-0 overflow-auto" : undefined
+          }
+        >
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className={headerRowClassName}>
@@ -110,7 +120,10 @@ export function DataTable<TData, TValue = unknown>({
                       )}
                     >
                       {header.isPlaceholder ? null : sizingStyle ? (
-                        <div className="min-w-0 overflow-hidden" style={sizingStyle}>
+                        <div
+                          className="min-w-0 overflow-hidden"
+                          style={sizingStyle}
+                        >
                           {flexRender(
                             header.column.columnDef.header,
                             header.getContext(),
@@ -139,7 +152,10 @@ export function DataTable<TData, TValue = unknown>({
                       className={cn(cell.column.columnDef.meta?.cellClassName)}
                     >
                       {sizingStyle ? (
-                        <div className="min-w-0 overflow-hidden" style={sizingStyle}>
+                        <div
+                          className="min-w-0 overflow-hidden"
+                          style={sizingStyle}
+                        >
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext(),

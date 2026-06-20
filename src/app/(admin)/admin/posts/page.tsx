@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ActionAlert } from "@/components/action-alert";
 import { Plus } from "lucide-react";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 export default function AdminPostsPage() {
   const [data, setData] = useState<PaginatedResponse<AdminPost> | null>(null);
@@ -57,7 +57,7 @@ export default function AdminPostsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 sm:h-[calc(100dvh-6.5rem)] lg:h-[calc(100dvh-4rem)]">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Yazılar</h1>
@@ -80,7 +80,7 @@ export default function AdminPostsPage() {
       <AdminPostFilter onSearch={handleSearch} />
 
       {loading ? (
-        <div className="bg-white rounded-xl border border-slate-200 p-4 flex flex-col gap-3">
+        <div className="bg-white rounded-xl border border-slate-200 p-4 flex flex-col gap-3 sm:flex-1 sm:min-h-0 overflow-hidden">
           {Array.from({ length: 5 }).map((_, i) => (
             <Skeleton key={i} className="h-10 w-full rounded-md" />
           ))}
@@ -90,6 +90,7 @@ export default function AdminPostsPage() {
           <PostTable
             posts={data?.content ?? []}
             onDeleteSuccess={() => fetchPosts(page, keyword, tag)}
+            fillHeight
           />
           {data && (
             <AdminPagination

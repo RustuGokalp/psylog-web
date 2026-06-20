@@ -4,7 +4,7 @@ import { CommentAdminResponse } from "@/types/post";
 
 export async function getAdminComments(
   page = 0,
-  size = 10,
+  size = 20,
 ): Promise<PagedResponse<CommentAdminResponse>> {
   const response = await apiClient.get<PagedResponse<CommentAdminResponse>>(
     `/api/admin/comments?page=${page}&size=${size}`,

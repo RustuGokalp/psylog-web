@@ -36,7 +36,7 @@ export default function AdminSpecializationsPage() {
   }, [fetchSpecializations]);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 sm:h-[calc(100dvh-6.5rem)] lg:h-[calc(100dvh-4rem)]">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">
@@ -59,7 +59,7 @@ export default function AdminSpecializationsPage() {
       </div>
 
       {loading ? (
-        <div className="bg-white rounded-xl border border-slate-200 p-4 flex flex-col gap-3">
+        <div className="bg-white rounded-xl border border-slate-200 p-4 flex flex-col gap-3 sm:flex-1 sm:min-h-0 overflow-hidden">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-10 w-full rounded-md" />
           ))}
@@ -68,6 +68,7 @@ export default function AdminSpecializationsPage() {
         <SpecializationTable
           specializations={specializations}
           onDeleteSuccess={fetchSpecializations}
+          fillHeight
         />
       )}
 

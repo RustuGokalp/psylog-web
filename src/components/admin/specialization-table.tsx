@@ -16,6 +16,7 @@ import { TableAction } from "@/components/tables/table-action";
 interface SpecializationTableProps {
   specializations: Specialization[];
   onDeleteSuccess?: () => void;
+  fillHeight?: boolean;
 }
 
 type FeedbackAlert = {
@@ -27,6 +28,7 @@ type FeedbackAlert = {
 export default function SpecializationTable({
   specializations: initialSpecializations,
   onDeleteSuccess,
+  fillHeight,
 }: SpecializationTableProps) {
   const router = useRouter();
   const [specializations, setSpecializations] = useState<Specialization[]>(
@@ -132,6 +134,7 @@ export default function SpecializationTable({
         getRowId={(s) => String(s.id)}
         renderMobileCard={renderMobileCard}
         emptyState={emptyState}
+        fillHeight={fillHeight}
       />
 
       <ActionAlert

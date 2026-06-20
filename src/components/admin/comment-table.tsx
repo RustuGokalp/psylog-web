@@ -29,6 +29,7 @@ interface CommentTableProps {
   comments: CommentAdminResponse[];
   onRefresh?: () => void;
   emptyMessage?: string;
+  fillHeight?: boolean;
 }
 
 type FeedbackAlert = {
@@ -53,7 +54,7 @@ function CommentDetail({ comment }: { comment: CommentAdminResponse }) {
       )}
 
       <dt className="text-slate-400 font-medium whitespace-nowrap">Yazı</dt>
-      <dd className="text-slate-700 line-clamp-1">{comment.postTitle}</dd>
+      <dd className="text-slate-700">{comment.postTitle}</dd>
 
       <dt className="text-slate-400 font-medium whitespace-nowrap">Yorum</dt>
       <dd className="text-slate-700 line-clamp-3">{comment.content}</dd>
@@ -65,6 +66,7 @@ export default function CommentTable({
   comments: initialComments,
   onRefresh,
   emptyMessage = "Bekleyen yorum bulunmuyor.",
+  fillHeight,
 }: CommentTableProps) {
   const [comments, setComments] =
     useState<CommentAdminResponse[]>(initialComments);
@@ -275,6 +277,7 @@ export default function CommentTable({
         getRowId={(c) => String(c.id)}
         renderMobileCard={renderMobileCard}
         emptyState={emptyState}
+        fillHeight={fillHeight}
       />
 
       {/* Approve confirmation */}

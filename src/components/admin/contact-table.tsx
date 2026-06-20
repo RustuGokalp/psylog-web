@@ -11,9 +11,13 @@ import ContactDetailModal from "@/components/admin/modals/contact-detail-modal";
 
 interface ContactTableProps {
   messages: ContactMessage[];
+  fillHeight?: boolean;
 }
 
-export default function ContactTable({ messages }: ContactTableProps) {
+export default function ContactTable({
+  messages,
+  fillHeight,
+}: ContactTableProps) {
   const [selected, setSelected] = useState<ContactMessage | null>(null);
 
   const emptyState = (
@@ -78,6 +82,7 @@ export default function ContactTable({ messages }: ContactTableProps) {
         getRowId={(m) => String(m.id)}
         renderMobileCard={renderMobileCard}
         emptyState={emptyState}
+        fillHeight={fillHeight}
       />
 
       <ContactDetailModal

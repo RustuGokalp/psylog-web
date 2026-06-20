@@ -43,7 +43,7 @@ export default function AdminPagination({
   totalPages,
   onPageChange,
 }: AdminPaginationProps) {
-  if (totalPages <= 1) return null;
+  if (totalPages < 1) return null;
 
   const windows = buildPageWindows(page, totalPages);
 
