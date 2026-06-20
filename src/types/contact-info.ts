@@ -21,6 +21,7 @@ export interface ContactInfo {
   phone: string;
   email: string;
   location: string;
+  instagram?: string;
   updatedAt: string;
   workingHours: WorkingHour[];
 }
@@ -29,6 +30,7 @@ export interface CreateContactInfoRequest {
   phone: string;
   email: string;
   location: string;
+  instagram?: string;
   workingHours: WorkingHour[];
 }
 
@@ -36,5 +38,6 @@ export interface UpdateContactInfoRequest {
   phone: string;
   email: string;
   location: string;
+  instagram?: string;
   workingHours: WorkingHour[];
 }

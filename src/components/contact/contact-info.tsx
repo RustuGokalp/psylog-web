@@ -1,6 +1,7 @@
 import PhoneSketch from "@/components/icons/phone-sketch";
 import EnvelopeSketch from "@/components/icons/envelope-sketch";
 import LocationSketch from "@/components/icons/location-sketch";
+import { Instagram } from "lucide-react";
 import Daisy from "@/components/icons/daisy";
 import Rose from "@/components/icons/rose";
 import { ContactInfo as ContactInfoData } from "@/types/contact-info";
@@ -10,18 +11,42 @@ interface ContactInfoProps {
   contactInfo: ContactInfoData | null;
 }
 
+interface ContactItem {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  href?: string;
+}
+
 export default function ContactInfo({ contactInfo }: ContactInfoProps) {
-  const contactItems = [
+  const ig = contactInfo?.instagram?.trim().replace(/^@/, "");
+
+  const contactItems: ContactItem[] = [
     {
       icon: <PhoneSketch className="h-16 w-16" />,
       label: "Telefon",
       value: contactInfo?.phone ?? "+90 5XX XXX XX XX",
     },
     {
-      icon: <EnvelopeSketch className="h-16 w-16" />,
+      icon: <EnvelopeSketch className="h-16 w-14" />,
       label: "E-posta",
       value: contactInfo?.email ?? "info@tugcetekin.com",
     },
+    ...(ig
+      ? [
+          {
+            icon: (
+              <Instagram
+                className="h-12 w-12 text-orange-500"
+                strokeWidth={1.25}
+              />
+            ),
+            label: "Instagram",
+            value: "@" + ig,
+            href: "https://www.instagram.com/" + ig,
+          } satisfies ContactItem,
+        ]
+      : []),
     {
       icon: <LocationSketch className="h-16 w-16" />,
       label: "Konum",
@@ -55,9 +80,21 @@ export default function ContactInfo({ contactInfo }: ContactInfoProps) {
               <p className="text-xs font-semibold uppercase tracking-widest text-orange-500">
                 {item.label}
               </p>
-              <p className="mt-0.5 text-base font-medium text-foreground">
-                {item.value}
-              </p>
+              {item.href ? (
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Instagram'da ${item.value} hesabını ziyaret et`}
+                  className="mt-0.5 inline-block text-base font-medium text-foreground underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
+                >
+                  {item.value}
+                </a>
+              ) : (
+                <p className="mt-0.5 text-base font-medium text-foreground">
+                  {item.value}
+                </p>
+              )}
             </div>
           </div>
         ))}
