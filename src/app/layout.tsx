@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/lib/metadata";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-sans",
@@ -31,6 +32,9 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GSC_VERIFICATION,
+  },
   openGraph: {
     type: "website",
     locale: "tr_TR",
@@ -50,6 +54,9 @@ export default function RootLayout({
       >
         {children}
         <Toaster />
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
       </body>
     </html>
   );
