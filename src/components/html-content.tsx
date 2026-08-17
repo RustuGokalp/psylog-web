@@ -1,4 +1,4 @@
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 import { cn } from "@/lib/utils";
 
 interface HtmlContentProps {
@@ -27,11 +27,42 @@ const richTextStyles = [
   "[&_img]:my-3 [&_img]:max-w-full [&_img]:rounded-lg",
 ].join(" ");
 
+const sanitizeOptions: sanitizeHtml.IOptions = {
+  allowedTags: [
+    "h1",
+    "h2",
+    "h3",
+    "p",
+    "strong",
+    "em",
+    "u",
+    "s",
+    "ul",
+    "ol",
+    "li",
+    "blockquote",
+    "code",
+    "pre",
+    "hr",
+    "a",
+    "img",
+    "br",
+  ],
+  allowedAttributes: {
+    a: ["href", "title", "target", "rel"],
+    img: ["src", "alt", "title"],
+  },
+  allowedSchemes: ["http", "https", "mailto", "tel"],
+  allowedSchemesAppliedToAttributes: ["href", "src"],
+  disallowedTagsMode: "discard",
+  nonTextTags: ["script", "style", "iframe", "textarea", "option", "noscript"],
+};
+
 export default function HtmlContent({ html, className }: HtmlContentProps) {
   return (
     <div
       className={cn(richTextStyles, className)}
-      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(html, sanitizeOptions) }}
     />
   );
 }
