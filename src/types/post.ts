@@ -90,4 +90,6 @@ export interface CreateCommentRequest {
   author: string;
   email?: string;
   content: string;
+  /** Bot tuzağı alanı — gerçek kullanıcılarda her zaman boş string gönderilir. */
+  website: string;
 }

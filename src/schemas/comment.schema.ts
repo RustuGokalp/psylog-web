@@ -10,6 +10,8 @@ export const commentSchema = Yup.object({
     .trim()
     .required("Yorum alanı boş bırakılamaz.")
     .max(1000, "Yorum en fazla 1000 karakter olabilir."),
+  // Bot tuzağı alanı — kullanıcıya görünmez, doğrulanmaz, boş gönderilir.
+  website: Yup.string().default(""),
 });
 
 export type CommentFormValues = Yup.InferType<typeof commentSchema>;

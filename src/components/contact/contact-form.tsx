@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ActionAlert } from "@/components/action-alert";
 import { sendContact } from "@/services/contact.service";
-import { ApiException } from "@/lib/api";
+import HoneypotField from "@/components/honeypot-field";
+import { getApiErrorMessage } from "@/lib/api";
 import { ContactRequest } from "@/types/contact";
 
 function maskPhone(raw: string): string {
@@ -39,6 +40,7 @@ export default function ContactForm() {
       subject: "",
       mobilePhone: "",
       message: "",
+      website: "",
     },
     validationSchema: contactSchema,
     validateOnBlur: true,
@@ -58,6 +60,7 @@ export default function ContactForm() {
       email: values.email.trim(),
       subject: values.subject.trim(),
       message: values.message.trim(),
+      website: values.website ?? "",
     };
 
     if (values.mobilePhone?.trim()) {
@@ -74,10 +77,10 @@ export default function ContactForm() {
         description: "En kısa sürede size dönüş yapacağım.",
       });
     } catch (err) {
-      const msg =
-        err instanceof ApiException
-          ? err.message
-          : "Bir hata oluştu. Lütfen tekrar deneyin.";
+      const msg = getApiErrorMessage(
+        err,
+        "Bir hata oluştu. Lütfen tekrar deneyin.",
+      );
       setAlert({
         open: true,
         type: "error",
@@ -118,6 +121,12 @@ export default function ContactForm() {
         noValidate
         className="flex flex-col gap-5"
       >
+        <HoneypotField
+          id="contact-website"
+          value={formik.values.website ?? ""}
+          onChange={formik.handleChange}
+        />
+
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="fullName" className="text-orange-800 font-medium">
             Ad Soyad <span className="text-orange-500">*</span>

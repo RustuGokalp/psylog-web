@@ -9,7 +9,8 @@ import {
   type CommentFormValues,
 } from "@/schemas/comment.schema";
 import { ActionAlert, AlertType } from "@/components/action-alert";
-import { ApiException } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/api";
+import HoneypotField from "@/components/honeypot-field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -44,7 +45,7 @@ export default function CommentSection({ postId, initialComments }: Props) {
   const [resultAlert, setResultAlert] = useState<ResultAlert | null>(null);
 
   const formik = useFormik<CommentFormValues>({
-    initialValues: { author: "", email: "", content: "" },
+    initialValues: { author: "", email: "", content: "", website: "" },
     validationSchema: commentSchema,
     validateOnBlur: true,
     validateOnChange: true,
@@ -62,6 +63,7 @@ export default function CommentSection({ postId, initialComments }: Props) {
         author: formik.values.author.trim(),
         ...(trimmedEmail && { email: trimmedEmail }),
         content: formik.values.content.trim(),
+        website: formik.values.website ?? "",
       });
       formik.resetForm();
       setSubmitted(true);
@@ -73,10 +75,10 @@ export default function CommentSection({ postId, initialComments }: Props) {
       });
     } catch (err) {
       setConfirmOpen(false);
-      const message =
-        err instanceof ApiException
-          ? err.error.message
-          : "Yorum gönderilemedi. Lütfen tekrar deneyin.";
+      const message = getApiErrorMessage(
+        err,
+        "Yorum gönderilemedi. Lütfen tekrar deneyin.",
+      );
       setResultAlert({
         type: "error",
         title: "Yorum gönderilemedi",
@@ -170,6 +172,12 @@ export default function CommentSection({ postId, initialComments }: Props) {
               className="flex flex-col gap-3"
               noValidate
             >
+              <HoneypotField
+                id="comment-website"
+                value={formik.values.website ?? ""}
+                onChange={formik.handleChange}
+              />
+
               <div className="flex flex-col gap-1">
                 <Input
                   type="text"

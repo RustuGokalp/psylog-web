@@ -8,6 +8,27 @@ export class ApiException extends Error {
   }
 }
 
+const TOO_MANY_REQUESTS = 429;
+
+const TOO_MANY_REQUESTS_FALLBACK =
+  "Çok fazla istek gönderdiniz. Lütfen bir süre sonra tekrar deneyin.";
+
+/**
+ * Kullanıcıya gösterilecek hata mesajını belirler.
+ * Backend'in Türkçe `message` alanı varsa o kullanılır; yoksa hız sınırı (429)
+ * için anlaşılır bir uyarıya, diğer durumlarda verilen genel mesaja düşer.
+ */
+export function getApiErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof ApiException) {
+    const message = error.error.message?.trim();
+    if (message) return message;
+    if (error.error.status === TOO_MANY_REQUESTS) {
+      return TOO_MANY_REQUESTS_FALLBACK;
+    }
+  }
+  return fallback;
+}
+
 export const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080",
   withCredentials: true,

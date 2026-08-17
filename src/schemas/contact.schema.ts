@@ -29,6 +29,8 @@ export const contactSchema = Yup.object({
     .required("Mesaj zorunludur.")
     .min(20, "Mesaj en az 20 karakter olmalıdır.")
     .max(750, "Mesaj en fazla 750 karakter olabilir."),
+  // Bot tuzağı alanı — kullanıcıya görünmez, doğrulanmaz, boş gönderilir.
+  website: Yup.string().default(""),
 });
 
 export type ContactFormValues = Yup.InferType<typeof contactSchema>;

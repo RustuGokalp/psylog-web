@@ -4,6 +4,8 @@ export interface ContactRequest {
   subject: string;
   message: string;
   mobilePhone?: string;
+  /** Bot tuzağı alanı — gerçek kullanıcılarda her zaman boş string gönderilir. */
+  website: string;
 }
 
 export interface ContactMessage {
