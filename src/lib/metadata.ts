@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const siteConfig = {
   name: "Tuğçe Tekin",
   tagline: "Klinik Psikolog",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://tugcetekin.com",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://psktugcetekin.com",
   description:
     "Klinik Psikolog Tuğçe Tekin'in resmi web sitesi. Psikoloji, terapi ve zihinsel sağlık üzerine profesyonel yazılar ve danışmanlık bilgisi.",
   author: "Tuğçe Tekin",
