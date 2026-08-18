@@ -89,7 +89,6 @@ export default function CommentTable({
   async function handleApprove() {
     if (!approveTarget) return;
     const target = approveTarget;
-    setApproveTarget(null);
     setProcessingId(target.id);
     try {
       await approveComment(target.id);
@@ -98,6 +97,7 @@ export default function CommentTable({
       } else {
         setComments((prev) => prev.filter((c) => c.id !== target.id));
       }
+      setApproveTarget(null);
       setFeedbackAlert({
         type: "success",
         title: "Yorum Onaylandı",
@@ -108,6 +108,7 @@ export default function CommentTable({
         err instanceof ApiException
           ? err.message
           : "Yorum onaylanırken bir hata oluştu.";
+      setApproveTarget(null);
       setFeedbackAlert({ type: "error", title: "Hata", description: msg });
     } finally {
       setProcessingId(null);
@@ -117,7 +118,6 @@ export default function CommentTable({
   async function handleReject() {
     if (!rejectTarget) return;
     const target = rejectTarget;
-    setRejectTarget(null);
     setProcessingId(target.id);
     try {
       await rejectComment(target.id);
@@ -126,6 +126,7 @@ export default function CommentTable({
       } else {
         setComments((prev) => prev.filter((c) => c.id !== target.id));
       }
+      setRejectTarget(null);
       setFeedbackAlert({
         type: "success",
         title: "Yorum Reddedildi",
@@ -136,6 +137,7 @@ export default function CommentTable({
         err instanceof ApiException
           ? err.message
           : "Yorum reddedilirken bir hata oluştu.";
+      setRejectTarget(null);
       setFeedbackAlert({ type: "error", title: "Hata", description: msg });
     } finally {
       setProcessingId(null);
@@ -145,10 +147,10 @@ export default function CommentTable({
   async function handleDelete() {
     if (!deleteTarget) return;
     const target = deleteTarget;
-    setDeleteTarget(null);
     setProcessingId(target.id);
     try {
       await deleteComment(target.id);
+      setDeleteTarget(null);
       setFeedbackAlert({
         type: "success",
         title: "Yorum Silindi",
@@ -159,6 +161,7 @@ export default function CommentTable({
         err instanceof ApiException
           ? err.message
           : "Yorum silinirken bir hata oluştu.";
+      setDeleteTarget(null);
       setFeedbackAlert({ type: "error", title: "Hata", description: msg });
     } finally {
       setProcessingId(null);
@@ -289,7 +292,9 @@ export default function CommentTable({
         content={
           approveTarget ? <CommentDetail comment={approveTarget} /> : null
         }
-        onClose={() => setApproveTarget(null)}
+        onClose={() =>
+          processingId !== approveTarget?.id && setApproveTarget(null)
+        }
         onConfirm={handleApprove}
         confirmLabel="Onayla"
         confirmClassName="bg-green-600 hover:bg-green-700 text-white"
@@ -303,7 +308,9 @@ export default function CommentTable({
         title="Yorum Reddedilecek"
         description="Bu yorum reddedilecek ve yayınlanmayacak. Onaylıyor musunuz?"
         content={rejectTarget ? <CommentDetail comment={rejectTarget} /> : null}
-        onClose={() => setRejectTarget(null)}
+        onClose={() =>
+          processingId !== rejectTarget?.id && setRejectTarget(null)
+        }
         onConfirm={handleReject}
         confirmLabel="Reddet"
         loading={processingId === rejectTarget?.id}
@@ -316,7 +323,9 @@ export default function CommentTable({
         title="Yorum Silinecek"
         description="Bu yorum kalıcı olarak silinecek ve geri alınamaz. Devam etmek istiyor musunuz?"
         content={deleteTarget ? <CommentDetail comment={deleteTarget} /> : null}
-        onClose={() => setDeleteTarget(null)}
+        onClose={() =>
+          processingId !== deleteTarget?.id && setDeleteTarget(null)
+        }
         onConfirm={handleDelete}
         confirmLabel="Sil"
         confirmClassName="bg-red-600 hover:bg-red-700 text-white"

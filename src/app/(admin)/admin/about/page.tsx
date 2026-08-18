@@ -406,7 +406,7 @@ export default function AdminAboutPage() {
             : "Hakkımda bilgilerini kaydetmek istiyor musunuz?"
         }
         description="Formu göndermeden önce bilgilerinizi kontrol edin."
-        onClose={() => setConfirmOpen(false)}
+        onClose={() => !isLoading && setConfirmOpen(false)}
         onConfirm={handleConfirm}
         confirmLabel={isUpdate ? "Güncelle" : "Kaydet"}
         confirmClassName="bg-green-600 hover:bg-green-700 text-white"
@@ -420,7 +420,7 @@ export default function AdminAboutPage() {
         type="warning"
         title="Hakkımda kaydını silmek istiyor musunuz?"
         description="Bu işlem geri alınamaz. Tüm bilgiler kalıcı olarak silinecektir."
-        onClose={() => setDeleteConfirm(false)}
+        onClose={() => !isDeleting && setDeleteConfirm(false)}
         onConfirm={handleDelete}
         confirmLabel="Evet, Sil"
         loading={isDeleting}

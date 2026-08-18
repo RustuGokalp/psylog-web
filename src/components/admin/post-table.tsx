@@ -65,11 +65,11 @@ export default function PostTable({
 
   async function handleConfirmToggle() {
     if (!toggleTarget) return;
-    setToggleTarget(null);
-    setTogglingId(toggleTarget.id);
+    const target = toggleTarget;
+    setTogglingId(target.id);
     try {
-      const detail = await fetchAdminPostById(toggleTarget.id);
-      const updated = await updatePost(toggleTarget.id, {
+      const detail = await fetchAdminPostById(target.id);
+      const updated = await updatePost(target.id, {
         title: detail.title,
         summary: detail.summary,
         content: detail.content,
@@ -80,9 +80,10 @@ export default function PostTable({
       });
       setPosts((prev) =>
         prev.map((p) =>
-          p.id === toggleTarget.id ? { ...p, published: updated.published } : p,
+          p.id === target.id ? { ...p, published: updated.published } : p,
         ),
       );
+      setToggleTarget(null);
       setFeedbackAlert({
         type: "success",
         title: "Taslağa Alındı",
@@ -93,6 +94,7 @@ export default function PostTable({
         err instanceof ApiException
           ? err.message
           : "Durum güncellenirken bir hata oluştu.";
+      setToggleTarget(null);
       setFeedbackAlert({ type: "error", title: "Hata", description: msg });
     } finally {
       setTogglingId(null);
@@ -281,9 +283,12 @@ export default function PostTable({
             ? `"${toggleTarget.title}" adlı yazı yayından kaldırılacak ve taslağa alınacak. Onaylıyor musunuz?`
             : undefined
         }
-        onClose={() => setToggleTarget(null)}
+        onClose={() =>
+          togglingId !== toggleTarget?.id && setToggleTarget(null)
+        }
         onConfirm={handleConfirmToggle}
         confirmLabel="Taslağa Al"
+        loading={togglingId === toggleTarget?.id}
       />
 
       {/* Delete confirmation */}

@@ -187,11 +187,11 @@ export default function PostForm({
   }
 
   async function executeUpdate() {
-    setConfirmOpen(false);
     formik.setSubmitting(true);
     try {
       const patch = buildPatchPayload(formik.values, formik.initialValues);
       await patchPost(postId!, patch);
+      setConfirmOpen(false);
       setResultAlert({
         type: "success",
         title: "Değişiklikler Kaydedildi",
@@ -202,6 +202,7 @@ export default function PostForm({
         err instanceof ApiException
           ? err.message
           : "Bir hata oluştu. Lütfen tekrar deneyin.";
+      setConfirmOpen(false);
       setResultAlert({
         type: "error",
         title: "Güncelleme Hatası",
@@ -636,10 +637,11 @@ export default function PostForm({
           type="warning"
           title="Değişiklikleri Kaydet"
           description="Bu yazıda yaptığınız değişiklikleri kaydetmek istediğinizden emin misiniz? Kaydedilen değişiklikler geri alınamaz."
-          onClose={() => setConfirmOpen(false)}
+          onClose={() => !formik.isSubmitting && setConfirmOpen(false)}
           onConfirm={executeUpdate}
           confirmLabel="Kaydet"
           confirmClassName="bg-green-600 hover:bg-green-700 text-white"
+          loading={formik.isSubmitting}
         />
       )}
 
