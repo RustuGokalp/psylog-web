@@ -129,12 +129,14 @@ export default function AdminSidebar() {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoutConfirm, setLogoutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState<string | null>(null);
 
   async function executeLogout() {
-    setLogoutConfirm(false);
+    setIsLoggingOut(true);
     try {
       await logout();
+      setLogoutConfirm(false);
       router.push("/admin/login");
       router.refresh();
     } catch (err) {
@@ -142,7 +144,10 @@ export default function AdminSidebar() {
         err instanceof ApiException
           ? err.message
           : "Çıkış yapılırken bir hata oluştu.";
+      setLogoutConfirm(false);
       setLogoutError(msg);
+    } finally {
+      setIsLoggingOut(false);
     }
   }
 
@@ -206,9 +211,10 @@ export default function AdminSidebar() {
         type="warning"
         title="Çıkış Yap"
         description="Oturumunuzu kapatmak istediğinizden emin misiniz?"
-        onClose={() => setLogoutConfirm(false)}
+        onClose={() => !isLoggingOut && setLogoutConfirm(false)}
         onConfirm={executeLogout}
         confirmLabel="Çıkış Yap"
+        loading={isLoggingOut}
       />
 
       <ActionAlert
